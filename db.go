@@ -15,6 +15,7 @@ import (
 func createTestDatabase() *memory.Database {
 	db := memory.NewDatabase(testDBName)
 	table := memory.NewTable(tableName, sql.Schema{
+		{Name: "id", Type: sql.Int32, Nullable: false, Source: tableName, PrimaryKey: true},
 		{Name: "name", Type: sql.Text, Nullable: false, Source: tableName},
 		{Name: "email", Type: sql.Text, Nullable: false, Source: tableName},
 		{Name: "phone_numbers", Type: sql.JSON, Nullable: false, Source: tableName},
@@ -23,10 +24,10 @@ func createTestDatabase() *memory.Database {
 
 	db.AddTable(tableName, table)
 	ctx := sql.NewEmptyContext()
-	table.Insert(ctx, sql.NewRow("John Doe", "john@doe.com", []string{"555-555-555"}, time.Now()))
-	table.Insert(ctx, sql.NewRow("John Doe", "johnalt@doe.com", []string{}, time.Now()))
-	table.Insert(ctx, sql.NewRow("Jane Doe", "jane@doe.com", []string{}, time.Now()))
-	table.Insert(ctx, sql.NewRow("Evil Bob", "evilbob@gmail.com", []string{"555-666-555", "666-666-666"}, time.Now()))
+	table.Insert(ctx, sql.NewRow(1, "John Doe", "john@doe.com", []string{"555-555-555"}, time.Now()))
+	table.Insert(ctx, sql.NewRow(2, "John Doe", "johnalt@doe.com", []string{}, time.Now()))
+	table.Insert(ctx, sql.NewRow(3, "Jane Doe", "jane@doe.com", []string{}, time.Now()))
+	table.Insert(ctx, sql.NewRow(4, "Evil Bob", "evilbob@gmail.com", []string{"555-666-555", "666-666-666"}, time.Now()))
 	return db
 }
 

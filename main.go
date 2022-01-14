@@ -13,7 +13,7 @@ import (
 const (
 	testDBPort int    = 33066
 	testDBName string = "testdb"
-	tableName  string = "mytable"
+	tableName  string = "user"
 )
 
 type User struct {
