@@ -10,8 +10,11 @@ import (
 	"github.com/olachat/gola/user"
 )
 
-var testDBPort int = 33066
-var testDBName string = "testdb"
+const (
+	testDBPort int    = 33066
+	testDBName string = "testdb"
+	tableName  string = "mytable"
+)
 
 type User struct {
 	user.Name

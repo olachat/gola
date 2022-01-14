@@ -13,10 +13,6 @@ import (
 )
 
 func createTestDatabase() *memory.Database {
-	const (
-		tableName = "mytable"
-	)
-
 	db := memory.NewDatabase(testDBName)
 	table := memory.NewTable(tableName, sql.Schema{
 		{Name: "name", Type: sql.Text, Nullable: false, Source: tableName},
