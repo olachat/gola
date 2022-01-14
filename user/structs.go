@@ -1,26 +1,16 @@
 package user
 
-type Name struct {
-	val string
-}
-type Nick string
-type Age int
+import "time"
 
-func (o *Name) SetName(v string) {
-	o.val = v
-}
-
-func (o *Name) GetName() string {
-	return o.val
-}
-
-func (o *Age) SetAge(v int) {
-	*o = Age(v)
-}
+type Id int
+type Name string
+type Email string
+type PhoneNumbers string
+type Created time.Time
 
 func Run() interface{} {
 	var q struct {
-		Nick
+		Email
 	}
 	return q
 }

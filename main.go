@@ -17,9 +17,11 @@ const (
 )
 
 type User struct {
+	user.Id
 	user.Name
-	user.Nick
-	user.Age
+	user.Email
+	user.PhoneNumbers
+	user.Created
 }
 
 var types = make(map[reflect.Type]bool)
@@ -39,26 +41,25 @@ func PrintString(s string) {
 
 func main() {
 	t := &User{}
-	t.Age = 1
+	t.Id = 1
 	Print(t)
-	t.SetAge(2)
-	t.SetName("run")
+	t.Name = "run"
 	Print(t)
 
 	for i := 0; i < 5; i++ {
 		var q struct {
-			user.Age
+			user.Id
 		}
 		Print(q)
 	}
 	for i := 0; i < 5; i++ {
 		var q struct {
-			user.Age
+			user.Id
 		}
-		q.Age = 1
+		q.Id = 1
 		Print(user.Run())
 	}
-	PrintString(t.GetName())
+	PrintString(string(t.Name))
 
 	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
 	defer db.Close()
@@ -67,16 +68,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var version string
 	data := []any{
-		&version,
+		&t.Id,
+		&t.Name,
+		&t.Email,
 	}
 
-	err2 := db.QueryRow("SELECT VERSION()").Scan(data...)
+	err2 := db.QueryRow("SELECT id, name, email from user where id=1").Scan(data...)
 
 	if err2 != nil {
 		log.Fatal(err2)
 	}
 
-	fmt.Println(version)
+	Print(t)
 }
