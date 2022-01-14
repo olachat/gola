@@ -43,11 +43,39 @@ func Print[T any, PT PointerType[T]](s PT) PT {
 	return s1
 }
 
+type SimpleUser struct {
+	user.Name
+	user.Email
+}
+
+func Exec[T any, PT PointerType[T]]() PT {
+
+	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
+	defer db.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	u := new(T)
+
+	columnNames, data := StrutForScan(u)
+	names := strings.Join(columnNames, ",")
+
+	err2 := db.QueryRow("SELECT " + names + " from user where id=1").Scan(data...)
+
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+
+	return u
+}
+
 func PrintString(s string) {
 	fmt.Println(s)
 }
 
-func StrutForScan(u any) (columnNames []string, pointers []any) {
+func StrutForScan[T any, PT PointerType[T]](u PT) (columnNames []string, pointers []interface{}) {
 	val := reflect.ValueOf(u).Elem()
 	pointers = make([]any, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
@@ -61,6 +89,8 @@ func StrutForScan(u any) (columnNames []string, pointers []any) {
 	return
 }
 
+type MyEmail struct{ user.Email }
+
 func main() {
 	t := &User{}
 	t.Id = 1
@@ -70,6 +100,9 @@ func main() {
 	t2.SetName("bar")
 	fmt.Printf("%v\n", t2)
 	fmt.Printf("%v\n", t)
+
+	obj := Exec[MyEmail]()
+	fmt.Printf("%v\n", obj)
 
 	for i := 0; i < 5; i++ {
 		var q *struct {
@@ -86,27 +119,7 @@ func main() {
 	}
 	PrintString(t.GetName())
 
-	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
-	defer db.Close()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	type SimpleUser struct {
-		user.Name
-		user.Email
-	}
-	u := &SimpleUser{}
-
-	columnNames, data := StrutForScan(u)
-	names := strings.Join(columnNames, ",")
-
-	err2 := db.QueryRow("SELECT " + names + " from user where id=1").Scan(data...)
-
-	if err2 != nil {
-		log.Fatal(err2)
-	}
+	u := Exec[SimpleUser]()
 
 	Print(u)
 }
