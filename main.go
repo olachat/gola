@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/olachat/gola/user"
@@ -39,11 +40,25 @@ func PrintString(s string) {
 	fmt.Println(s)
 }
 
+func StrutForScan(u any) (columnNames []string, pointers []any) {
+	val := reflect.ValueOf(u).Elem()
+	pointers = make([]any, val.NumField())
+	for i := 0; i < val.NumField(); i++ {
+		valueField := val.Field(i)
+		if f, ok := valueField.Addr().Interface().(user.Column); ok {
+			pointers[i] = f.GetPointer()
+			columnNames = append(columnNames, f.GetColumnName())
+		}
+
+	}
+	return
+}
+
 func main() {
 	t := &User{}
 	t.Id = 1
 	Print(t)
-	t.Name = "run"
+	t.SetName("piggy")
 	Print(t)
 
 	for i := 0; i < 5; i++ {
@@ -59,7 +74,7 @@ func main() {
 		q.Id = 1
 		Print(user.Run())
 	}
-	PrintString(string(t.Name))
+	PrintString(t.GetName())
 
 	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
 	defer db.Close()
@@ -68,17 +83,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	data := []any{
-		&t.Id,
-		&t.Name,
-		&t.Email,
+	type SimpleUser struct {
+		user.Name
+		user.Email
 	}
+	u := &SimpleUser{}
 
-	err2 := db.QueryRow("SELECT id, name, email from user where id=1").Scan(data...)
+	columnNames, data := StrutForScan(u)
+	names := strings.Join(columnNames, ",")
+
+	err2 := db.QueryRow("SELECT " + names + " from user where id=1").Scan(data...)
 
 	if err2 != nil {
 		log.Fatal(err2)
 	}
 
-	Print(t)
+	Print(u)
 }
