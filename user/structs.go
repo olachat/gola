@@ -40,10 +40,12 @@ func (c *Email) GetPointer() interface{} {
 	return &c.val
 }
 
-func Run() interface{} {
-	var q struct {
-		Email
-	}
+type E struct {
+	Email
+}
+
+func Run() *E {
+	var q *E
 	return q
 }
 

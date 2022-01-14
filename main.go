@@ -27,13 +27,20 @@ type User struct {
 
 var types = make(map[reflect.Type]bool)
 
-func Print[T any](s T) T {
+type PointerType[B any] interface {
+	*B
+}
+
+func Print[T any, PT PointerType[T]](s PT) PT {
 	t := reflect.TypeOf(s)
 	flag := types[t]
 
+	s1 := new(T)
+	fmt.Printf("%v \n", s1)
+
 	fmt.Printf("%v %v %v\n", s, t, flag)
 	types[t] = true
-	return s
+	return s1
 }
 
 func PrintString(s string) {
@@ -59,18 +66,21 @@ func main() {
 	t.Id = 1
 	Print(t)
 	t.SetName("piggy")
-	Print(t)
+	t2 := Print(t)
+	t2.SetName("bar")
+	fmt.Printf("%v\n", t2)
+	fmt.Printf("%v\n", t)
 
 	for i := 0; i < 5; i++ {
-		var q struct {
+		var q *struct {
 			user.Id
 		}
 		Print(q)
 	}
 	for i := 0; i < 5; i++ {
-		var q struct {
+		var q = new(struct {
 			user.Id
-		}
+		})
 		q.Id = 1
 		Print(user.Run())
 	}
