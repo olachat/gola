@@ -5,8 +5,14 @@
 # Todo
 
 * [ ] CURD
+  * [ ] Insert
   * [ ] Update
   * [ ] Delete
+* [ ] Connection Pool
+  * [ ] Default & per struct connstr
+* [ ] Safety
+  * [ ] SQL escape
+  * [ ] parameterize
 * [ ] code gen template
   * [ ] struct
   * [ ] index query methods
