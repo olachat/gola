@@ -1,7 +1,8 @@
-package main
+package user
 
 import (
 	"fmt"
+	"testing"
 	"time"
 
 	sqle "github.com/dolthub/go-mysql-server"
@@ -10,6 +11,7 @@ import (
 	"github.com/dolthub/go-mysql-server/server"
 	"github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/olachat/gola/corelib"
 )
 
@@ -59,4 +61,46 @@ func init() {
 	}
 
 	go s.Start()
+}
+
+type SimpleUser struct {
+	Name
+	Email
+}
+
+func TestUserMethods(t *testing.T) {
+	u := FetchById[struct {
+		Email
+	}](1)
+	if u.GetEmail() != "john@doe.com" {
+		t.Error("Failed to FetchById with email using id 1")
+	}
+
+	u2 := FetchById[User](1)
+	if u2.GetEmail() != "john@doe.com" && u2.GetName() != "John Doe" {
+		t.Error("Failed to FetchById with User using id 1")
+	}
+
+	u3 := FetchUserById(1)
+	if u2.GetEmail() != u3.GetEmail() && u2.GetName() != u3.GetName() {
+		t.Error("FetchUserById and FetchById[User] returns different result")
+	}
+
+	u4 := FetchUserById(0)
+	if u4 != nil {
+		t.Error("FetchUserById must return nil for id 0")
+	}
+
+	users := FetchByIds[SimpleUser]([]int{1, 2})
+	if len(users) != 2 {
+		t.Error("FetchByIds[SimpleUser]([]int{1, 2}) failed")
+	}
+	if users[0].GetEmail() != u.GetEmail() {
+		t.Error("FetchById and FetchByIds[SimpleUser] returns different result")
+	}
+
+	users2 := FetchUserByIds([]int{3, 4})
+	if len(users2) != 2 {
+		t.Error("FetchUserByIds([]int{3, 4}) failed")
+	}
 }
