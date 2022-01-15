@@ -24,6 +24,10 @@ func (c *Name) GetColumnName() string {
 	return "name"
 }
 
+func (c *Name) IsPrimaryKey() bool {
+	return false
+}
+
 func (c *Name) GetValPointer() interface{} {
 	return &c.val
 }
@@ -40,6 +44,10 @@ func (c *Email) GetValPointer() interface{} {
 	return &c.val
 }
 
+func (c *Email) IsPrimaryKey() bool {
+	return false
+}
+
 type E struct {
 	Email
 }
@@ -47,9 +55,4 @@ type E struct {
 func Run() *E {
 	var q *E
 	return q
-}
-
-type ColumnType interface {
-	GetColumnName() string
-	GetValPointer() interface{}
 }
