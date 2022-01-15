@@ -2,6 +2,7 @@ package corelib
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"reflect"
 	"strings"
@@ -16,7 +17,7 @@ func Setup(connstr string) {
 var typeColumnNames = make(map[reflect.Type]string)
 var typeTableNames = make(map[reflect.Type]string)
 
-func ExecScalar[T any, PT PointerType[T]]() PT {
+func FetchById[T any, PT PointerType[T]](id int) PT {
 	db, err := sql.Open("mysql", _connstr)
 	defer db.Close()
 
@@ -25,12 +26,16 @@ func ExecScalar[T any, PT PointerType[T]]() PT {
 	}
 
 	u := new(T)
-	names, tableName := GetColumnsNames[T]()
+	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 
-	err2 := db.QueryRow("SELECT " + names + " from " + tableName + " where id=1").Scan(data...)
+	query := fmt.Sprintf("SELECT %s from %s where id=%d", columnsNames, tableName, id)
+	err2 := db.QueryRow(query).Scan(data...)
 
 	if err2 != nil {
+		if err2 == sql.ErrNoRows {
+			return nil
+		}
 		log.Fatal(err2)
 	}
 
@@ -48,9 +53,9 @@ func Query[T any, PT PointerType[T]]() []PT {
 	var result []PT
 
 	var u *T
-	names, tableName := GetColumnsNames[T]()
+	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
-	rows, err2 := db.Query("SELECT " + names + " from " + tableName + " where id in (1,2)")
+	rows, err2 := db.Query("SELECT " + columnsNames + " from " + tableName + " where id in (1,2)")
 
 	if err2 != nil {
 		log.Fatal(err2)
@@ -66,7 +71,7 @@ func Query[T any, PT PointerType[T]]() []PT {
 	return result
 }
 
-func GetColumnsNames[T any, PT PointerType[T]]() (joinedColumnNames string, tableName string) {
+func GetTableAndColumnsNames[T any, PT PointerType[T]]() (tableName string, joinedColumnNames string) {
 	var o *T
 	t := reflect.TypeOf(o)
 	joinedColumnNames, ok := typeColumnNames[t]
@@ -86,13 +91,11 @@ func GetColumnsNames[T any, PT PointerType[T]]() (joinedColumnNames string, tabl
 				tableName = f.GetTableType().GetTableName()
 			}
 		}
-
 	}
 
 	joinedColumnNames = strings.Join(columnNames, ",")
 	typeTableNames[t] = tableName
 	typeColumnNames[t] = joinedColumnNames
-	println("NewTypeColumns: " + tableName + " " + joinedColumnNames)
 
 	return
 }

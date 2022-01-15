@@ -8,14 +8,6 @@ import (
 	"github.com/olachat/gola/user"
 )
 
-type User struct {
-	user.Id
-	user.Name
-	user.Email
-	user.PhoneNumbers
-	user.Created
-}
-
 type SimpleUser struct {
 	user.Name
 	user.Email
@@ -27,9 +19,9 @@ func Print[T any, PT corelib.PointerType[T]](s PT) {
 
 func main() {
 	println("ExecScalar:")
-	u := corelib.ExecScalar[struct {
+	u := user.FetchById[struct {
 		user.Email
-	}]()
+	}](1)
 	Print(u)
 
 	println("Query:")

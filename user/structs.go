@@ -6,6 +6,22 @@ import (
 	"github.com/olachat/gola/corelib"
 )
 
+type User struct {
+	Id
+	Name
+	Email
+	PhoneNumbers
+	Created
+}
+
+func FetchUserById(id int) *User {
+	return corelib.FetchById[User](id)
+}
+
+func FetchById[T any, PT corelib.PointerType[T]](id int) *T {
+	return corelib.FetchById[T](id)
+}
+
 type UserTable struct{}
 
 func (*UserTable) GetTableName() string {
@@ -68,13 +84,4 @@ func (c *Email) IsPrimaryKey() bool {
 
 func (c *Email) GetTableType() corelib.TableType {
 	return table
-}
-
-type E struct {
-	Email
-}
-
-func Run() *E {
-	var q *E
-	return q
 }
