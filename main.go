@@ -58,7 +58,7 @@ func ExecScalar[T any, PT PointerType[T]]() PT {
 	}
 
 	u := new(T)
-	names := GetColumnsNames(u)
+	names := GetColumnsNames[T]()
 	data := StrutForScan(u)
 
 	err2 := db.QueryRow("SELECT " + names + " from user where id=1").Scan(data...)
@@ -81,7 +81,7 @@ func Query[T any, PT PointerType[T]]() []PT {
 	var result []PT
 
 	var u *T
-	names := GetColumnsNames(u)
+	names := GetColumnsNames[T]()
 
 	rows, err2 := db.Query("SELECT " + names + " from user where id in (1,2)")
 
@@ -103,13 +103,15 @@ func PrintString(s string) {
 	fmt.Println("\n\n" + s)
 }
 
-func GetColumnsNames[T any, PT PointerType[T]](o PT) (joinedColumnNames string) {
+func GetColumnsNames[T any, PT PointerType[T]]() (joinedColumnNames string) {
+	var o *T
 	t := reflect.TypeOf(o)
 	joinedColumnNames, ok := typeColumnNames[t]
 	if ok {
 		return joinedColumnNames
 	}
 
+	o = new(T)
 	var columnNames []string
 	val := reflect.ValueOf(o).Elem()
 	for i := 0; i < val.NumField(); i++ {
@@ -122,6 +124,7 @@ func GetColumnsNames[T any, PT PointerType[T]](o PT) (joinedColumnNames string) 
 
 	joinedColumnNames = strings.Join(columnNames, ",")
 	typeColumnNames[t] = joinedColumnNames
+	PrintString("NewTypeColumns: " + joinedColumnNames)
 
 	return joinedColumnNames
 }
@@ -163,7 +166,9 @@ func main() {
 	}
 	PrintString(t.GetName())
 
-	u := ExecScalar[SimpleUser]()
+	u := ExecScalar[struct {
+		user.Email
+	}]()
 	Print(u)
 
 	PrintString("Query:")
