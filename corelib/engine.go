@@ -102,11 +102,11 @@ func GetTableAndColumnsNames[T any, PT PointerType[T]]() (tableName string, join
 
 func StrutForScan[T any, PT PointerType[T]](u PT) (pointers []interface{}) {
 	val := reflect.ValueOf(u).Elem()
-	pointers = make([]any, val.NumField())
+	pointers = make([]interface{}, 0, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
 		if f, ok := valueField.Addr().Interface().(ColumnType); ok {
-			pointers[i] = f.GetValPointer()
+			pointers = append(pointers, f.GetValPointer())
 		}
 	}
 	return
