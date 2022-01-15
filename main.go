@@ -48,7 +48,7 @@ type SimpleUser struct {
 	user.Email
 }
 
-func Exec[T any, PT PointerType[T]]() PT {
+func ExecScalar[T any, PT PointerType[T]]() PT {
 	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
 	defer db.Close()
 
@@ -113,7 +113,6 @@ func main() {
 	}
 	PrintString(t.GetName())
 
-	u := Exec[SimpleUser]()
-
+	u := ExecScalar[SimpleUser]()
 	Print(u)
 }
