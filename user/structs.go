@@ -24,7 +24,7 @@ func (c *Name) GetColumnName() string {
 	return "name"
 }
 
-func (c *Name) GetPointer() interface{} {
+func (c *Name) GetValPointer() interface{} {
 	return &c.val
 }
 
@@ -36,7 +36,7 @@ func (c *Email) GetColumnName() string {
 	return "email"
 }
 
-func (c *Email) GetPointer() interface{} {
+func (c *Email) GetValPointer() interface{} {
 	return &c.val
 }
 
@@ -49,7 +49,7 @@ func Run() *E {
 	return q
 }
 
-type Column interface {
+type ColumnType interface {
 	GetColumnName() string
-	GetPointer() interface{}
+	GetValPointer() interface{}
 }

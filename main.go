@@ -116,7 +116,7 @@ func GetColumnsNames[T any, PT PointerType[T]]() (joinedColumnNames string) {
 	val := reflect.ValueOf(o).Elem()
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
-		if f, ok := valueField.Addr().Interface().(user.Column); ok {
+		if f, ok := valueField.Addr().Interface().(user.ColumnType); ok {
 			columnNames = append(columnNames, f.GetColumnName())
 		}
 
@@ -134,8 +134,8 @@ func StrutForScan[T any, PT PointerType[T]](u PT) (pointers []interface{}) {
 	pointers = make([]any, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
-		if f, ok := valueField.Addr().Interface().(user.Column); ok {
-			pointers[i] = f.GetPointer()
+		if f, ok := valueField.Addr().Interface().(user.ColumnType); ok {
+			pointers[i] = f.GetValPointer()
 		}
 	}
 	return
