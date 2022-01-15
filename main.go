@@ -70,6 +70,36 @@ func ExecScalar[T any, PT PointerType[T]]() PT {
 	return u
 }
 
+func Query[T any, PT PointerType[T]]() []PT {
+	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
+	defer db.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var result []PT
+
+	u := new(T)
+	columnNames, data := StrutForScan(u)
+	names := strings.Join(columnNames, ",")
+
+	rows, err2 := db.Query("SELECT " + names + " from user where id in (1,2)")
+
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+
+	for rows.Next() {
+		u = new(T)
+		_, data = StrutForScan(u)
+		rows.Scan(data...)
+		result = append(result, u)
+	}
+
+	return result
+}
+
 func PrintString(s string) {
 	fmt.Println(s)
 }
@@ -115,4 +145,11 @@ func main() {
 
 	u := ExecScalar[SimpleUser]()
 	Print(u)
+
+	PrintString("Query:")
+	users := Query[SimpleUser]()
+	for _, user := range users {
+		Print(user)
+	}
+
 }
