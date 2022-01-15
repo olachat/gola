@@ -30,6 +30,7 @@ func FetchById[T any, PT PointerType[T]](id int) PT {
 	data := StrutForScan(u)
 
 	query := fmt.Sprintf("SELECT %s from %s where id=%d", columnsNames, tableName, id)
+	println(query)
 	err2 := db.QueryRow(query).Scan(data...)
 
 	if err2 != nil {
@@ -42,7 +43,16 @@ func FetchById[T any, PT PointerType[T]](id int) PT {
 	return u
 }
 
-func Query[T any, PT PointerType[T]]() []PT {
+func FetchByIds[T any, PT PointerType[T]](ids []int) []*T {
+	tableName, columnsNames := GetTableAndColumnsNames[T]()
+
+	idstr := JoinInts(ids, ",")
+	query := fmt.Sprintf("SELECT %s from %s where id in(%s)", columnsNames, tableName, idstr)
+
+	return Query[T](query)
+}
+
+func Query[T any, PT PointerType[T]](query string) []*T {
 	db, err := sql.Open("mysql", _connstr)
 	defer db.Close()
 
@@ -50,12 +60,10 @@ func Query[T any, PT PointerType[T]]() []PT {
 		log.Fatal(err)
 	}
 
-	var result []PT
-
+	var result []*T
 	var u *T
-	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
-	rows, err2 := db.Query("SELECT " + columnsNames + " from " + tableName + " where id in (1,2)")
+	rows, err2 := db.Query(query)
 
 	if err2 != nil {
 		log.Fatal(err2)

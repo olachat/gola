@@ -24,9 +24,17 @@ func main() {
 	}](1)
 	Print(u)
 
-	println("Query:")
-	users := corelib.Query[SimpleUser]()
+	u2 := user.FetchById[user.User](1)
+	Print(u2)
+
+	println("\n\nQuery:")
+	users := user.FetchByIds[SimpleUser]([]int{1, 2})
 	for _, user := range users {
+		Print(user)
+	}
+
+	users2 := user.FetchUserByIds([]int{3, 4})
+	for _, user := range users2 {
 		Print(user)
 	}
 }
