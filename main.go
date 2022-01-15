@@ -27,8 +27,8 @@ type User struct {
 
 var types = make(map[reflect.Type]bool)
 
-type PointerType[B any] interface {
-	*B
+type PointerType[T any] interface {
+	*T
 }
 
 func Print[T any, PT PointerType[T]](s PT) PT {
@@ -49,7 +49,6 @@ type SimpleUser struct {
 }
 
 func Exec[T any, PT PointerType[T]]() PT {
-
 	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
 	defer db.Close()
 
@@ -89,8 +88,6 @@ func StrutForScan[T any, PT PointerType[T]](u PT) (columnNames []string, pointer
 	return
 }
 
-type MyEmail struct{ user.Email }
-
 func main() {
 	t := &User{}
 	t.Id = 1
@@ -100,9 +97,6 @@ func main() {
 	t2.SetName("bar")
 	fmt.Printf("%v\n", t2)
 	fmt.Printf("%v\n", t)
-
-	obj := Exec[MyEmail]()
-	fmt.Printf("%v\n", obj)
 
 	for i := 0; i < 5; i++ {
 		var q *struct {
