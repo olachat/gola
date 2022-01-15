@@ -13,17 +13,23 @@ import (
 	"github.com/olachat/gola/corelib"
 )
 
+const (
+	TestDBPort int    = 33066
+	TestDBName string = "testdb"
+	TableName  string = "users"
+)
+
 func createTestDatabase() *memory.Database {
-	db := memory.NewDatabase(corelib.TestDBName)
-	table := memory.NewTable(corelib.TableName, sql.Schema{
-		{Name: "id", Type: sql.Int32, Nullable: false, Source: corelib.TableName, PrimaryKey: true},
-		{Name: "name", Type: sql.Text, Nullable: false, Source: corelib.TableName},
-		{Name: "email", Type: sql.Text, Nullable: false, Source: corelib.TableName},
-		{Name: "phone_numbers", Type: sql.JSON, Nullable: false, Source: corelib.TableName},
-		{Name: "created_at", Type: sql.Timestamp, Nullable: false, Source: corelib.TableName},
+	db := memory.NewDatabase(TestDBName)
+	table := memory.NewTable(TableName, sql.Schema{
+		{Name: "id", Type: sql.Int32, Nullable: false, Source: TableName, PrimaryKey: true},
+		{Name: "name", Type: sql.Text, Nullable: false, Source: TableName},
+		{Name: "email", Type: sql.Text, Nullable: false, Source: TableName},
+		{Name: "phone_numbers", Type: sql.JSON, Nullable: false, Source: TableName},
+		{Name: "created_at", Type: sql.Timestamp, Nullable: false, Source: TableName},
 	})
 
-	db.AddTable(corelib.TableName, table)
+	db.AddTable(TableName, table)
 	ctx := sql.NewEmptyContext()
 	table.Insert(ctx, sql.NewRow(1, "John Doe", "john@doe.com", []string{"555-555-555"}, time.Now()))
 	table.Insert(ctx, sql.NewRow(2, "John Doe", "johnalt@doe.com", []string{}, time.Now()))
@@ -33,6 +39,8 @@ func createTestDatabase() *memory.Database {
 }
 
 func init() {
+	corelib.Setup(fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", TestDBPort, TestDBName))
+
 	engine := sqle.NewDefault(sql.NewDatabaseProvider(
 		createTestDatabase(),
 		information_schema.NewInformationSchemaDatabase(),
@@ -40,7 +48,7 @@ func init() {
 
 	config := server.Config{
 		Protocol: "tcp",
-		Address:  fmt.Sprintf("localhost:%d", corelib.TestDBPort),
+		Address:  fmt.Sprintf("localhost:%d", TestDBPort),
 		Auth:     auth.NewNativeSingle("root", "", auth.AllPermissions),
 	}
 	var err error

@@ -2,22 +2,22 @@ package corelib
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"reflect"
 	"strings"
 )
 
-const (
-	TestDBPort int    = 33066
-	TestDBName string = "testdb"
-)
+var _connstr string
+
+func Setup(connstr string) {
+	_connstr = connstr
+}
 
 var typeColumnNames = make(map[reflect.Type]string)
 var typeTableNames = make(map[reflect.Type]string)
 
 func ExecScalar[T any, PT PointerType[T]]() PT {
-	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", TestDBPort, TestDBName))
+	db, err := sql.Open("mysql", _connstr)
 	defer db.Close()
 
 	if err != nil {
@@ -38,7 +38,7 @@ func ExecScalar[T any, PT PointerType[T]]() PT {
 }
 
 func Query[T any, PT PointerType[T]]() []PT {
-	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", TestDBPort, TestDBName))
+	db, err := sql.Open("mysql", _connstr)
 	defer db.Close()
 
 	if err != nil {
