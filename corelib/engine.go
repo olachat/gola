@@ -11,10 +11,10 @@ import (
 const (
 	TestDBPort int    = 33066
 	TestDBName string = "testdb"
-	TableName  string = "user"
 )
 
 var typeColumnNames = make(map[reflect.Type]string)
+var typeTableNames = make(map[reflect.Type]string)
 
 func ExecScalar[T any, PT PointerType[T]]() PT {
 	db, err := sql.Open("mysql", fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", TestDBPort, TestDBName))
@@ -25,10 +25,10 @@ func ExecScalar[T any, PT PointerType[T]]() PT {
 	}
 
 	u := new(T)
-	names := GetColumnsNames[T]()
+	names, tableName := GetColumnsNames[T]()
 	data := StrutForScan(u)
 
-	err2 := db.QueryRow("SELECT " + names + " from user where id=1").Scan(data...)
+	err2 := db.QueryRow("SELECT " + names + " from " + tableName + " where id=1").Scan(data...)
 
 	if err2 != nil {
 		log.Fatal(err2)
@@ -48,9 +48,9 @@ func Query[T any, PT PointerType[T]]() []PT {
 	var result []PT
 
 	var u *T
-	names := GetColumnsNames[T]()
+	names, tableName := GetColumnsNames[T]()
 
-	rows, err2 := db.Query("SELECT " + names + " from user where id in (1,2)")
+	rows, err2 := db.Query("SELECT " + names + " from " + tableName + " where id in (1,2)")
 
 	if err2 != nil {
 		log.Fatal(err2)
@@ -66,12 +66,13 @@ func Query[T any, PT PointerType[T]]() []PT {
 	return result
 }
 
-func GetColumnsNames[T any, PT PointerType[T]]() (joinedColumnNames string) {
+func GetColumnsNames[T any, PT PointerType[T]]() (joinedColumnNames string, tableName string) {
 	var o *T
 	t := reflect.TypeOf(o)
 	joinedColumnNames, ok := typeColumnNames[t]
 	if ok {
-		return joinedColumnNames
+		tableName = typeTableNames[t]
+		return
 	}
 
 	o = new(T)
@@ -81,15 +82,19 @@ func GetColumnsNames[T any, PT PointerType[T]]() (joinedColumnNames string) {
 		valueField := val.Field(i)
 		if f, ok := valueField.Addr().Interface().(ColumnType); ok {
 			columnNames = append(columnNames, f.GetColumnName())
+			if tableName == "" {
+				tableName = f.GetTableType().GetTableName()
+			}
 		}
 
 	}
 
 	joinedColumnNames = strings.Join(columnNames, ",")
+	typeTableNames[t] = tableName
 	typeColumnNames[t] = joinedColumnNames
-	println("NewTypeColumns: " + joinedColumnNames)
+	println("NewTypeColumns: " + tableName + " " + joinedColumnNames)
 
-	return joinedColumnNames
+	return
 }
 
 func StrutForScan[T any, PT PointerType[T]](u PT) (pointers []interface{}) {

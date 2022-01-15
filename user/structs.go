@@ -1,6 +1,20 @@
 package user
 
-import "time"
+import (
+	"time"
+
+	"github.com/olachat/gola/corelib"
+)
+
+type UserTable struct{}
+
+func (*UserTable) GetTableName() string {
+	return "users"
+}
+
+var _ corelib.ColumnType = &Name{}
+
+var table *UserTable
 
 type Id int
 type Name struct {
@@ -32,6 +46,10 @@ func (c *Name) GetValPointer() interface{} {
 	return &c.val
 }
 
+func (c *Name) GetTableType() corelib.TableType {
+	return table
+}
+
 func (c *Email) GetEmail() string {
 	return c.val
 }
@@ -46,6 +64,10 @@ func (c *Email) GetValPointer() interface{} {
 
 func (c *Email) IsPrimaryKey() bool {
 	return false
+}
+
+func (c *Email) GetTableType() corelib.TableType {
+	return table
 }
 
 type E struct {
