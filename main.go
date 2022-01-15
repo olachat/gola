@@ -26,6 +26,7 @@ type User struct {
 }
 
 var types = make(map[reflect.Type]bool)
+var typeColumnNames = make(map[reflect.Type]string)
 
 type PointerType[T any] interface {
 	*T
@@ -57,9 +58,8 @@ func ExecScalar[T any, PT PointerType[T]]() PT {
 	}
 
 	u := new(T)
-
-	columnNames, data := StrutForScan(u)
-	names := strings.Join(columnNames, ",")
+	names := GetColumnsNames(u)
+	data := StrutForScan(u)
 
 	err2 := db.QueryRow("SELECT " + names + " from user where id=1").Scan(data...)
 
@@ -80,9 +80,8 @@ func Query[T any, PT PointerType[T]]() []PT {
 
 	var result []PT
 
-	u := new(T)
-	columnNames, data := StrutForScan(u)
-	names := strings.Join(columnNames, ",")
+	var u *T
+	names := GetColumnsNames(u)
 
 	rows, err2 := db.Query("SELECT " + names + " from user where id in (1,2)")
 
@@ -92,7 +91,7 @@ func Query[T any, PT PointerType[T]]() []PT {
 
 	for rows.Next() {
 		u = new(T)
-		_, data = StrutForScan(u)
+		data := StrutForScan(u)
 		rows.Scan(data...)
 		result = append(result, u)
 	}
@@ -101,19 +100,40 @@ func Query[T any, PT PointerType[T]]() []PT {
 }
 
 func PrintString(s string) {
-	fmt.Println(s)
+	fmt.Println("\n\n" + s)
 }
 
-func StrutForScan[T any, PT PointerType[T]](u PT) (columnNames []string, pointers []interface{}) {
+func GetColumnsNames[T any, PT PointerType[T]](o PT) (joinedColumnNames string) {
+	t := reflect.TypeOf(o)
+	joinedColumnNames, ok := typeColumnNames[t]
+	if ok {
+		return joinedColumnNames
+	}
+
+	var columnNames []string
+	val := reflect.ValueOf(o).Elem()
+	for i := 0; i < val.NumField(); i++ {
+		valueField := val.Field(i)
+		if f, ok := valueField.Addr().Interface().(user.Column); ok {
+			columnNames = append(columnNames, f.GetColumnName())
+		}
+
+	}
+
+	joinedColumnNames = strings.Join(columnNames, ",")
+	typeColumnNames[t] = joinedColumnNames
+
+	return joinedColumnNames
+}
+
+func StrutForScan[T any, PT PointerType[T]](u PT) (pointers []interface{}) {
 	val := reflect.ValueOf(u).Elem()
 	pointers = make([]any, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
 		if f, ok := valueField.Addr().Interface().(user.Column); ok {
 			pointers[i] = f.GetPointer()
-			columnNames = append(columnNames, f.GetColumnName())
 		}
-
 	}
 	return
 }
@@ -151,5 +171,4 @@ func main() {
 	for _, user := range users {
 		Print(user)
 	}
-
 }
