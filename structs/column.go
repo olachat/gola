@@ -278,12 +278,12 @@ func (c ColumnStruct) GetEnumConst() string {
 }
 
 func (c ColumnStruct) IsPrimaryKey() string {
-	fmt.Printf("c.table.PKey %v\n", c.table.PKey)
+	if c.Name == "id" {
+		return "true"
+	}
 	if c.table.PKey == nil {
 		return "false"
 	}
-
-	fmt.Printf("c.table.PKey.Columns %v\n", c.table.PKey.Columns)
 
 	for _, pc := range c.table.PKey.Columns {
 		if pc == c.Name {

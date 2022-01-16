@@ -238,7 +238,6 @@ func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []s
 
 // PrimaryKeyInfo looks up the primary key for a table.
 func (m *MySQLDriver) PrimaryKeyInfo(schema, tableName string) (*drivers.PrimaryKey, error) {
-	println(schema, tableName)
 	pkey := &drivers.PrimaryKey{}
 	var err error
 
@@ -266,7 +265,7 @@ func (m *MySQLDriver) PrimaryKeyInfo(schema, tableName string) (*drivers.Primary
 		return nil, err
 	}
 	defer rows.Close()
-	println(queryColumns, tableName, pkey.Name, schema)
+
 	var columns []string
 	for rows.Next() {
 		var column string

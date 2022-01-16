@@ -48,7 +48,7 @@ func (c *Id) GetColumnName() string {
 }
 
 func (c *Id) IsPrimaryKey() bool {
-	return false
+	return true
 }
 
 func (c *Id) GetValPointer() interface{} {
