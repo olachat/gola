@@ -3,71 +3,187 @@
 package testdb
 
 import (
-	sqle "github.com/dolthub/go-mysql-server"
+	"github.com/olachat/gola/corelib"
 
-	"github.com/dolthub/go-mysql-server/memory"
-	"github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/expression"
 	"github.com/dolthub/vitess/go/sqltypes"
 )
 
-// Users represent a row in users table
+// Users represents users table
 type Users struct {
 	//  bigint unsigned
-	Id uint64 `json:"id"`
+	Id
 	// Name varchar(255)
-	Name string `json:"name"`
+	Name
 	// Email address varchar(255)
-	Email string `json:"email"`
+	Email
 	// Created Timestamp int unsigned
-	CreatedAt uint `json:"created_at"`
+	CreatedAt
 	// Updated Timestamp int unsigned
-	UpdatedAt uint `json:"updated_at"`
+	UpdatedAt
+}
+
+type UsersTable struct{}
+
+func (*UsersTable) GetTableName() string {
+	return "users"
+}
+
+// Id field
+//
+type Id struct {
+	val uint64
+}
+
+func (c *Id) GetId() uint64 {
+	return c.val
+}
+
+func (c *Id) SetId(val uint64) {
+	c.val = val
+}
+
+func (c *Id) GetColumnName() string {
+	return "id"
+}
+
+func (c *Id) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Id) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *Id) GetTableType() corelib.TableType {
+	return table
+}
+
+// Name field
+// Name
+type Name struct {
+	val string
+}
+
+func (c *Name) GetName() string {
+	return c.val
+}
+
+func (c *Name) SetName(val string) {
+	c.val = val
+}
+
+func (c *Name) GetColumnName() string {
+	return "name"
+}
+
+func (c *Name) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Name) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *Name) GetTableType() corelib.TableType {
+	return table
+}
+
+// Email field
+// Email address
+type Email struct {
+	val string
+}
+
+func (c *Email) GetEmail() string {
+	return c.val
+}
+
+func (c *Email) SetEmail(val string) {
+	c.val = val
+}
+
+func (c *Email) GetColumnName() string {
+	return "email"
+}
+
+func (c *Email) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Email) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *Email) GetTableType() corelib.TableType {
+	return table
+}
+
+// CreatedAt field
+// Created Timestamp
+type CreatedAt struct {
+	val uint
+}
+
+func (c *CreatedAt) GetCreatedAt() uint {
+	return c.val
+}
+
+func (c *CreatedAt) SetCreatedAt(val uint) {
+	c.val = val
+}
+
+func (c *CreatedAt) GetColumnName() string {
+	return "created_at"
+}
+
+func (c *CreatedAt) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *CreatedAt) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *CreatedAt) GetTableType() corelib.TableType {
+	return table
+}
+
+// UpdatedAt field
+// Updated Timestamp
+type UpdatedAt struct {
+	val uint
+}
+
+func (c *UpdatedAt) GetUpdatedAt() uint {
+	return c.val
+}
+
+func (c *UpdatedAt) SetUpdatedAt(val uint) {
+	c.val = val
+}
+
+func (c *UpdatedAt) GetColumnName() string {
+	return "updated_at"
+}
+
+func (c *UpdatedAt) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *UpdatedAt) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *UpdatedAt) GetTableType() corelib.TableType {
+	return table
 }
 
 func NewUsers() *Users {
 	return &Users{
-		Name:      "",
-		Email:     "",
-		CreatedAt: uint(0),
-		UpdatedAt: uint(0),
+		Name:      {val: ""},
+		Email:     {val: ""},
+		CreatedAt: {val: uint(0)},
+		UpdatedAt: {val: uint(0)},
 	}
-}
-
-func (o *Users) Save(engine *sqle.Engine) error {
-	idb, _ := engine.Catalog.Database("testdb")
-	db := idb.(*memory.Database)
-
-	t := db.Tables()["users"].(*memory.Table)
-	ctx := sql.NewEmptyContext()
-	return t.Insert(ctx, sql.NewRow(
-		o.Id,
-		o.Name,
-		o.Email,
-		o.CreatedAt,
-		o.UpdatedAt,
-	))
-}
-
-// AddUsersTable adds Users table to given db
-func AddUsersTable(db *memory.Database) {
-	tableName := "users"
-	defaultName, _ := sql.NewColumnDefaultValue(expression.NewLiteral("", sql.MustCreateStringWithDefaults(sqltypes.VarChar, 255)), sql.MustCreateStringWithDefaults(sqltypes.VarChar, 255), true, false)
-	defaultEmail, _ := sql.NewColumnDefaultValue(expression.NewLiteral("", sql.MustCreateStringWithDefaults(sqltypes.VarChar, 255)), sql.MustCreateStringWithDefaults(sqltypes.VarChar, 255), true, false)
-	defaultCreatedAt, _ := sql.NewColumnDefaultValue(expression.NewLiteral(uint(0), sql.Uint32), sql.Uint32, true, false)
-	defaultUpdatedAt, _ := sql.NewColumnDefaultValue(expression.NewLiteral(uint(0), sql.Uint32), sql.Uint32, true, false)
-
-	t := memory.NewTable(tableName, sql.Schema{
-		{Name: "id", Type: sql.Uint64, Nullable: false, Source: "users",
-			AutoIncrement: true, Comment: "", PrimaryKey: false},
-		{Name: "name", Type: sql.MustCreateStringWithDefaults(sqltypes.VarChar, 255), Nullable: false, Source: "users",
-			AutoIncrement: false, Comment: "Name", PrimaryKey: false, Default: defaultName},
-		{Name: "email", Type: sql.MustCreateStringWithDefaults(sqltypes.VarChar, 255), Nullable: false, Source: "users",
-			AutoIncrement: false, Comment: "Email address", PrimaryKey: false, Default: defaultEmail},
-		{Name: "created_at", Type: sql.Uint32, Nullable: false, Source: "users",
-			AutoIncrement: false, Comment: "Created Timestamp", PrimaryKey: false, Default: defaultCreatedAt},
-		{Name: "updated_at", Type: sql.Uint32, Nullable: false, Source: "users",
-			AutoIncrement: false, Comment: "Updated Timestamp", PrimaryKey: false, Default: defaultUpdatedAt},
-	})
-	db.AddTable(tableName, t)
 }
