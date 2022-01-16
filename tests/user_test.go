@@ -1,57 +1,40 @@
 package user
 
 import (
+	"database/sql"
 	"fmt"
 	"testing"
-	"time"
 
 	sqle "github.com/dolthub/go-mysql-server"
 	"github.com/dolthub/go-mysql-server/auth"
 	"github.com/dolthub/go-mysql-server/memory"
 	"github.com/dolthub/go-mysql-server/server"
-	"github.com/dolthub/go-mysql-server/sql"
+	gsql "github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/olachat/gola/corelib"
+	"github.com/olachat/gola/mysqldriver"
+	"github.com/olachat/gola/testdata"
 	"github.com/olachat/gola/testdata/users"
 )
 
 const (
-	TestDBPort int    = 33067
-	TestDBName string = "testdb"
-	TableName  string = "users"
+	testDBPort int    = 33067
+	testDBName string = "testdb"
+	tableName  string = "users"
 )
 
-func createTestDatabase() *memory.Database {
-	db := memory.NewDatabase(TestDBName)
-	table := memory.NewTable(TableName, sql.Schema{
-		{Name: "id", Type: sql.Int32, Nullable: false, Source: TableName, PrimaryKey: true},
-		{Name: "name", Type: sql.Text, Nullable: false, Source: TableName},
-		{Name: "email", Type: sql.Text, Nullable: false, Source: TableName},
-		{Name: "created_at", Type: sql.Uint32, Nullable: false, Source: TableName},
-		{Name: "updated_at", Type: sql.Uint32, Nullable: false, Source: TableName},
-	})
-
-	db.AddTable(TableName, table)
-	ctx := sql.NewEmptyContext()
-	table.Insert(ctx, sql.NewRow(1, "John Doe", "john@doe.com", time.Now(), time.Now()))
-	table.Insert(ctx, sql.NewRow(2, "John Doe", "johnalt@doe.com", time.Now(), time.Now()))
-	table.Insert(ctx, sql.NewRow(3, "Jane Doe", "jane@doe.com", time.Now(), time.Now()))
-	table.Insert(ctx, sql.NewRow(4, "Evil Bob", "evilbob@gmail.com", time.Now(), time.Now()))
-	return db
-}
-
 func init() {
-	corelib.Setup(fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", TestDBPort, TestDBName))
+	corelib.Setup(fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
 
-	engine := sqle.NewDefault(sql.NewDatabaseProvider(
-		createTestDatabase(),
+	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
+		memory.NewDatabase(testDBName),
 		information_schema.NewInformationSchemaDatabase(),
 	))
 
 	config := server.Config{
 		Protocol: "tcp",
-		Address:  fmt.Sprintf("localhost:%d", TestDBPort),
+		Address:  fmt.Sprintf("localhost:%d", testDBPort),
 		Auth:     auth.NewNativeSingle("root", "", auth.AllPermissions),
 	}
 	var err error
@@ -62,6 +45,37 @@ func init() {
 	}
 
 	go s.Start()
+
+	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
+	db, err := sql.Open("mysql", connStr)
+	if err != nil {
+		panic(err)
+	}
+
+	//create table
+	query, _ := testdata.Fixtures.ReadFile(tableName + ".sql")
+	exec(db, string(query))
+
+	//add data
+	exec(db, `
+insert into users (name, email, created_at, updated_at) values
+("John Doe", "john@doe.com", NOW(), NOW()),
+("John Doe", "johnalt@doe.com", NOW(), NOW()),
+("Jane Doe", "jane@doe.com", NOW(), NOW()),
+("Evil Bob", "evilbob@gmail.com", NOW(), NOW())
+	`)
+}
+
+func exec(db *sql.DB, query string) {
+	stmt, err := db.Prepare(query)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	_, err = stmt.Exec()
+	if err != nil {
+		panic(err)
+	}
 }
 
 type SimpleUser struct {
