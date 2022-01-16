@@ -30,6 +30,7 @@ var s *server.Server
 var testDBPort int = 33066
 var testDBName string = "testdb"
 var testTables = []string{"users"}
+var testDataPath = "testdata" + string(filepath.Separator)
 
 var update = flag.Bool("update", false, "update generated files")
 
@@ -61,7 +62,7 @@ func init() {
 	}
 
 	for _, tableName := range testTables {
-		query, _ := fixtures.ReadFile("testdata/" + tableName + ".sql")
+		query, _ := fixtures.ReadFile(testDataPath + tableName + ".sql")
 
 		stmt, err := db.Prepare(string(query))
 		if err != nil {
@@ -80,9 +81,9 @@ type genMethod func(db *drivers.DBInfo, t drivers.Table) []byte
 func testGen(t *testing.T, wd string, gen genMethod, db *drivers.DBInfo, table drivers.Table, extName string) {
 	resultFile := gen(db, table)
 	if *update {
-		ioutil.WriteFile(wd+string(filepath.Separator)+"testdata"+string(filepath.Separator)+table.Name+"."+extName, resultFile, 0644)
+		ioutil.WriteFile(wd+string(filepath.Separator)+testDataPath+table.Name+"."+extName, resultFile, 0644)
 	} else {
-		expectedFile, _ := fixtures.ReadFile("testdata/" + table.Name + "." + extName)
+		expectedFile, _ := fixtures.ReadFile(testDataPath + table.Name + "." + extName)
 		if diff := cmp.Diff(resultFile, expectedFile); diff != "" {
 			t.Error("file different: ", table.Name+"."+extName)
 			fmt.Println(diff)
