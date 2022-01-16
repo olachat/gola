@@ -28,7 +28,7 @@ type TableStruct struct {
 }
 
 func (t *TableStruct) Package() string {
-	return t.dbinfo.Schema
+	return t.Name
 }
 
 func (t *TableStruct) ClassName() string {

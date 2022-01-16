@@ -24,7 +24,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/drivers"
 )
 
-//go:embed testdata/*
+//go:embed testdata
 var fixtures embed.FS
 var s *server.Server
 var testDBPort int = 33066
@@ -80,12 +80,19 @@ type genMethod func(db *drivers.DBInfo, t drivers.Table) []byte
 
 func testGen(t *testing.T, wd string, gen genMethod, db *drivers.DBInfo, table drivers.Table, extName string) {
 	resultFile := gen(db, table)
+	expectedFileFolder := testDataPath + table.Name + string(filepath.Separator)
+	expectedFilePath := expectedFileFolder + table.Name + "." + extName
+
 	if *update {
-		ioutil.WriteFile(wd+string(filepath.Separator)+testDataPath+table.Name+"."+extName, resultFile, 0644)
+		os.Mkdir(expectedFileFolder, os.ModePerm)
+		err := ioutil.WriteFile(expectedFilePath, resultFile, 0644)
+		if err != nil {
+			panic(err)
+		}
 	} else {
-		expectedFile, _ := fixtures.ReadFile(testDataPath + table.Name + "." + extName)
+		expectedFile, _ := fixtures.ReadFile(expectedFilePath)
 		if diff := cmp.Diff(resultFile, expectedFile); diff != "" {
-			t.Error("file different: ", table.Name+"."+extName)
+			t.Error("file different: ", expectedFilePath)
 			fmt.Println(diff)
 		}
 	}
