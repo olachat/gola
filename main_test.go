@@ -20,7 +20,6 @@ import (
 	"github.com/dolthub/go-mysql-server/server"
 	gsql "github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
-	"github.com/olachat/gola/dbhelper"
 	"github.com/olachat/gola/mysqldriver"
 	"github.com/volatiletech/sqlboiler/v4/drivers"
 )
@@ -64,7 +63,7 @@ func init() {
 
 	for _, tableName := range testTables {
 		query, _ := fixtures.ReadFile(testDataPath + tableName + ".sql")
-		err = dbhelper.Exec(db, string(query))
+		_, err = db.Exec(string(query))
 		if err != nil {
 			panic(err.Error())
 		}

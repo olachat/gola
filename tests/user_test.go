@@ -13,7 +13,6 @@ import (
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/olachat/gola/corelib"
-	"github.com/olachat/gola/dbhelper"
 	"github.com/olachat/gola/mysqldriver"
 	"github.com/olachat/gola/testdata"
 	"github.com/olachat/gola/testdata/users"
@@ -55,10 +54,10 @@ func init() {
 
 	//create table
 	query, _ := testdata.Fixtures.ReadFile(tableName + ".sql")
-	dbhelper.Exec(db, string(query))
+	db.Exec(string(query))
 
 	//add data
-	dbhelper.Exec(db, `
+	db.Exec(`
 insert into users (name, email, created_at, updated_at) values
 ("John Doe", "john@doe.com", NOW(), NOW()),
 ("John Doe", "johnalt@doe.com", NOW(), NOW()),
