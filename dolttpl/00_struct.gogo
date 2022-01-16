@@ -22,6 +22,27 @@ func (*{{.ClassName}}Table) GetTableName() string {
 	return "{{.Name}}"
 }
 
+var table *{{.ClassName}}Table
+
+// Fetch methods
+func Fetch{{.ClassName}}ById(id int) *{{.ClassName}} {
+	return corelib.FetchById[{{.ClassName}}](id)
+}
+
+func FetchById[T any, PT corelib.PointerType[T]](id int) *T {
+	return corelib.FetchById[T](id)
+}
+
+func Fetch{{.ClassName}}ByIds(ids []int) []*{{.ClassName}} {
+	return corelib.FetchByIds[{{.ClassName}}](ids)
+}
+
+func FetchByIds[T any, PT corelib.PointerType[T]](ids []int) []*T {
+	return corelib.FetchByIds[T](ids)
+}
+
+// Column types
+
 {{- range .SqlColumns }}
 // {{.GoName}} field
 // {{.Comment}}
@@ -58,7 +79,9 @@ func New{{.ClassName}}() *{{.ClassName}} {
 	return &{{.ClassName}}{
 	{{- range .SqlColumns }}
 	{{- if .HasDefault}}
-	{{.GoName}}: {val:{{.GoDefaultValue}}},
+	{{.GoName}}{val:{{.GoDefaultValue}}},
+	{{- else}}
+	{{.GoName}}{},
 	{{- end }}
 	{{- end }}
 	}

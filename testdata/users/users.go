@@ -4,14 +4,11 @@ package users
 
 import (
 	"github.com/olachat/gola/corelib"
-
-	"github.com/dolthub/go-mysql-server/sql/expression"
-	"github.com/dolthub/vitess/go/sqltypes"
 )
 
-// Users represents users table
-type Users struct {
-	//  bigint unsigned
+// User represents users table
+type User struct {
+	//  int
 	Id
 	// Name varchar(255)
 	Name
@@ -23,23 +20,43 @@ type Users struct {
 	UpdatedAt
 }
 
-type UsersTable struct{}
+type UserTable struct{}
 
-func (*UsersTable) GetTableName() string {
+func (*UserTable) GetTableName() string {
 	return "users"
 }
 
+var table *UserTable
+
+// Fetch methods
+func FetchUserById(id int) *User {
+	return corelib.FetchById[User](id)
+}
+
+func FetchById[T any, PT corelib.PointerType[T]](id int) *T {
+	return corelib.FetchById[T](id)
+}
+
+func FetchUserByIds(ids []int) []*User {
+	return corelib.FetchByIds[User](ids)
+}
+
+func FetchByIds[T any, PT corelib.PointerType[T]](ids []int) []*T {
+	return corelib.FetchByIds[T](ids)
+}
+
+// Column types
 // Id field
 //
 type Id struct {
-	val uint64
+	val int
 }
 
-func (c *Id) GetId() uint64 {
+func (c *Id) GetId() int {
 	return c.val
 }
 
-func (c *Id) SetId(val uint64) {
+func (c *Id) SetId(val int) {
 	c.val = val
 }
 
@@ -179,11 +196,12 @@ func (c *UpdatedAt) GetTableType() corelib.TableType {
 	return table
 }
 
-func NewUsers() *Users {
-	return &Users{
-		Name:      {val: ""},
-		Email:     {val: ""},
-		CreatedAt: {val: uint(0)},
-		UpdatedAt: {val: uint(0)},
+func NewUser() *User {
+	return &User{
+		Id{},
+		Name{val: ""},
+		Email{val: ""},
+		CreatedAt{val: uint(0)},
+		UpdatedAt{val: uint(0)},
 	}
 }

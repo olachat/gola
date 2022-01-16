@@ -1,5 +1,5 @@
 CREATE TABLE `users` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '' COMMENT 'Name',
   `email` varchar(255) NOT NULL DEFAULT '' COMMENT 'Email address',
   `created_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Created Timestamp',

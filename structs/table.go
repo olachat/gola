@@ -32,7 +32,12 @@ func (t *TableStruct) Package() string {
 }
 
 func (t *TableStruct) ClassName() string {
-	return getGoName(t.Name)
+	name := getGoName(t.Name)
+	if strings.HasSuffix(name, "s") {
+		return name[:len(name)-1]
+	}
+
+	return name
 }
 
 func (t *TableStruct) SqlColumns() []ColumnStruct {
@@ -42,12 +47,6 @@ func (t *TableStruct) SqlColumns() []ColumnStruct {
 func (t *TableStruct) Imports() string {
 	packages := make(map[string]bool)
 	for _, c := range t.sqlColumns {
-		if strings.Contains(c.SQLType(), "Char") {
-			packages[`"github.com/dolthub/vitess/go/sqltypes"`] = true
-		}
-		if c.HasDefault() {
-			packages[`"github.com/dolthub/go-mysql-server/sql/expression"`] = true
-		}
 		if strings.Contains(c.SQLType(), "Time") {
 			packages[`"time"`] = true
 		}
