@@ -25,7 +25,7 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
   * [ ] SQL escape
   * [ ] parameterize
 * [X] code gen template
-  * [ ] struct
+  * [X] struct
   * [ ] index query methods
     * [ ] index
     * [ ] uniuqe index
@@ -38,9 +38,11 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
   * [ ] float
   * [ ] enum
   * [ ] set
+* [ ] Tests
+  * [ ] Use sql to create table & insert testdata
+  * [ ] Performance test
 * [ ] context support
 * [ ] transaction support
-* [ ] Performance test
 * [ ] Non-generice version?
 * [ ] zero reflect verison?
 * [ ] Embed groupcache
