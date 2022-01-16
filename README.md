@@ -2,6 +2,17 @@
 
 `gola` is a ORM for go utilizing generic with unique design goals.
 
+# Test
+
+`go test` command will:
+
+* Use `testdata` sql to create tables on the fly
+* Do code generation for tables
+* Compare with `testdata/*.go`
+* Report error if file not matching
+
+Use `go test -update`, if template is changed, and want to update `testdata/*.go`
+
 # Todo
 
 * [ ] CURD
@@ -13,7 +24,7 @@
 * [ ] Safety
   * [ ] SQL escape
   * [ ] parameterize
-* [ ] code gen template
+* [X] code gen template
   * [ ] struct
   * [ ] index query methods
     * [ ] index

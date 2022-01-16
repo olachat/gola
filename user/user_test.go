@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	TestDBPort int    = 33066
+	TestDBPort int    = 33067
 	TestDBName string = "testdb"
 	TableName  string = "users"
 )
