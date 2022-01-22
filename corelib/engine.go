@@ -30,7 +30,6 @@ func FetchById[T any, PT PointerType[T]](id int) PT {
 	data := StrutForScan(u)
 
 	query := fmt.Sprintf("SELECT %s from %s where id=%d", columnsNames, tableName, id)
-	println(query)
 	err2 := db.QueryRow(query).Scan(data...)
 
 	if err2 != nil {

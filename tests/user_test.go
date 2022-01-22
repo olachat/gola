@@ -54,28 +54,16 @@ func init() {
 
 	//create table
 	query, _ := testdata.Fixtures.ReadFile(tableName + ".sql")
-	exec(db, string(query))
+	db.Exec(string(query))
 
 	//add data
-	exec(db, `
+	db.Exec(`
 insert into users (name, email, created_at, updated_at) values
 ("John Doe", "john@doe.com", NOW(), NOW()),
 ("John Doe", "johnalt@doe.com", NOW(), NOW()),
 ("Jane Doe", "jane@doe.com", NOW(), NOW()),
 ("Evil Bob", "evilbob@gmail.com", NOW(), NOW())
 	`)
-}
-
-func exec(db *sql.DB, query string) {
-	stmt, err := db.Prepare(query)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	_, err = stmt.Exec()
-	if err != nil {
-		panic(err)
-	}
 }
 
 type SimpleUser struct {

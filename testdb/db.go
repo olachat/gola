@@ -23,7 +23,39 @@ func createTestDatabase() *memory.Database {
 	return db
 }
 
+type User struct {
+	Name
+}
+
+type Name string
+
+func (c Name) GetName() string {
+	return string(c)
+}
+
+func (c *Name) SetName(val string) {
+	*c = Name(val)
+}
+
+func (c Name) GetValPointer() interface{} {
+	return &c
+}
+
 func main() {
+	var c Name = "hello"
+	fmt.Printf("c: %v\n", c)
+	c.SetName("world")
+	fmt.Printf("c: %v\n", c)
+
+	u := new(User)
+	u.Name = "foo"
+	fmt.Printf("u: %v\n", u)
+	u.SetName("bar")
+	fmt.Printf("u: %v\n", u)
+}
+
+func main1() {
+
 	corelib.Setup(fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", TestDBPort, TestDBName))
 
 	engine := sqle.NewDefault(sql.NewDatabaseProvider(

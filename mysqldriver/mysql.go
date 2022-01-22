@@ -86,6 +86,8 @@ func (m *MySQLDriver) Assemble(config drivers.Config) (dbinfo *drivers.DBInfo, e
 		return nil, err
 	}
 
+	m.SetIndexAndKey(dbinfo)
+
 	return dbinfo, err
 }
 

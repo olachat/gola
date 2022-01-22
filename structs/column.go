@@ -278,9 +278,6 @@ func (c ColumnStruct) GetEnumConst() string {
 }
 
 func (c ColumnStruct) IsPrimaryKey() string {
-	if c.Name == "id" {
-		return "true"
-	}
 	if c.table.PKey == nil {
 		return "false"
 	}

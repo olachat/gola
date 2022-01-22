@@ -63,15 +63,9 @@ func init() {
 
 	for _, tableName := range testTables {
 		query, _ := fixtures.ReadFile(testDataPath + tableName + ".sql")
-
-		stmt, err := db.Prepare(string(query))
+		_, err = db.Exec(string(query))
 		if err != nil {
 			panic(err.Error())
-		}
-
-		_, err = stmt.Exec()
-		if err != nil {
-			panic(err)
 		}
 	}
 }
