@@ -38,6 +38,8 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
   * [ ] float
   * [ ] enum
   * [ ] set
+* [ ] Remove sqlboiler dependency in code gen
+* [ ] Project badges
 * [ ] Tests
   * [ ] Use sql to create table & insert testdata
   * [ ] Performance test
