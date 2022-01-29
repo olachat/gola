@@ -1,8 +1,10 @@
 package corelib
 
+import "context"
+
 type ColumnType interface {
-	GetColumnName() string
-	GetValPointer() interface{}
-	IsPrimaryKey() bool
-	GetTableType() TableType
+	GetColumnName(ctx context.Context) string
+	GetValPointer(ctx context.Context) interface{}
+	IsPrimaryKey(ctx context.Context) bool
+	GetTableType(ctx context.Context) TableType
 }

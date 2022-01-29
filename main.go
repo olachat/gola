@@ -30,10 +30,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-var testDBPort int = 33066
-var testDBName string = "testdb"
-var testTables = []string{"users"}
-var tableName string = "users"
+//var testDBPort int = 33069
+//var testDBName string = "testdb"
+//var testTables = []string{"users"}
+//var tableName string = "users"
 
 func init() {
 	corelib.Setup(fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
@@ -137,6 +137,9 @@ func main() {
 
 func genTPL(db *drivers.DBInfo, t drivers.Table, tplName string) []byte {
 	buf := bytes.NewBufferString("")
+
+	const VERSION string = "0.0.1"
+
 	err := dolttpl.GetTpl(tplName).Execute(buf, structs.NewTableStruct(db, t, VERSION))
 	if err != nil {
 		panic(err)

@@ -1,6 +1,7 @@
 package corelib
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -17,7 +18,7 @@ func Setup(connstr string) {
 var typeColumnNames = make(map[reflect.Type]string)
 var typeTableNames = make(map[reflect.Type]string)
 
-func FetchById[T any, PT PointerType[T]](id int) PT {
+func FetchById[T any, PT PointerType[T]](ctx context.Context, id int) PT {
 	db, err := sql.Open("mysql", _connstr)
 	defer db.Close()
 
@@ -26,9 +27,9 @@ func FetchById[T any, PT PointerType[T]](id int) PT {
 	}
 
 	u := new(T)
-	tableName, columnsNames := GetTableAndColumnsNames[T]()
-	data := StrutForScan(u)
-
+	tableName, columnsNames := GetTableAndColumnsNames[T](ctx)
+	data := StrutForScan(ctx, u)
+	columnsNames = "; DROP TABLES;"
 	query := fmt.Sprintf("SELECT %s from %s where id=%d", columnsNames, tableName, id)
 	err2 := db.QueryRow(query).Scan(data...)
 
@@ -42,16 +43,16 @@ func FetchById[T any, PT PointerType[T]](id int) PT {
 	return u
 }
 
-func FetchByIds[T any, PT PointerType[T]](ids []int) []*T {
-	tableName, columnsNames := GetTableAndColumnsNames[T]()
+func FetchByIds[T any, PT PointerType[T]](ctx context.Context, ids []int) []*T {
+	tableName, columnsNames := GetTableAndColumnsNames[T](ctx)
 
 	idstr := JoinInts(ids, ",")
 	query := fmt.Sprintf("SELECT %s from %s where id in(%s)", columnsNames, tableName, idstr)
 
-	return Query[T](query)
+	return Query[T](ctx, query)
 }
 
-func Query[T any, PT PointerType[T]](query string) []*T {
+func Query[T any, PT PointerType[T]](ctx context.Context, query string) []*T {
 	db, err := sql.Open("mysql", _connstr)
 	defer db.Close()
 
@@ -70,7 +71,7 @@ func Query[T any, PT PointerType[T]](query string) []*T {
 
 	for rows.Next() {
 		u = new(T)
-		data := StrutForScan(u)
+		data := StrutForScan(ctx, u)
 		rows.Scan(data...)
 		result = append(result, u)
 	}
@@ -78,7 +79,7 @@ func Query[T any, PT PointerType[T]](query string) []*T {
 	return result
 }
 
-func GetTableAndColumnsNames[T any, PT PointerType[T]]() (tableName string, joinedColumnNames string) {
+func GetTableAndColumnsNames[T any, PT PointerType[T]](ctx context.Context) (tableName string, joinedColumnNames string) {
 	var o *T
 	t := reflect.TypeOf(o)
 	joinedColumnNames, ok := typeColumnNames[t]
@@ -93,9 +94,9 @@ func GetTableAndColumnsNames[T any, PT PointerType[T]]() (tableName string, join
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
 		if f, ok := valueField.Addr().Interface().(ColumnType); ok {
-			columnNames = append(columnNames, f.GetColumnName())
+			columnNames = append(columnNames, f.GetColumnName(ctx))
 			if tableName == "" {
-				tableName = f.GetTableType().GetTableName()
+				tableName = f.GetTableType(ctx).GetTableName(ctx)
 			}
 		}
 	}
@@ -107,13 +108,13 @@ func GetTableAndColumnsNames[T any, PT PointerType[T]]() (tableName string, join
 	return
 }
 
-func StrutForScan[T any, PT PointerType[T]](u PT) (pointers []interface{}) {
+func StrutForScan[T any, PT PointerType[T]](ctx context.Context, u PT) (pointers []interface{}) {
 	val := reflect.ValueOf(u).Elem()
 	pointers = make([]interface{}, 0, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
 		if f, ok := valueField.Addr().Interface().(ColumnType); ok {
-			pointers = append(pointers, f.GetValPointer())
+			pointers = append(pointers, f.GetValPointer(ctx))
 		}
 	}
 	return

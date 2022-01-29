@@ -27,9 +27,11 @@ import (
 //go:embed testdata
 var fixtures embed.FS
 var s *server.Server
-var testDBPort int = 33066
-var testDBName string = "testdb"
-var testTables = []string{"users"}
+
+var testDBPort1 int = 33067
+
+//var testDBName string = "testdb"
+//var testTables = []string{"users"}
 var testDataPath = "testdata" + string(filepath.Separator)
 
 var update = flag.Bool("update", false, "update generated files")
@@ -43,7 +45,7 @@ func init() {
 
 	config := server.Config{
 		Protocol: "tcp",
-		Address:  fmt.Sprintf("localhost:%d", testDBPort),
+		Address:  fmt.Sprintf("localhost:%d", testDBPort1),
 		Auth:     auth.NewNativeSingle("root", "", auth.AllPermissions),
 	}
 	var err error
@@ -55,7 +57,7 @@ func init() {
 
 	go s.Start()
 
-	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
+	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort1, "false")
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
 		panic(err)
@@ -97,7 +99,7 @@ func TestCodeGen(t *testing.T) {
 		"dbname":    testDBName,
 		"whitelist": testTables,
 		"host":      "localhost",
-		"port":      testDBPort,
+		"port":      testDBPort1,
 		"user":      "root",
 		"pass":      "",
 		"sslmode":   "false",

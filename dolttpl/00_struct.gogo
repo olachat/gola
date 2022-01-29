@@ -26,19 +26,19 @@ var table *{{.ClassName}}Table
 
 // Fetch methods
 func Fetch{{.ClassName}}ById(ctx context.Context, id int) *{{.ClassName}} {
-	return corelib.FetchById[{{.ClassName}}](id)
+	return corelib.FetchById[{{.ClassName}}](ctx, id)
 }
 
 func FetchById[T any, PT corelib.PointerType[T]](ctx context.Context, id int) *T {
-	return corelib.FetchById[T](id)
+	return corelib.FetchById[T](ctx, id)
 }
 
 func Fetch{{.ClassName}}ByIds(ctx context.Context, ids []int) []*{{.ClassName}} {
-	return corelib.FetchByIds[{{.ClassName}}](ids)
+	return corelib.FetchByIds[{{.ClassName}}](ctx, ids)
 }
 
 func FetchByIds[T any, PT corelib.PointerType[T]](ctx context.Context, ids []int) []*T {
-	return corelib.FetchByIds[T](ids)
+	return corelib.FetchByIds[T](ctx, ids)
 }
 
 // Column types

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"testing"
@@ -72,37 +73,40 @@ type SimpleUser struct {
 }
 
 func TestUserMethods(t *testing.T) {
+
+	ctx := context.Background()
+
 	u := users.FetchById[struct {
 		users.Email
-	}](1)
-	if u.GetEmail() != "john@doe.com" {
+	}](ctx, 1)
+	if u.GetEmail(ctx) != "john@doe.com" {
 		t.Error("Failed to FetchById with email using id 1")
 	}
 
-	u2 := users.FetchById[users.User](1)
-	if u2.GetEmail() != "john@doe.com" && u2.GetName() != "John Doe" {
+	u2 := users.FetchById[users.User](ctx, 1)
+	if u2.GetEmail(ctx) != "john@doe.com" && u2.GetName(ctx) != "John Doe" {
 		t.Error("Failed to FetchById with User using id 1")
 	}
 
-	u3 := users.FetchUserById(1)
-	if u2.GetEmail() != u3.GetEmail() && u2.GetName() != u3.GetName() {
+	u3 := users.FetchUserById(ctx, 1)
+	if u2.GetEmail(ctx) != u3.GetEmail(ctx) && u2.GetName(ctx) != u3.GetName(ctx) {
 		t.Error("FetchUserById and FetchById[User] returns different result")
 	}
 
-	u4 := users.FetchUserById(0)
+	u4 := users.FetchUserById(ctx, 0)
 	if u4 != nil {
 		t.Error("FetchUserById must return nil for id 0")
 	}
 
-	objs := users.FetchByIds[SimpleUser]([]int{1, 2})
+	objs := users.FetchByIds[SimpleUser](ctx, []int{1, 2})
 	if len(objs) != 2 {
 		t.Error("FetchByIds[SimpleUser]([]int{1, 2}) failed")
 	}
-	if objs[0].GetEmail() != u.GetEmail() {
+	if objs[0].GetEmail(ctx) != u.GetEmail(ctx) {
 		t.Error("FetchById and FetchByIds[SimpleUser] returns different result")
 	}
 
-	objs2 := users.FetchUserByIds([]int{3, 4})
+	objs2 := users.FetchUserByIds(ctx, []int{3, 4})
 	if len(objs2) != 2 {
 		t.Error("FetchUserByIds([]int{3, 4}) failed")
 	}

@@ -1,5 +1,7 @@
 package corelib
 
+import "context"
+
 type TableType interface {
-	GetTableName() string
+	GetTableName(ctx context.Context) string
 }
