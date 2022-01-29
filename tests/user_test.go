@@ -75,6 +75,16 @@ type SimpleUser struct {
 	users.Email
 }
 
+func TestUserInsert(t *testing.T) {
+	u := users.NewUser()
+	u.SetId(11)
+	u.SetEmail("hello")
+	u.SetName("maou sheng")
+	u.SetCreatedAt(111)
+	u.SetUpdatedAt(222)
+	u.Insert()
+}
+
 func TestUserDouble(t *testing.T) {
 	u1 := users.FetchUserById(1)
 	if u1.GetDoubleType() != 1.8729 {

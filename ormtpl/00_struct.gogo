@@ -4,6 +4,9 @@ package {{.Package}}
 {{$table := .}}
 import (
 	"github.com/olachat/gola/corelib"
+	"database/sql"
+	"strings"
+	"fmt"
 
 	{{.Imports}}
 )
@@ -123,4 +126,15 @@ func New{{.ClassName}}() *{{.ClassName}} {
 	{{- end }}
 	{{- end }}
 	}
+}
+
+func (c *{{.ClassName}}) Insert()(sql.Result, error){
+	tableName, columnNames := corelib.GetTableAndColumnsNames[{{.ClassName}}]()
+	sql := `INSERT INTO ` + tableName + ` (` + columnNames + `) value (`
+	values := make([]string, 0)
+	{{- range .SqlColumns }}
+	values = append(values, fmt.Sprintf("%v", c.Get{{.GoName}}()))
+	{{- end }}
+	sql += strings.Join(values, ",") + `)`
+	return corelib.Exec[{{.ClassName}}](sql)
 }
