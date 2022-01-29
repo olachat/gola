@@ -51,6 +51,17 @@ func FetchByIds[T any, PT PointerType[T]](ids []int) []*T {
 	return Query[T](query)
 }
 
+func Exec[T any, PT PointerType[T]](query string) (sql.Result, error) {
+	db, err := sql.Open("mysql", _connstr)
+	defer db.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db.Exec(query)
+}
+
 func Query[T any, PT PointerType[T]](query string) []*T {
 	db, err := sql.Open("mysql", _connstr)
 	defer db.Close()

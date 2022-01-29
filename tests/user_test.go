@@ -71,6 +71,16 @@ type SimpleUser struct {
 	users.Email
 }
 
+func TestUserInsert(t *testing.T) {
+	u := users.NewUser()
+	u.SetId(11)
+	u.SetEmail("hello")
+	u.SetName("maou sheng")
+	u.SetCreatedAt(111)
+	u.SetUpdatedAt(222)
+	u.Insert()
+}
+
 func TestUserMethods(t *testing.T) {
 	u := users.FetchById[struct {
 		users.Email

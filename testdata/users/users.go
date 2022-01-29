@@ -3,7 +3,10 @@
 package users
 
 import (
+	"database/sql"
+	"fmt"
 	"github.com/olachat/gola/corelib"
+	"strings"
 )
 
 // User represents users table
@@ -204,4 +207,17 @@ func NewUser() *User {
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
 	}
+}
+
+func (c *User) Insert() (sql.Result, error) {
+	tableName, columnNames := corelib.GetTableAndColumnsNames[User]()
+	sql := `INSERT INTO ` + tableName + ` (` + columnNames + `) value (`
+	values := make([]string, 0)
+	values = append(values, fmt.Sprintf("%v", c.GetId()))
+	values = append(values, fmt.Sprintf("%v", c.GetName()))
+	values = append(values, fmt.Sprintf("%v", c.GetEmail()))
+	values = append(values, fmt.Sprintf("%v", c.GetCreatedAt()))
+	values = append(values, fmt.Sprintf("%v", c.GetUpdatedAt()))
+	sql += strings.Join(values, ",") + `)`
+	return corelib.Exec[User](sql)
 }
