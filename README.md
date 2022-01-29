@@ -1,4 +1,9 @@
-![Builds status](https://github.com/github/docs/actions/workflows/go.yml/badge.svg) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/olachat/gola) ![GitHub repo size](https://img.shields.io/github/repo-size/olachat/gola) ![GitHub issues](https://img.shields.io/github/issues-raw/olachat/gola) ![GitHub pull requests](https://img.shields.io/github/issues-pr/olachat/gola)
+![Builds status](https://github.com/yanghua-ola/gola/actions/workflows/go.yml/badge.svg)
+![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/yanghua-ola/f78532b2b7fa732b9884ebbf0c8c23aa/raw/gola.cov)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/olachat/gola)
+![GitHub repo size](https://img.shields.io/github/repo-size/olachat/gola) 
+![GitHub issues](https://img.shields.io/github/issues-raw/olachat/gola)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/olachat/gola)
 # gola
 
 `gola` is a ORM for go utilizing generic with unique design goals.
