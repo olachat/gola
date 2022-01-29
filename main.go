@@ -3,8 +3,17 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"database/sql"
 	"errors"
 	"fmt"
+	sqle "github.com/dolthub/go-mysql-server"
+	"github.com/dolthub/go-mysql-server/auth"
+	"github.com/dolthub/go-mysql-server/memory"
+	"github.com/dolthub/go-mysql-server/server"
+	gsql "github.com/dolthub/go-mysql-server/sql"
+	"github.com/dolthub/go-mysql-server/sql/information_schema"
+	"github.com/olachat/gola/corelib"
+	"github.com/olachat/gola/testdata"
 	"go/format"
 	"io/ioutil"
 	"os"
@@ -21,6 +30,53 @@ import (
 	"github.com/spf13/viper"
 )
 
+var testDBPort int = 33066
+var testDBName string = "testdb"
+var testTables = []string{"users"}
+var tableName string = "users"
+
+func init() {
+	corelib.Setup(fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
+
+	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
+		memory.NewDatabase(testDBName),
+		information_schema.NewInformationSchemaDatabase(),
+	))
+
+	config := server.Config{
+		Protocol: "tcp",
+		Address:  fmt.Sprintf("localhost:%d", testDBPort),
+		Auth:     auth.NewNativeSingle("root", "", auth.AllPermissions),
+	}
+	var err error
+
+	s, err := server.NewDefaultServer(config, engine)
+	if err != nil {
+		panic(err)
+	}
+
+	go s.Start()
+
+	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
+	db, err := sql.Open("mysql", connStr)
+	if err != nil {
+		panic(err)
+	}
+
+	//create table
+	query, _ := testdata.Fixtures.ReadFile(tableName + ".sql")
+	db.Exec(string(query))
+
+	//add data
+	db.Exec(`
+insert into users (name, email, created_at, updated_at) values
+("John Doe", "john@doe.com", NOW(), NOW()),
+("John Doe", "johnalt@doe.com", NOW(), NOW()),
+("Jane Doe", "jane@doe.com", NOW(), NOW()),
+("Evil Bob", "evilbob@gmail.com", NOW(), NOW())
+	`)
+}
+
 func main() {
 	viper.SetConfigName("gola")
 	wd, err := os.Getwd()
@@ -34,9 +90,23 @@ func main() {
 	}
 	viper.ReadInConfig()
 	viper.AutomaticEnv()
-	driverName := "mysql"
+	//driverName := "mysql"
 
-	var config drivers.Config = viper.GetStringMap(driverName)
+	//var config drivers.Config = viper.GetStringMap(driverName)
+
+	//var fixtures embed.FS
+	//var s *server.Server
+	//var testDataPath = "testdata" + string(filepath.Separator)
+
+	var config drivers.Config = map[string]interface{}{
+		"dbname":    testDBName,
+		"whitelist": testTables,
+		"host":      "localhost",
+		"port":      testDBPort,
+		"user":      "root",
+		"pass":      "",
+		"sslmode":   "false",
+	}
 
 	m := &mysqldriver.MySQLDriver{}
 	db, err := m.Assemble(config)
@@ -57,6 +127,7 @@ func main() {
 
 	for _, t := range db.Tables {
 		println(t.Name)
+		println(gentype)
 		switch gentype {
 		case "orm":
 			ioutil.WriteFile(output+t.Name+".go", genORM(db, t), 0644)
