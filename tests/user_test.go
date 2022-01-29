@@ -77,7 +77,7 @@ func TestUserDouble(t *testing.T) {
 		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u1.GetDoubleType())
 	}
 	if u1.GetFloatType() != 1.55555 {
-		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u1.GetDoubleType())
+		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u1.GetFloatType())
 	}
 
 	u2 := users.FetchUserById(2)
@@ -85,7 +85,7 @@ func TestUserDouble(t *testing.T) {
 		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u2.GetDoubleType())
 	}
 	if u2.GetFloatType() != 2.5 {
-		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u2.GetDoubleType())
+		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u2.GetFloatType())
 	}
 
 	u3 := users.FetchUserById(3)
@@ -93,7 +93,7 @@ func TestUserDouble(t *testing.T) {
 		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u3.GetDoubleType())
 	}
 	if u3.GetFloatType() != 3.5 {
-		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u3.GetDoubleType())
+		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u3.GetFloatType())
 	}
 
 	u4 := users.FetchUserById(4)
@@ -101,7 +101,7 @@ func TestUserDouble(t *testing.T) {
 		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u4.GetDoubleType())
 	}
 	if u4.GetFloatType() != 4.5 {
-		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u4.GetDoubleType())
+		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u4.GetFloatType())
 	}
 }
 
