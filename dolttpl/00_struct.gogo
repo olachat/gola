@@ -44,6 +44,16 @@ func FetchByIds[T any, PT corelib.PointerType[T]](ids []int) []*T {
 // Column types
 
 {{- range .SqlColumns }}
+	{{- if .IsEnum}}
+type {{$table.ClassName}}{{.GoName}} string
+const (
+	{{.GetEnumConst}}
+)
+	{{- end }}
+{{- end }}
+
+{{- range .SqlColumns }}
+
 // {{.GoName}} field
 // {{.Comment}}
 type {{.GoName}} struct {
