@@ -82,8 +82,8 @@ func genORM(db *drivers.DBInfo, t drivers.Table) map[string][]byte {
 	tableFolder := t.Name + string(filepath.Separator)
 
 	genFiles := map[string]string{
-		"00_struct.gogo": tableFolder + t.Name + ".go",
-		// "01_struct_idx.gogo": tableFolder + t.Name + "_idx.go",
+		"00_struct.gogo":     tableFolder + t.Name + ".go",
+		"01_struct_idx.gogo": tableFolder + t.Name + "_idx.go",
 	}
 
 	for genTpl, genPath := range genFiles {
