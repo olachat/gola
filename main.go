@@ -59,7 +59,10 @@ func main() {
 		println(t.Name)
 		switch gentype {
 		case "orm":
-			ioutil.WriteFile(output+t.Name+".go", genORM(db, t), 0644)
+			files := genORM(db, t)
+			for path, data := range files {
+				ioutil.WriteFile(output+path, data, 0644)
+			}
 		}
 	}
 }
@@ -73,8 +76,22 @@ func genTPL(db *drivers.DBInfo, t drivers.Table, tplName string) []byte {
 	return buf.Bytes()
 }
 
-func genORM(db *drivers.DBInfo, t drivers.Table) []byte {
-	return formatBuffer(genTPL(db, t, "00_struct.gogo"))
+func genORM(db *drivers.DBInfo, t drivers.Table) map[string][]byte {
+	files := make(map[string][]byte)
+
+	tableFolder := t.Name + string(filepath.Separator)
+
+	genFiles := map[string]string{
+		"00_struct.gogo": tableFolder + t.Name + ".go",
+		// "01_struct_idx.gogo": tableFolder + t.Name + "_idx.go",
+	}
+
+	for genTpl, genPath := range genFiles {
+		data := formatBuffer(genTPL(db, t, genTpl))
+		files[genPath] = data
+	}
+
+	return files
 }
 
 var (

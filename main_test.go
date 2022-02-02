@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"database/sql"
@@ -70,24 +71,30 @@ func init() {
 	}
 }
 
-type genMethod func(db *drivers.DBInfo, t drivers.Table) []byte
+type genMethod func(db *drivers.DBInfo, t drivers.Table) map[string][]byte
 
-func testGen(t *testing.T, wd string, gen genMethod, db *drivers.DBInfo, table drivers.Table, extName string) {
-	resultFile := gen(db, table)
+func testGen(t *testing.T, wd string, gen genMethod, db *drivers.DBInfo, table drivers.Table) {
+	resultFiles := gen(db, table)
 	expectedFileFolder := testDataPath + table.Name + string(filepath.Separator)
-	expectedFilePath := expectedFileFolder + table.Name + "." + extName
 
 	if *update {
-		os.Mkdir(expectedFileFolder, os.ModePerm)
-		err := ioutil.WriteFile(expectedFilePath, resultFile, 0644)
-		if err != nil {
-			panic(err)
+		for path, data := range resultFiles {
+			pos := strings.LastIndex(path, string(filepath.Separator))
+			expectedFileFolder = testDataPath + path[0:pos-1]
+			os.Mkdir(expectedFileFolder, os.ModePerm)
+			err := ioutil.WriteFile(testDataPath+path, data, 0644)
+			if err != nil {
+				panic(err)
+			}
 		}
 	} else {
-		expectedFile, _ := fixtures.ReadFile(expectedFilePath)
-		if diff := cmp.Diff(resultFile, expectedFile); diff != "" {
-			t.Error("file different: ", expectedFilePath)
-			fmt.Println(diff)
+		for path, data := range resultFiles {
+			expectedFilePath := testDataPath + path
+			expectedFile, _ := fixtures.ReadFile(expectedFilePath)
+			if diff := cmp.Diff(data, expectedFile); diff != "" {
+				t.Error("file different: ", expectedFilePath)
+				fmt.Println(diff)
+			}
 		}
 	}
 }
@@ -115,6 +122,6 @@ func TestCodeGen(t *testing.T) {
 	}
 
 	for _, table := range db.Tables {
-		testGen(t, wd, genORM, db, table, "go")
+		testGen(t, wd, genORM, db, table)
 	}
 }
