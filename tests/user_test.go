@@ -1,4 +1,4 @@
-package user
+package tests
 
 import (
 	"database/sql"
@@ -21,8 +21,9 @@ import (
 const (
 	testDBPort int    = 33067
 	testDBName string = "testdb"
-	tableName  string = "users"
 )
+
+var tableNames = []string{"users", "blogs"}
 
 func init() {
 	corelib.Setup(fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
@@ -52,9 +53,11 @@ func init() {
 		panic(err)
 	}
 
-	//create table
-	query, _ := testdata.Fixtures.ReadFile(tableName + ".sql")
-	db.Exec(string(query))
+	//create tables
+	for _, tableName := range tableNames {
+		query, _ := testdata.Fixtures.ReadFile(tableName + ".sql")
+		db.Exec(string(query))
+	}
 
 	//add data
 	db.Exec(`
