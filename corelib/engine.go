@@ -17,7 +17,7 @@ func Setup(connstr string) {
 var typeColumnNames = make(map[reflect.Type]string)
 var typeTableNames = make(map[reflect.Type]string)
 
-func FetchById[T any, PT PointerType[T]](id int) PT {
+func FetchById[T any](id int) *T {
 	db, err := sql.Open("mysql", _connstr)
 	if err != nil {
 		log.Fatal(err)
@@ -41,7 +41,7 @@ func FetchById[T any, PT PointerType[T]](id int) PT {
 	return u
 }
 
-func FetchByIds[T any, PT PointerType[T]](ids []int) []*T {
+func FetchByIds[T any](ids []int) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
 	idstr := JoinInts(ids, ",")
@@ -50,7 +50,7 @@ func FetchByIds[T any, PT PointerType[T]](ids []int) []*T {
 	return Query[T](query)
 }
 
-func FindOne[T any, PT PointerType[T]](where WhereQuery) PT {
+func FindOne[T any](where WhereQuery) *T {
 	db, err := sql.Open("mysql", _connstr)
 	if err != nil {
 		log.Fatal(err)
@@ -75,7 +75,7 @@ func FindOne[T any, PT PointerType[T]](where WhereQuery) PT {
 	return u
 }
 
-func Find[T any, PT PointerType[T]](where WhereQuery) []*T {
+func Find[T any](where WhereQuery) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
 	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
@@ -84,7 +84,7 @@ func Find[T any, PT PointerType[T]](where WhereQuery) []*T {
 	return Query[T](query)
 }
 
-func Query[T any, PT PointerType[T]](query string) []*T {
+func Query[T any](query string) []*T {
 	db, err := sql.Open("mysql", _connstr)
 	if err != nil {
 		log.Fatal(err)
@@ -110,7 +110,7 @@ func Query[T any, PT PointerType[T]](query string) []*T {
 	return result
 }
 
-func GetTableAndColumnsNames[T any, PT PointerType[T]]() (tableName string, joinedColumnNames string) {
+func GetTableAndColumnsNames[T any]() (tableName string, joinedColumnNames string) {
 	var o *T
 	t := reflect.TypeOf(o)
 	joinedColumnNames, ok := typeColumnNames[t]
@@ -139,7 +139,7 @@ func GetTableAndColumnsNames[T any, PT PointerType[T]]() (tableName string, join
 	return
 }
 
-func StrutForScan[T any, PT PointerType[T]](u PT) (pointers []interface{}) {
+func StrutForScan[T any](u *T) (pointers []interface{}) {
 	val := reflect.ValueOf(u).Elem()
 	pointers = make([]interface{}, 0, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
