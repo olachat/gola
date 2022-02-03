@@ -37,3 +37,46 @@ func TestBlogMethods(t *testing.T) {
   ).Limit(limit, offset)
 }
 ```
+
+```go
+import "github.com/olachat/gola/corelib"
+
+
+
+type IdxSlug struct {
+  op corelib.Ops
+}
+
+func (i *IdxSlug) SlugIs(slug string) string {
+}
+
+func (i *IdxSlug) SlugIn(slugs []string) string {
+}
+
+func (i *IdxSlug) GetWhere() string {
+  switch i.op {
+  case corelib.OpEqual:
+    return "slug = ?"
+  }
+
+}
+
+type IdxFirstColumns struct {
+
+}
+
+func (i *IdxFirstColumns) All() {
+}
+
+func (i *IdxFirstColumns) Count() {
+}
+
+// Find methods
+func Query() *IdxFirstColumns {
+  return new(IdxFirstColumns)
+
+  corelib.FindWithSlug().Find()
+
+  return corelib.FindOne[Blog](i)
+}
+```

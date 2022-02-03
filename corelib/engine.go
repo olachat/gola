@@ -50,6 +50,40 @@ func FetchByIds[T any, PT PointerType[T]](ids []int) []*T {
 	return Query[T](query)
 }
 
+func FindOne[T any, PT PointerType[T]](where WhereQuery) PT {
+	db, err := sql.Open("mysql", _connstr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	u := new(T)
+	tableName, columnsNames := GetTableAndColumnsNames[T]()
+	data := StrutForScan(u)
+
+	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
+		tableName, where.GetWhere())
+	err2 := db.QueryRow(query).Scan(data...)
+
+	if err2 != nil {
+		if err2 == sql.ErrNoRows {
+			return nil
+		}
+		log.Fatal(err2)
+	}
+
+	return u
+}
+
+func Find[T any, PT PointerType[T]](where WhereQuery) []*T {
+	tableName, columnsNames := GetTableAndColumnsNames[T]()
+
+	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
+		tableName, where.GetWhere())
+
+	return Query[T](query)
+}
+
 func Query[T any, PT PointerType[T]](query string) []*T {
 	db, err := sql.Open("mysql", _connstr)
 	if err != nil {
