@@ -19,11 +19,10 @@ var typeTableNames = make(map[reflect.Type]string)
 
 func FetchById[T any, PT PointerType[T]](id int) PT {
 	db, err := sql.Open("mysql", _connstr)
-	defer db.Close()
-
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
@@ -53,11 +52,10 @@ func FetchByIds[T any, PT PointerType[T]](ids []int) []*T {
 
 func Query[T any, PT PointerType[T]](query string) []*T {
 	db, err := sql.Open("mysql", _connstr)
-	defer db.Close()
-
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 
 	var result []*T
 	var u *T
