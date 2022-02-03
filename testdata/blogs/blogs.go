@@ -16,6 +16,10 @@ type Blog struct {
 	Slug
 	// Title varchar(255)
 	Title
+	// Category Id int
+	CategoryId
+	// Country of the blog user varchar(255)
+	Country
 	// Created Timestamp int unsigned
 	CreatedAt
 	// Updated Timestamp int unsigned
@@ -168,6 +172,66 @@ func (c *Title) GetTableType() corelib.TableType {
 	return table
 }
 
+// CategoryId field
+// Category Id
+type CategoryId struct {
+	val int
+}
+
+func (c *CategoryId) GetCategoryId() int {
+	return c.val
+}
+
+func (c *CategoryId) SetCategoryId(val int) {
+	c.val = val
+}
+
+func (c *CategoryId) GetColumnName() string {
+	return "category_id"
+}
+
+func (c *CategoryId) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *CategoryId) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *CategoryId) GetTableType() corelib.TableType {
+	return table
+}
+
+// Country field
+// Country of the blog user
+type Country struct {
+	val string
+}
+
+func (c *Country) GetCountry() string {
+	return c.val
+}
+
+func (c *Country) SetCountry(val string) {
+	c.val = val
+}
+
+func (c *Country) GetColumnName() string {
+	return "country"
+}
+
+func (c *Country) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Country) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *Country) GetTableType() corelib.TableType {
+	return table
+}
+
 // CreatedAt field
 // Created Timestamp
 type CreatedAt struct {
@@ -234,6 +298,8 @@ func NewBlog() *Blog {
 		UserId{val: int(0)},
 		Slug{val: ""},
 		Title{val: ""},
+		CategoryId{val: int(0)},
+		Country{val: ""},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
 	}
