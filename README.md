@@ -1,6 +1,6 @@
 ![Builds status](https://github.com/yanghua-ola/gola/actions/workflows/go.yml/badge.svg)
-![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/yanghua-ola/f78532b2b7fa732b9884ebbf0c8c23aa/raw/gola.cov)
-![Go Report Card](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/yanghua-ola/f91bfcfee734a57cbdc5001d3886c8a7/raw/gola.goreport.json)
+![Coverage](badges/coverage.svg)
+![Go Report Card](badges/go-report-card.svg)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/olachat/gola)
 ![GitHub repo size](https://img.shields.io/github/repo-size/olachat/gola) 
 ![GitHub issues](https://img.shields.io/github/issues-raw/olachat/gola)

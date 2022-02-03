@@ -26,61 +26,60 @@ jobs:
     - name: Test
       run: go test -v ./...
 
-    - name: Coverage
-      run: |
-        go test -coverprofile=coverage.out -covermode=count  ./...
-        coverage=$(go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+')
-        echo "COVERAGE=$coverage" >> $GITHUB_ENV
+    # - name: Coverage
+    #   run: |
+    #     go test -coverprofile=coverage.out -covermode=count  ./...
+    #     coverage=$(go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+')
+    #     echo "COVERAGE=$coverage" >> $GITHUB_ENV
 
-    - name: Install go report card
-      run: |
-        git clone https://github.com/gojp/goreportcard.git
-        cd goreportcard
-        make install
-        go install github.com/client9/misspell/cmd/misspell
-        go install ./cmd/goreportcard-cli
+    # - name: Install go report card
+    #   run: |
+    #     git clone https://github.com/gojp/goreportcard.git
+    #     cd goreportcard
+    #     make install
+    #     go install ./cmd/goreportcard-cli
 
-    - name: Run go report card
-      run: |
-        goreportcard-cli
-        grade=$(goreportcard-cli | head -1)
-        grade=${grade:7}
-        grade_percent=$(echo $grade | grep -E -o "[0-9.]+")
-        echo "GRADE=${grade}" >> $GITHUB_ENV
-        echo "GRADE_PERCENT=${grade_percent}" >> $GITHUB_ENV
+    # - name: Run go report card
+    #   run: |
+    #     goreportcard-cli
+    #     grade=$(goreportcard-cli | head -1)
+    #     grade=${grade:7}
+    #     grade_percent=$(echo $grade | grep -E -o "[0-9.]+")
+    #     echo "GRADE=${grade}" >> $GITHUB_ENV
+    #     echo "GRADE_PERCENT=${grade_percent}" >> $GITHUB_ENV
 
-    - name: Decide color of badges
-      run: |
-        get_color () {
-          percent=$1
-          if (( $(echo "$percent <= 50" | bc -l) )) ; then
-            color=red
-          elif (( $(echo "$percent > 80" | bc -l) )); then
-            color=green
-          else
-            color=orange
-          fi
-          echo $color
-        }
-        echo "COVERAGE_COLOR=$(get_color ${{ env.COVERAGE }})" >> $GITHUB_ENV
-        echo "GRADE_COLOR=$(get_color ${{ env.GRADE_PERCENT }})" >> $GITHUB_ENV
+    # - name: Decide color of badges
+    #   run: |
+    #     get_color () {
+    #       percent=$1
+    #       if (( $(echo "$percent <= 50" | bc -l) )) ; then
+    #         color=red
+    #       elif (( $(echo "$percent > 80" | bc -l) )); then
+    #         color=green
+    #       else
+    #         color=orange
+    #       fi
+    #       echo $color
+    #     }
+    #     echo "COVERAGE_COLOR=$(get_color ${{ env.COVERAGE }})" >> $GITHUB_ENV
+    #     echo "GRADE_COLOR=$(get_color ${{ env.GRADE_PERCENT }})" >> $GITHUB_ENV
 
-    - name: Create code coverage badge
-      uses: schneegans/dynamic-badges-action@v1.1.0
-      with:
-        auth: ${{ secrets.GIST }}
-        gistID: f78532b2b7fa732b9884ebbf0c8c23aa
-        filename: gola.cov
-        label: Coverage
-        message: ${{ env.COVERAGE }}%
-        color: ${{ env.COVERAGE_COLOR }}
+    # - name: Create code coverage badge
+    #   uses: schneegans/dynamic-badges-action@v1.1.0
+    #   with:
+    #     auth: ${{ secrets.GIST }}
+    #     gistID: f78532b2b7fa732b9884ebbf0c8c23aa
+    #     filename: gola.cov
+    #     label: Coverage
+    #     message: ${{ env.COVERAGE }}%
+    #     color: ${{ env.COVERAGE_COLOR }}
 
-    - name: Create go report badge
-      uses: schneegans/dynamic-badges-action@v1.1.0
-      with:
-        auth: ${{ secrets.GIST }}
-        gistID: f91bfcfee734a57cbdc5001d3886c8a7
-        filename: gola.goreport.json
-        label: Go Report
-        message: ${{ env.GRADE }}
-        color: ${{ env.GRADE_COLOR }}
+    # - name: Create go report badge
+    #   uses: schneegans/dynamic-badges-action@v1.1.0
+    #   with:
+    #     auth: ${{ secrets.GIST }}
+    #     gistID: f91bfcfee734a57cbdc5001d3886c8a7
+    #     filename: gola.goreport.json
+    #     label: Go Report
+    #     message: ${{ env.GRADE }}
+    #     color: ${{ env.GRADE_COLOR }}
