@@ -110,6 +110,9 @@ func TestUserDouble(t *testing.T) {
 }
 
 func TestUserHobby(t *testing.T) {
+
+	ctx := context.Background()
+
 	u1 := users.FetchUserById(ctx,1)
 	if u1.GetHobby(ctx) != users.UserHobbyRunning {
 		t.Errorf("FetchUserById GetHobby returns unexpected value: %v", u1.GetHobby(ctx))
