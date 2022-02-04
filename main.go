@@ -34,23 +34,9 @@ func main() {
 	}
 	viper.ReadInConfig()
 	viper.AutomaticEnv()
-	//driverName := "mysql"
+	driverName := "mysql"
 
-	//var config drivers.Config = viper.GetStringMap(driverName)
-
-	//var fixtures embed.FS
-	//var s *server.Server
-	//var testDataPath = "testdata" + string(filepath.Separator)
-
-	var config drivers.Config = map[string]interface{}{
-		"dbname":    testDBName,
-		"whitelist": testTables,
-		"host":      "localhost",
-		"port":      testDBPort,
-		"user":      "root",
-		"pass":      "",
-		"sslmode":   "false",
-	}
+	var config drivers.Config = viper.GetStringMap(driverName)
 
 	m := &mysqldriver.MySQLDriver{}
 	db, err := m.Assemble(config)
