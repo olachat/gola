@@ -17,6 +17,8 @@ const (
 	CategoryIdDesc
 	IsPinnedAsc
 	IsPinnedDesc
+	IsVipAsc
+	IsVipDesc
 	CountryAsc
 	CountryDesc
 	CreatedAtAsc
