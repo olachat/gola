@@ -39,6 +39,7 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
     * [ ] index
     * [ ] uniuqe index
     * [ ] paging & order
+      * [ ] paging using cursor
 * [ ] better primary key support
   * [ ] Single Key types / names
   * [ ] Composite key

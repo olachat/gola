@@ -13,34 +13,34 @@ const (
 	TitleDesc
 )
 
-type Idx1[T any] struct {
+type idxQuery[T any] struct {
 }
 
-func (i *Idx1[T]) WhereCountryEQ(country string) iQuery2[T] {
-	return i
+func (q *idxQuery[T]) WhereCountryEQ(country string) iQuery2[T] {
+	return q
 }
 
-func (i *Idx1[T]) WhereCountryIN(country ...string) iQuery2[T] {
-	return i
+func (q *idxQuery[T]) WhereCountryIN(country ...string) iQuery2[T] {
+	return q
 }
 
-func (i *Idx1[T]) AndCategoryIdEQ(categoryId int) corelib.ReadQuery[T] {
-	return i
+func (q *idxQuery[T]) AndCategoryIdEQ(categoryId int) corelib.ReadQuery[T] {
+	return q
 }
-func (i *Idx1[T]) AndCategoryIdIN(args ...int) corelib.ReadQuery[T] {
-	return i
+func (q *idxQuery[T]) AndCategoryIdIN(args ...int) corelib.ReadQuery[T] {
+	return q
 }
 
-func (i *Idx1[T]) All() []*T {
+func (q *idxQuery[T]) All() []*T {
 	return nil
 }
 
-func (i *Idx1[T]) Limit(limit, offset int) []*T {
+func (q *idxQuery[T]) Limit(limit, offset int) []*T {
 	return nil
 }
 
-func (i *Idx1[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
-	return i
+func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
+	return q
 }
 
 type order[T any] interface {
@@ -63,5 +63,5 @@ type iQuery2[T any] interface {
 
 // Find methods
 func Select[T any]() iQuery1[T] {
-	return new(Idx1[T])
+	return new(idxQuery[T])
 }
