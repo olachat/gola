@@ -91,7 +91,7 @@ func testGen(t *testing.T, wd string, gen genMethod, db *drivers.DBInfo, table d
 		for path, data := range resultFiles {
 			expectedFilePath := testDataPath + path
 			expectedFile, _ := fixtures.ReadFile(expectedFilePath)
-			if diff := cmp.Diff(data, expectedFile); diff != "" {
+			if diff := cmp.Diff(expectedFile, data); diff != "" {
 				t.Error("file different: ", expectedFilePath)
 				fmt.Println(diff)
 			}
