@@ -18,6 +18,8 @@ type Blog struct {
 	Title
 	// Category Id int
 	CategoryId
+	// Is pinned to top tinyint
+	IsPinned
 	// Country of the blog user varchar(255)
 	Country
 	// Created Timestamp int unsigned
@@ -202,6 +204,36 @@ func (c *CategoryId) GetTableType() corelib.TableType {
 	return table
 }
 
+// IsPinned field
+// Is pinned to top
+type IsPinned struct {
+	val int8
+}
+
+func (c *IsPinned) GetIsPinned() int8 {
+	return c.val
+}
+
+func (c *IsPinned) SetIsPinned(val int8) {
+	c.val = val
+}
+
+func (c *IsPinned) GetColumnName() string {
+	return "is_pinned"
+}
+
+func (c *IsPinned) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *IsPinned) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *IsPinned) GetTableType() corelib.TableType {
+	return table
+}
+
 // Country field
 // Country of the blog user
 type Country struct {
@@ -299,6 +331,7 @@ func NewBlog() *Blog {
 		Slug{val: ""},
 		Title{val: ""},
 		CategoryId{val: int(0)},
+		IsPinned{val: int8(0)},
 		Country{val: ""},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
