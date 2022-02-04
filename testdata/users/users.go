@@ -211,6 +211,97 @@ func (c *UpdatedAt) GetTableType(ctx context.Context) corelib.TableType {
 	return table
 }
 
+// FloatType field
+// float
+type FloatType struct {
+	val float32
+}
+
+func (c *FloatType) GetFloatType(ctx context.Context) float32 {
+	return c.val
+}
+
+func (c *FloatType) SetFloatType(ctx context.Context, val float32) {
+	c.val = val
+}
+
+func (c *FloatType) GetColumnName(ctx context.Context) string {
+	return "float_type"
+}
+
+func (c *FloatType) IsPrimaryKey(ctx context.Context) bool {
+	return false
+}
+
+func (c *FloatType) GetValPointer(ctx context.Context) interface{} {
+	return &c.val
+}
+
+func (c *FloatType) GetTableType(ctx context.Context) corelib.TableType {
+	return table
+}
+
+// DoubleType field
+// double
+type DoubleType struct {
+	val float64
+}
+
+func (c *DoubleType) GetDoubleType(ctx context.Context) float64 {
+	return c.val
+}
+
+func (c *DoubleType) SetDoubleType(ctx context.Context, val float64) {
+	c.val = val
+}
+
+func (c *DoubleType) GetColumnName(ctx context.Context) string {
+	return "double_type"
+}
+
+func (c *DoubleType) IsPrimaryKey(ctx context.Context) bool {
+	return false
+}
+
+func (c *DoubleType) GetValPointer(ctx context.Context) interface{} {
+	return &c.val
+}
+
+func (c *DoubleType) GetTableType(ctx context.Context) corelib.TableType {
+	return table
+}
+
+// Hobby field
+// user hobby
+type Hobby struct {
+	val UserHobby
+}
+
+func (c *Hobby) GetHobby(ctx context.Context) UserHobby {
+	return c.val
+}
+
+func (c *Hobby) SetHobby(ctx context.Context, val UserHobby) {
+	c.val = val
+}
+
+func (c *Hobby) GetColumnName(ctx context.Context) string {
+	return "hobby"
+}
+
+func (c *Hobby) IsPrimaryKey(ctx context.Context) bool {
+	return false
+}
+
+func (c *Hobby) GetValPointer(ctx context.Context) interface{} {
+	return &c.val
+}
+
+func (c *Hobby) GetTableType(ctx context.Context) corelib.TableType {
+	return table
+}
+
+
 func NewUser(ctx context.Context) *User {
 	return &User{
 		Id{},
