@@ -23,8 +23,6 @@ func TestTransaction(t *testing.T) {
 
 	ctx := context.Background()
 
-	//fmt.Println("-----------")
-
 	db, err := sql.Open("mysql", "root:123456@tcp(localhost:3306)/testdb")
 	if err != nil {
 
@@ -38,35 +36,6 @@ func TestTransaction(t *testing.T) {
 	if err != nil {
 		panic(err.Error()) // proper error handling instead of panic in your app
 	}
-
-	// Prepare statement for inserting data
-	//stmtIns, err := db.Prepare("INSERT INTO squareNum VALUES( ?, ? )") // ? = placeholder
-	//if err != nil {
-	//	panic(err.Error()) // proper error handling instead of panic in your app
-	//}
-	//defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
-
-	//i := 2
-	//_, err = stmtIns.Exec(i, (i * i)) // Insert tuples (i, i^2)
-	//if err != nil {
-	//	panic(err.Error()) // proper error handling instead of panic in your app
-	//}
-
-	// Prepare statement for reading data
-	//stmtOut, err := db.Prepare("SELECT squareNumber FROM squareNum WHERE number = ?")
-	//if err != nil {
-	//	panic(err.Error()) // proper error handling instead of panic in your app
-	//}
-	//defer stmtOut.Close()
-	//
-	//var squareNum int // we "scan" the result in here
-	//
-	//// Query the square-number of 2
-	//err = stmtOut.QueryRow(2).Scan(&squareNum) // WHERE number = 2
-	//if err != nil {
-	//	panic(err.Error()) // proper error handling instead of panic in your app
-	//}
-	//fmt.Printf("-----------The square number of 2 is: %d\n", squareNum)
 
 	err = mysql_util.RunMultipleAsTrx(ctx, db, []mysql_util.TrxAction{
 
