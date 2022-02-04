@@ -54,6 +54,7 @@ func FetchByIds[T any](ids []int) []*T {
 }
 
 // Column types
+
 // Id field
 //
 type Id struct {

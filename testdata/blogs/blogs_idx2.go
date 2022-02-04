@@ -2,17 +2,6 @@ package blogs
 
 import "github.com/olachat/gola/corelib"
 
-type orderBy int
-
-const (
-	IdAsc orderBy = iota
-	IdDesc
-	CategoryIdAsc
-	CategoryIdDesc
-	TitleAsc
-	TitleDesc
-)
-
 type idxQuery[T any] struct {
 }
 
