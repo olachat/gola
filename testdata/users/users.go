@@ -18,6 +18,12 @@ type User struct {
 	CreatedAt
 	// Updated Timestamp int unsigned
 	UpdatedAt
+	// float float
+	FloatType
+	// double double
+	DoubleType
+	// user hobby enum('swimming','running','singing')
+	Hobby
 }
 
 type UserTable struct{}
@@ -46,6 +52,14 @@ func FetchByIds[T any, PT corelib.PointerType[T]](ids []int) []*T {
 }
 
 // Column types
+type UserHobby string
+
+const (
+	UserHobbySwimming UserHobby = "swimming"
+	UserHobbyRunning  UserHobby = "running"
+	UserHobbySinging  UserHobby = "singing"
+)
+
 // Id field
 //
 type Id struct {
@@ -196,6 +210,96 @@ func (c *UpdatedAt) GetTableType() corelib.TableType {
 	return table
 }
 
+// FloatType field
+// float
+type FloatType struct {
+	val float32
+}
+
+func (c *FloatType) GetFloatType() float32 {
+	return c.val
+}
+
+func (c *FloatType) SetFloatType(val float32) {
+	c.val = val
+}
+
+func (c *FloatType) GetColumnName() string {
+	return "float_type"
+}
+
+func (c *FloatType) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *FloatType) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *FloatType) GetTableType() corelib.TableType {
+	return table
+}
+
+// DoubleType field
+// double
+type DoubleType struct {
+	val float64
+}
+
+func (c *DoubleType) GetDoubleType() float64 {
+	return c.val
+}
+
+func (c *DoubleType) SetDoubleType(val float64) {
+	c.val = val
+}
+
+func (c *DoubleType) GetColumnName() string {
+	return "double_type"
+}
+
+func (c *DoubleType) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *DoubleType) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *DoubleType) GetTableType() corelib.TableType {
+	return table
+}
+
+// Hobby field
+// user hobby
+type Hobby struct {
+	val UserHobby
+}
+
+func (c *Hobby) GetHobby() UserHobby {
+	return c.val
+}
+
+func (c *Hobby) SetHobby(val UserHobby) {
+	c.val = val
+}
+
+func (c *Hobby) GetColumnName() string {
+	return "hobby"
+}
+
+func (c *Hobby) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Hobby) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *Hobby) GetTableType() corelib.TableType {
+	return table
+}
+
 func NewUser() *User {
 	return &User{
 		Id{},
@@ -203,5 +307,8 @@ func NewUser() *User {
 		Email{val: ""},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
+		FloatType{val: float32(0)},
+		DoubleType{val: float64(0)},
+		Hobby{val: "swimming"},
 	}
 }
