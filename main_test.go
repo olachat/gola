@@ -48,7 +48,7 @@ func init() {
 
 	config := server.Config{
 		Protocol: "tcp",
-		Address:  fmt.Sprintf("localhost:%d", testDBPort1),
+		Address:  fmt.Sprintf("localhost:%d", testDBPort),
 		Auth:     auth.NewNativeSingle("root", "", auth.AllPermissions),
 	}
 	var err error
@@ -60,7 +60,7 @@ func init() {
 
 	go s.Start()
 
-	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort1, "false")
+	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
 		panic(err)
@@ -102,7 +102,7 @@ func TestCodeGen(t *testing.T) {
 		"dbname":    testDBName,
 		"whitelist": testTables,
 		"host":      "localhost",
-		"port":      testDBPort1,
+		"port":      testDBPort,
 		"user":      "root",
 		"pass":      "",
 		"sslmode":   "false",
