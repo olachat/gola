@@ -70,17 +70,20 @@ func RunMultipleAsTrx(ctx context.Context, db *sql.DB, queryFuncs []TrxAction) (
 
 			fmt.Println("-----------roll back 1------")
 
-			rows, err := db.Query("SELECT * FROM squareNum")
+			rows, err := trx.Query("SELECT * FROM squareNum")
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
 
-			count := 0
-			for rows.Next() {
-				count++
+			if rows != nil {
+				count := 0
+				for rows.Next() {
+					count++
+				}
+
+				fmt.Printf("-----------count 4: %d\n", count)
 			}
 
-			fmt.Printf("-----------count 4: %d\n", count)
 
 			err = fmt.Errorf("mysql_util: RunAsTrx: rollback: panic=%#v, errRollback=%#v", r, errRollback)
 
@@ -90,17 +93,19 @@ func RunMultipleAsTrx(ctx context.Context, db *sql.DB, queryFuncs []TrxAction) (
 
 			fmt.Println("-----------roll back 2------")
 
-			rows, _ := db.Query("SELECT * FROM squareNum")
+			rows, _ := trx.Query("SELECT * FROM squareNum")
 			//if err != nil {
 			//	panic(err.Error()) // proper error handling instead of panic in your app
 			//}
 
-			count := 0
-			for rows.Next() {
-				count++
-			}
+			if rows != nil {
+				count := 0
+				for rows.Next() {
+					count++
+				}
 
-			fmt.Printf("-----------count 3: %d\n", count)
+				fmt.Printf("-----------count 3: %d\n", count)
+			}
 
 			err = fmt.Errorf("mysql_util: RunAsTrx: err is not nil: err=%w, errRollback=%#v", err, errRollback)
 
@@ -118,17 +123,19 @@ func RunMultipleAsTrx(ctx context.Context, db *sql.DB, queryFuncs []TrxAction) (
 
 			fmt.Println("-----------roll back------")
 
-			rows, err := db.Query("SELECT * FROM squareNum")
+			rows, err := trx.Query("SELECT * FROM squareNum")
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
 
-			count := 0
-			for rows.Next() {
-				count++
-			}
+			if rows != nil {
+				count := 0
+				for rows.Next() {
+					count++
+				}
 
-			fmt.Printf("-----------count 2: %d\n", count)
+				fmt.Printf("-----------count 2: %d\n", count)
+			}
 
 			//spew.Dump(rows)
 

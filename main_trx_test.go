@@ -75,7 +75,7 @@ func TestTransaction(t *testing.T) {
 
 			fmt.Println("-----------start")
 
-			rows, err := db.Query("SELECT * FROM squareNum")
+			rows, err := trx.Query("SELECT * FROM squareNum")
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
@@ -87,14 +87,14 @@ func TestTransaction(t *testing.T) {
 
 			fmt.Printf("-----------count 1: %d\n", count)
 
-			stmtIns, err := db.Prepare("INSERT INTO squareNum VALUES( ?, ? )") // ? = placeholder
+			stmtIns, err := trx.Prepare("INSERT INTO squareNum VALUES( ?, ? )") // ? = placeholder
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
 			defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
 
-			i := 3
-			_, err = stmtIns.Exec(i, (i * i)) // Insert tuples (i, i^2)
+			//i := 3
+			_, err = trx.Exec("INSERT INTO squareNum VALUES( 3, 9 )") // Insert tuples (i, i^2)
 			if err != nil {
 				panic(err.Error()) // proper error handling instead of panic in your app
 			}
