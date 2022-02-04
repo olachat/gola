@@ -29,7 +29,6 @@ func FetchById[T any, PT PointerType[T]](ctx context.Context, id int) PT {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T](ctx)
 	data := StrutForScan(ctx, u)
-	columnsNames = "; DROP TABLES;"
 	query := fmt.Sprintf("SELECT %s from %s where id=%d", columnsNames, tableName, id)
 	err2 := db.QueryRow(query).Scan(data...)
 

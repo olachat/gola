@@ -28,7 +28,10 @@ import (
 var fixtures embed.FS
 var s *server.Server
 
-var testDBPort1 int = 33067
+var testDBPort int = 33061
+var testDBName string = "testdb"
+var testTables = []string{"users"}
+var tableName string = "users"
 
 //var testDBName string = "testdb"
 //var testTables = []string{"users"}
@@ -45,7 +48,7 @@ func init() {
 
 	config := server.Config{
 		Protocol: "tcp",
-		Address:  fmt.Sprintf("localhost:%d", testDBPort1),
+		Address:  fmt.Sprintf("localhost:%d", testDBPort),
 		Auth:     auth.NewNativeSingle("root", "", auth.AllPermissions),
 	}
 	var err error
@@ -57,7 +60,7 @@ func init() {
 
 	go s.Start()
 
-	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort1, "false")
+	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
 		panic(err)
@@ -99,7 +102,7 @@ func TestCodeGen(t *testing.T) {
 		"dbname":    testDBName,
 		"whitelist": testTables,
 		"host":      "localhost",
-		"port":      testDBPort1,
+		"port":      testDBPort,
 		"user":      "root",
 		"pass":      "",
 		"sslmode":   "false",
