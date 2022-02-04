@@ -8,9 +8,10 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
 	"database/sql"
-
+	//"context"
+	//"errors"
+	//"github.com/olachat/gola/util/mysql_util"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/go-cmp/cmp"
 
@@ -32,6 +33,8 @@ var testDBPort int = 33061
 var testDBName string = "testdb"
 var testTables = []string{"users"}
 var tableName string = "users"
+
+//var db *sql.DB
 
 //var testDBName string = "testdb"
 //var testTables = []string{"users"}
