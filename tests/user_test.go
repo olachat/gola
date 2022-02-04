@@ -59,17 +59,73 @@ func init() {
 
 	//add data
 	db.Exec(`
-insert into users (name, email, created_at, updated_at) values
-("John Doe", "john@doe.com", NOW(), NOW()),
-("John Doe", "johnalt@doe.com", NOW(), NOW()),
-("Jane Doe", "jane@doe.com", NOW(), NOW()),
-("Evil Bob", "evilbob@gmail.com", NOW(), NOW())
+insert into users (name, email, created_at, updated_at, float_type, double_type, hobby) values
+("John Doe", "john@doe.com", NOW(), NOW(), 1.55555, 1.8729, 'running'),
+("John Doe", "johnalt@doe.com", NOW(), NOW(), 2.5, 2.8239, 'swimming'),
+("Jane Doe", "jane@doe.com", NOW(), NOW(), 3.5, 334.8593, 'singing'),
+("Evil Bob", "evilbob@gmail.com", NOW(), NOW(), 4.5, 42234.83, 'singing')
 	`)
 }
 
 type SimpleUser struct {
 	users.Name
 	users.Email
+}
+
+func TestUserDouble(t *testing.T) {
+	u1 := users.FetchUserById(1)
+	if u1.GetDoubleType() != 1.8729 {
+		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u1.GetDoubleType())
+	}
+	if u1.GetFloatType() != 1.55555 {
+		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u1.GetFloatType())
+	}
+
+	u2 := users.FetchUserById(2)
+	if u2.GetDoubleType() != 2.8239 {
+		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u2.GetDoubleType())
+	}
+	if u2.GetFloatType() != 2.5 {
+		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u2.GetFloatType())
+	}
+
+	u3 := users.FetchUserById(3)
+	if u3.GetDoubleType() != 334.8593 {
+		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u3.GetDoubleType())
+	}
+	if u3.GetFloatType() != 3.5 {
+		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u3.GetFloatType())
+	}
+
+	u4 := users.FetchUserById(4)
+	if u4.GetDoubleType() != 42234.83 {
+		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u4.GetDoubleType())
+	}
+	if u4.GetFloatType() != 4.5 {
+		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u4.GetFloatType())
+	}
+}
+
+func TestUserHobby(t *testing.T) {
+	u1 := users.FetchUserById(1)
+	if u1.GetHobby() != users.UserHobbyRunning {
+		t.Errorf("FetchUserById GetHobby returns unexpected value: %v", u1.GetHobby())
+	}
+
+	u2 := users.FetchUserById(2)
+	if u2.GetHobby() != users.UserHobbySwimming {
+		t.Errorf("FetchUserById GetHobby returns unexpected value: %v", u2.GetHobby())
+	}
+
+	u3 := users.FetchUserById(3)
+	if u3.GetHobby() != users.UserHobbySinging {
+		t.Errorf("FetchUserById GetHobby returns unexpected value: %v", u3.GetHobby())
+	}
+
+	u4 := users.FetchUserById(4)
+	if u4.GetHobby() != users.UserHobbySinging {
+		t.Errorf("FetchUserById GetHobby returns unexpected value: %v", u4.GetHobby())
+	}
 }
 
 func TestUserMethods(t *testing.T) {

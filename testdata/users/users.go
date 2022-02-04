@@ -19,6 +19,12 @@ type User struct {
 	CreatedAt
 	// Updated Timestamp int unsigned
 	UpdatedAt
+	// float float
+	FloatType
+	// double double
+	DoubleType
+	// user hobby enum('swimming','running','singing')
+	Hobby
 }
 
 type UserTable struct{}
@@ -47,6 +53,14 @@ func FetchByIds[T any, PT corelib.PointerType[T]](ctx context.Context, ids []int
 }
 
 // Column types
+type UserHobby string
+
+const (
+	UserHobbySwimming UserHobby = "swimming"
+	UserHobbyRunning  UserHobby = "running"
+	UserHobbySinging  UserHobby = "singing"
+)
+
 // Id field
 //
 type Id struct {
@@ -204,5 +218,8 @@ func NewUser(ctx context.Context) *User {
 		Email{val: ""},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
+		FloatType{val: float32(0)},
+		DoubleType{val: float64(0)},
+		Hobby{val: "swimming"},
 	}
 }
