@@ -81,7 +81,7 @@ func (m *MySQLDriver) Assemble(config drivers.Config) (dbinfo *drivers.DBInfo, e
 	}
 
 	dbinfo.Schema = schema
-	dbinfo.Tables, err = drivers.Tables(m, schema, whitelist, blacklist)
+	dbinfo.Tables, err = Tables(m, schema, whitelist, blacklist)
 	if err != nil {
 		return nil, err
 	}
