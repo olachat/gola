@@ -54,7 +54,7 @@ func GetTable(tables []*Table, name string) (tbl *Table) {
 }
 
 // GetColumn by name. Panics if not found (for use in templates mostly).
-func (t Table) GetColumn(name string) (col Column) {
+func (t *Table) GetColumn(name string) (col Column) {
 	for _, c := range t.Columns {
 		if c.Name == name {
 			return c

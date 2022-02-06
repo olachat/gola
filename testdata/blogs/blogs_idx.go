@@ -4,6 +4,9 @@ package blogs
 
 type orderBy int
 
+type idxQuery[T any] struct {
+}
+
 const (
 	IdAsc orderBy = iota
 	IdDesc
@@ -26,3 +29,35 @@ const (
 	UpdatedAtAsc
 	UpdatedAtDesc
 )
+
+func (q *idxQuery[T]) WhereCategoryIdEQ(val int) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereCategoryIdIN(vals ...int) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereCountryEQ(val string) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereCountryIN(vals ...string) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereSlugEQ(val string) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereSlugIN(vals ...string) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereUserIdEQ(val int) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereUserIdIN(vals ...int) idxQuery[T] {
+	return q
+}

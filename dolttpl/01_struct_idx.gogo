@@ -4,6 +4,9 @@ package {{.Package}}
 
 type orderBy int
 
+type idxQuery[T any] struct {
+}
+
 const (
 {{- range $i, $col := .Columns }}
 	{{- if eq $i 0 }}
@@ -15,3 +18,13 @@ const (
 	{{- end }}
 {{- end }}
 )
+
+{{- range $i, $col := .FirstIdxColumns }}
+func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) idxQuery[T] {
+	return q
+}
+{{ end }}

@@ -34,6 +34,27 @@ func (t *Table) ClassName() string {
 	return name
 }
 
+func (t *Table) FirstIdxColumns() []Column {
+	firstCols := make(map[string]bool)
+
+	for _, items := range t.Indexes {
+		firstCols[items[0].Column_name] = true
+	}
+
+	result := make([]Column, len(firstCols))
+	i := 0
+	for colName, _ := range firstCols {
+		result[i] = t.GetColumn(colName)
+		i++
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Name < result[j].Name
+	})
+
+	return result
+}
+
 func (t *Table) Imports() string {
 	packages := make(map[string]bool)
 	for _, c := range t.Columns {

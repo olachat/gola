@@ -2,17 +2,6 @@ package blogs
 
 import "github.com/olachat/gola/corelib"
 
-type idxQuery[T any] struct {
-}
-
-func (q *idxQuery[T]) WhereCountryEQ(country string) iQuery2[T] {
-	return q
-}
-
-func (q *idxQuery[T]) WhereCountryIN(country ...string) iQuery2[T] {
-	return q
-}
-
 func (q *idxQuery[T]) AndCategoryIdEQ(categoryId int) corelib.ReadQuery[T] {
 	return q
 }

@@ -4,6 +4,9 @@ package users
 
 type orderBy int
 
+type idxQuery[T any] struct {
+}
+
 const (
 	IdAsc orderBy = iota
 	IdDesc
@@ -22,3 +25,19 @@ const (
 	HobbyAsc
 	HobbyDesc
 )
+
+func (q *idxQuery[T]) WhereEmailEQ(val string) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereEmailIN(vals ...string) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereNameEQ(val string) idxQuery[T] {
+	return q
+}
+
+func (q *idxQuery[T]) WhereNameIN(vals ...string) idxQuery[T] {
+	return q
+}
