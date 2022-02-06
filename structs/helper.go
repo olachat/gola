@@ -30,3 +30,13 @@ func getValue(fullDBType string) string {
 
 	return ""
 }
+
+func setInclude(str string, slice []string) bool {
+	for _, s := range slice {
+		if str == s {
+			return true
+		}
+	}
+
+	return false
+}

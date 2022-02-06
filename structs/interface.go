@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/strmangle"
+	"github.com/pkg/errors"
 )
 
 // These constants are used in the config map passed into the driver
@@ -140,8 +139,8 @@ func setIsJoinTable(t *Table) {
 func filterForeignKeys(t *Table, whitelist, blacklist []string) {
 	var fkeys []ForeignKey
 	for _, fkey := range t.FKeys {
-		if (len(whitelist) == 0 || strmangle.SetInclude(fkey.ForeignTable, whitelist)) &&
-			(len(blacklist) == 0 || !strmangle.SetInclude(fkey.ForeignTable, blacklist)) {
+		if (len(whitelist) == 0 || setInclude(fkey.ForeignTable, whitelist)) &&
+			(len(blacklist) == 0 || !setInclude(fkey.ForeignTable, blacklist)) {
 			fkeys = append(fkeys, fkey)
 		}
 	}
