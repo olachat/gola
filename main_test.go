@@ -22,6 +22,7 @@ import (
 	gsql "github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	"github.com/olachat/gola/mysqldriver"
+	"github.com/olachat/gola/structs"
 )
 
 //go:embed testdata
@@ -70,9 +71,9 @@ func init() {
 	}
 }
 
-type genMethod func(db *mysqldriver.DBInfo, t mysqldriver.Table) map[string][]byte
+type genMethod func(db *structs.DBInfo, t structs.Table) map[string][]byte
 
-func testGen(t *testing.T, wd string, gen genMethod, db *mysqldriver.DBInfo, table mysqldriver.Table) {
+func testGen(t *testing.T, wd string, gen genMethod, db *structs.DBInfo, table structs.Table) {
 	resultFiles := gen(db, table)
 	expectedFileFolder := testDataPath + table.Name + string(filepath.Separator)
 

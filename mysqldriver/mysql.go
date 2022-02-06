@@ -10,11 +10,12 @@ import (
 
 	"github.com/friendsofgo/errors"
 	"github.com/go-sql-driver/mysql"
+	"github.com/olachat/gola/structs"
 )
 
 // Assemble is more useful for calling into the library so you don't
 // have to instantiate an empty type.
-func Assemble(config Config) (dbinfo *DBInfo, err error) {
+func Assemble(config Config) (dbinfo *structs.DBInfo, err error) {
 	driver := MySQLDriver{}
 	return driver.Assemble(config)
 }
@@ -29,7 +30,7 @@ type MySQLDriver struct {
 }
 
 // Assemble all the information we need to provide back to the driver
-func (m *MySQLDriver) Assemble(config Config) (dbinfo *DBInfo, err error) {
+func (m *MySQLDriver) Assemble(config Config) (dbinfo *structs.DBInfo, err error) {
 	defer func() {
 		if r := recover(); r != nil && err == nil {
 			dbinfo = nil
@@ -37,16 +38,16 @@ func (m *MySQLDriver) Assemble(config Config) (dbinfo *DBInfo, err error) {
 		}
 	}()
 
-	user := config.MustString(ConfigUser)
-	pass, _ := config.String(ConfigPass)
-	dbname := config.MustString(ConfigDBName)
-	host := config.MustString(ConfigHost)
-	port := config.DefaultInt(ConfigPort, 3306)
-	sslmode := config.DefaultString(ConfigSSLMode, "true")
+	user := config.MustString(structs.ConfigUser)
+	pass, _ := config.String(structs.ConfigPass)
+	dbname := config.MustString(structs.ConfigDBName)
+	host := config.MustString(structs.ConfigHost)
+	port := config.DefaultInt(structs.ConfigPort, 3306)
+	sslmode := config.DefaultString(structs.ConfigSSLMode, "true")
 
 	schema := dbname
-	whitelist, _ := config.StringSlice(ConfigWhitelist)
-	blacklist, _ := config.StringSlice(ConfigBlacklist)
+	whitelist, _ := config.StringSlice(structs.ConfigWhitelist)
+	blacklist, _ := config.StringSlice(structs.ConfigBlacklist)
 
 	tinyIntAsIntIntf, ok := config["tinyint_as_int"]
 	if ok {
@@ -68,10 +69,10 @@ func (m *MySQLDriver) Assemble(config Config) (dbinfo *DBInfo, err error) {
 		}
 	}()
 
-	dbinfo = &DBInfo{}
+	dbinfo = &structs.DBInfo{}
 
 	dbinfo.Schema = schema
-	dbinfo.Tables, err = Tables(m, schema, whitelist, blacklist)
+	dbinfo.Tables, err = structs.Tables(m, schema, whitelist, blacklist)
 	if err != nil {
 		return nil, err
 	}
@@ -155,8 +156,8 @@ func (m *MySQLDriver) TableNames(schema string, whitelist, blacklist []string) (
 // from the database information_schema.columns. It retrieves the column names
 // and column types and returns those as a []Column after TranslateColumnType()
 // converts the SQL types to Go types, for example: "varchar" to "string"
-func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []string) ([]Column, error) {
-	var columns []Column
+func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []string) ([]structs.Column, error) {
+	var columns []structs.Column
 	args := []interface{}{tableName, schema}
 
 	query := `
@@ -209,7 +210,7 @@ func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []s
 			return nil, errors.Wrapf(err, "unable to scan for table %s", tableName)
 		}
 
-		column := Column{
+		column := structs.Column{
 			Name:       colName,
 			Comment:    colComment,
 			FullDBType: colFullType, // example: tinyint(1) instead of tinyint
@@ -229,8 +230,8 @@ func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []s
 }
 
 // PrimaryKeyInfo looks up the primary key for a table.
-func (m *MySQLDriver) PrimaryKeyInfo(schema, tableName string) (*PrimaryKey, error) {
-	pkey := &PrimaryKey{}
+func (m *MySQLDriver) PrimaryKeyInfo(schema, tableName string) (*structs.PrimaryKey, error) {
+	pkey := &structs.PrimaryKey{}
 	var err error
 
 	query := `
@@ -280,8 +281,8 @@ func (m *MySQLDriver) PrimaryKeyInfo(schema, tableName string) (*PrimaryKey, err
 }
 
 // ForeignKeyInfo retrieves the foreign keys for a given table name.
-func (m *MySQLDriver) ForeignKeyInfo(schema, tableName string) ([]ForeignKey, error) {
-	var fkeys []ForeignKey
+func (m *MySQLDriver) ForeignKeyInfo(schema, tableName string) ([]structs.ForeignKey, error) {
+	var fkeys []structs.ForeignKey
 
 	query := `
 	select constraint_name, table_name, column_name, referenced_table_name, referenced_column_name
@@ -297,7 +298,7 @@ func (m *MySQLDriver) ForeignKeyInfo(schema, tableName string) ([]ForeignKey, er
 	}
 
 	for rows.Next() {
-		var fkey ForeignKey
+		var fkey structs.ForeignKey
 		var sourceTable string
 
 		fkey.Table = tableName
@@ -319,7 +320,7 @@ func (m *MySQLDriver) ForeignKeyInfo(schema, tableName string) ([]ForeignKey, er
 // TranslateColumnType converts mysql database types to Go types, for example
 // "varchar" to "string" and "bigint" to "int64". It returns this parsed data
 // as a Column object.
-func (m *MySQLDriver) TranslateColumnType(c Column) Column {
+func (m *MySQLDriver) TranslateColumnType(c structs.Column) structs.Column {
 	unsigned := strings.Contains(c.FullDBType, "unsigned")
 	if c.Nullable {
 		switch c.DBType {

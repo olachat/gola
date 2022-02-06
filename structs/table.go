@@ -3,11 +3,9 @@ package structs
 import (
 	"sort"
 	"strings"
-
-	"github.com/olachat/gola/mysqldriver"
 )
 
-func NewTableStruct(DBInfo *mysqldriver.DBInfo, t mysqldriver.Table, version string) *TableStruct {
+func NewTableStruct(DBInfo *DBInfo, t Table, version string) *TableStruct {
 	columns := make([]ColumnStruct, 0, len(t.Columns))
 	ts := &TableStruct{DBInfo, t, nil, version}
 	for _, c := range t.Columns {
@@ -21,8 +19,8 @@ func NewTableStruct(DBInfo *mysqldriver.DBInfo, t mysqldriver.Table, version str
 }
 
 type TableStruct struct {
-	dbinfo *mysqldriver.DBInfo
-	mysqldriver.Table
+	dbinfo *DBInfo
+	Table
 	sqlColumns []ColumnStruct
 	VERSION    string
 }

@@ -66,7 +66,7 @@ func main() {
 	}
 }
 
-func genTPL(db *mysqldriver.DBInfo, t mysqldriver.Table, tplName string) []byte {
+func genTPL(db *structs.DBInfo, t structs.Table, tplName string) []byte {
 	buf := bytes.NewBufferString("")
 	err := dolttpl.GetTpl(tplName).Execute(buf, structs.NewTableStruct(db, t, VERSION))
 	if err != nil {
@@ -75,7 +75,7 @@ func genTPL(db *mysqldriver.DBInfo, t mysqldriver.Table, tplName string) []byte 
 	return buf.Bytes()
 }
 
-func genORM(db *mysqldriver.DBInfo, t mysqldriver.Table) map[string][]byte {
+func genORM(db *structs.DBInfo, t structs.Table) map[string][]byte {
 	files := make(map[string][]byte)
 
 	tableFolder := t.Name + string(filepath.Separator)

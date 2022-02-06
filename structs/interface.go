@@ -1,4 +1,4 @@
-package mysqldriver
+package structs
 
 // modified from: https://github.com/volatiletech/sqlboiler/blob/v4.6.0/drivers/sqlboiler-mysql/driver/interface.go
 
