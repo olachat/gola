@@ -5,7 +5,7 @@ package {{.Package}}
 type orderBy int
 
 const (
-{{- range $i, $col := .SqlColumns }}
+{{- range $i, $col := .Columns }}
 	{{- if eq $i 0 }}
 	{{$col.GoName}}Asc orderBy = iota
 	{{$col.GoName}}Desc

@@ -6,23 +6,24 @@ import (
 )
 
 func NewTableStruct(DBInfo *DBInfo, t Table, version string) *TableStruct {
-	columns := make([]ColumnStruct, 0, len(t.Columns))
-	ts := &TableStruct{DBInfo, t, nil, version}
-	for _, c := range t.Columns {
+	ts := &TableStruct{DBInfo, t, version}
+	columns := make([]Column, len(t.Columns))
+	for i, c := range t.Columns {
 		c.Comment = strings.ReplaceAll(c.Comment, "\r\n", " ")
 		c.Comment = strings.ReplaceAll(c.Comment, "\n", " ")
 		c.Comment = strings.ReplaceAll(c.Comment, "\"", "'")
-		columns = append(columns, ColumnStruct{c, ts})
+		c.table = ts
+		columns[i] = c
 	}
-	ts.sqlColumns = columns
+
+	ts.Columns = columns
 	return ts
 }
 
 type TableStruct struct {
 	dbinfo *DBInfo
 	Table
-	sqlColumns []ColumnStruct
-	VERSION    string
+	VERSION string
 }
 
 func (t *TableStruct) Package() string {
@@ -38,13 +39,9 @@ func (t *TableStruct) ClassName() string {
 	return name
 }
 
-func (t *TableStruct) SqlColumns() []ColumnStruct {
-	return t.sqlColumns
-}
-
 func (t *TableStruct) Imports() string {
 	packages := make(map[string]bool)
-	for _, c := range t.sqlColumns {
+	for _, c := range t.Columns {
 		if strings.Contains(c.SQLType(), "Time") {
 			packages[`"time"`] = true
 		}
