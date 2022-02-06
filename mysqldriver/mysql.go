@@ -156,7 +156,7 @@ func (m *MySQLDriver) TableNames(schema string, whitelist, blacklist []string) (
 // from the database information_schema.columns. It retrieves the column names
 // and column types and returns those as a []Column after TranslateColumnType()
 // converts the SQL types to Go types, for example: "varchar" to "string"
-func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []string) ([]structs.Column, error) {
+func (m *MySQLDriver) Columns(schema string, table *structs.Table, tableName string, whitelist, blacklist []string) ([]structs.Column, error) {
 	var columns []structs.Column
 	args := []interface{}{tableName, schema}
 
@@ -222,6 +222,12 @@ func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []s
 		if defaultValue != nil && *defaultValue != "NULL" {
 			column.Default = *defaultValue
 		}
+
+		column.Comment = strings.ReplaceAll(column.Comment, "\r\n", " ")
+		column.Comment = strings.ReplaceAll(column.Comment, "\n", " ")
+		column.Comment = strings.ReplaceAll(column.Comment, "\"", "'")
+
+		column.Table = table
 
 		columns = append(columns, column)
 	}

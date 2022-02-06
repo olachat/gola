@@ -71,9 +71,9 @@ func init() {
 	}
 }
 
-type genMethod func(db *structs.DBInfo, t structs.Table) map[string][]byte
+type genMethod func(db *structs.DBInfo, t *structs.Table) map[string][]byte
 
-func testGen(t *testing.T, wd string, gen genMethod, db *structs.DBInfo, table structs.Table) {
+func testGen(t *testing.T, wd string, gen genMethod, db *structs.DBInfo, table *structs.Table) {
 	resultFiles := gen(db, table)
 	expectedFileFolder := testDataPath + table.Name + string(filepath.Separator)
 

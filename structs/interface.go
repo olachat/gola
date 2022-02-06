@@ -25,22 +25,8 @@ const (
 )
 
 type DBInfo struct {
-	Schema string  `json:"schema"`
-	Tables []Table `json:"tables"`
-}
-
-type Table struct {
-	Name string `json:"name"`
-	// For dbs with real schemas, like Postgres.
-	// Example value: "schema_name"."table_name"
-	SchemaName string   `json:"schema_name"`
-	Columns    []Column `json:"columns"`
-
-	PKey  *PrimaryKey  `json:"p_key"`
-	FKeys []ForeignKey `json:"f_keys"`
-
-	IsJoinTable bool `json:"is_join_table"`
-	Indexes     []*IndexDesc
+	Schema string   `json:"schema"`
+	Tables []*Table `json:"tables"`
 }
 
 // Constructor breaks down the functionality required to implement a driver
@@ -48,7 +34,7 @@ type Table struct {
 // implementations.
 type Constructor interface {
 	TableNames(schema string, whitelist, blacklist []string) ([]string, error)
-	Columns(schema, tableName string, whitelist, blacklist []string) ([]Column, error)
+	Columns(schema string, table *Table, tableName string, whitelist, blacklist []string) ([]Column, error)
 	PrimaryKeyInfo(schema, tableName string) (*PrimaryKey, error)
 	ForeignKeyInfo(schema, tableName string) ([]ForeignKey, error)
 
@@ -57,7 +43,7 @@ type Constructor interface {
 }
 
 // GetTable by name. Panics if not found (for use in templates mostly).
-func GetTable(tables []Table, name string) (tbl Table) {
+func GetTable(tables []*Table, name string) (tbl *Table) {
 	for _, t := range tables {
 		if t.Name == name {
 			return t
@@ -78,7 +64,7 @@ func (t Table) GetColumn(name string) (col Column) {
 	panic(fmt.Sprintf("could not find column name: %s", name))
 }
 
-func Tables(c Constructor, schema string, whitelist, blacklist []string) ([]Table, error) {
+func Tables(c Constructor, schema string, whitelist, blacklist []string) ([]*Table, error) {
 	var err error
 
 	names, err := c.TableNames(schema, whitelist, blacklist)
@@ -88,13 +74,13 @@ func Tables(c Constructor, schema string, whitelist, blacklist []string) ([]Tabl
 
 	sort.Strings(names)
 
-	var tables []Table
+	var tables []*Table
 	for _, name := range names {
-		t := Table{
+		t := &Table{
 			Name: name,
 		}
 
-		if t.Columns, err = c.Columns(schema, name, whitelist, blacklist); err != nil {
+		if t.Columns, err = c.Columns(schema, t, name, whitelist, blacklist); err != nil {
 			return nil, errors.Wrapf(err, "unable to fetch table column info (%s)", name)
 		}
 
@@ -110,16 +96,16 @@ func Tables(c Constructor, schema string, whitelist, blacklist []string) ([]Tabl
 			return nil, errors.Wrapf(err, "unable to fetch table fkey info (%s)", name)
 		}
 
-		filterForeignKeys(&t, whitelist, blacklist)
+		filterForeignKeys(t, whitelist, blacklist)
 
-		setIsJoinTable(&t)
+		setIsJoinTable(t)
 
 		tables = append(tables, t)
 	}
 
 	// Relationships have a dependency on foreign key nullability.
 	for i := range tables {
-		tbl := &tables[i]
+		tbl := tables[i]
 		setForeignKeyConstraints(tbl, tables)
 	}
 
@@ -162,7 +148,7 @@ func filterForeignKeys(t *Table, whitelist, blacklist []string) {
 	t.FKeys = fkeys
 }
 
-func setForeignKeyConstraints(t *Table, tables []Table) {
+func setForeignKeyConstraints(t *Table, tables []*Table) {
 	for i, fkey := range t.FKeys {
 		localColumn := t.GetColumn(fkey.Column)
 		foreignTable := GetTable(tables, fkey.ForeignTable)

@@ -4,7 +4,7 @@ import "github.com/olachat/gola/structs"
 
 func (m *MySQLDriver) SetIndexAndKey(dbinfo *structs.DBInfo) (err error) {
 	for i := range dbinfo.Tables {
-		t := &dbinfo.Tables[i]
+		t := dbinfo.Tables[i]
 		var tableDesc []*structs.RowDesc
 		rows, err := m.conn.Query("desc " + t.Name)
 		if err != nil {
