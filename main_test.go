@@ -172,13 +172,13 @@ func TestIdx(t *testing.T) {
 					t.Error("Failed to parse blogs.user_pinned_cate index")
 				}
 				if data[0].Column_name != "user_id" {
-					t.Error("Failed to parse blogs.user_pinned_cate index unique")
+					t.Error("Failed to parse blogs.user_pinned_cate index user_id column")
 				}
 				if data[1].Column_name != "is_pinned" {
-					t.Error("Failed to parse blogs.user_pinned_cate index unique")
+					t.Error("Failed to parse blogs.user_pinned_cate index is_pinned column")
 				}
 				if data[2].Column_name != "category_id" {
-					t.Error("Failed to parse blogs.user_pinned_cate index unique")
+					t.Error("Failed to parse blogs.user_pinned_cate index category_id column")
 				}
 
 			}
