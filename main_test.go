@@ -22,7 +22,6 @@ import (
 	gsql "github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	"github.com/olachat/gola/mysqldriver"
-	"github.com/volatiletech/sqlboiler/v4/drivers"
 )
 
 //go:embed testdata
@@ -100,7 +99,7 @@ func testGen(t *testing.T, wd string, gen genMethod, db *mysqldriver.DBInfo, tab
 }
 
 func TestCodeGen(t *testing.T) {
-	var config drivers.Config = map[string]interface{}{
+	var config mysqldriver.Config = map[string]interface{}{
 		"dbname":    testDBName,
 		"whitelist": testTables,
 		"host":      "localhost",

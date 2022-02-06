@@ -8,8 +8,9 @@ require (
 	github.com/friendsofgo/errors v0.9.2
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/go-cmp v0.3.0
+	github.com/pkg/errors v0.8.1
 	github.com/spf13/viper v1.6.3
-	github.com/volatiletech/sqlboiler/v4 v4.6.0
+	github.com/volatiletech/strmangle v0.0.1
 )
 
 require (
@@ -30,7 +31,6 @@ require (
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852 // indirect
 	github.com/opentracing/opentracing-go v1.1.0 // indirect
 	github.com/pelletier/go-toml v1.2.0 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/shopspring/decimal v0.0.0-20191130220710-360f2bc03045 // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect
@@ -42,7 +42,6 @@ require (
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
-	github.com/volatiletech/strmangle v0.0.1 // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58 // indirect
 	golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 // indirect

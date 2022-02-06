@@ -10,13 +10,11 @@ import (
 
 	"github.com/friendsofgo/errors"
 	"github.com/go-sql-driver/mysql"
-	"github.com/volatiletech/sqlboiler/v4/drivers"
-	"github.com/volatiletech/sqlboiler/v4/importers"
 )
 
 // Assemble is more useful for calling into the library so you don't
 // have to instantiate an empty type.
-func Assemble(config drivers.Config) (dbinfo *DBInfo, err error) {
+func Assemble(config Config) (dbinfo *DBInfo, err error) {
 	driver := MySQLDriver{}
 	return driver.Assemble(config)
 }
@@ -31,7 +29,7 @@ type MySQLDriver struct {
 }
 
 // Assemble all the information we need to provide back to the driver
-func (m *MySQLDriver) Assemble(config drivers.Config) (dbinfo *DBInfo, err error) {
+func (m *MySQLDriver) Assemble(config Config) (dbinfo *DBInfo, err error) {
 	defer func() {
 		if r := recover(); r != nil && err == nil {
 			dbinfo = nil
@@ -39,16 +37,16 @@ func (m *MySQLDriver) Assemble(config drivers.Config) (dbinfo *DBInfo, err error
 		}
 	}()
 
-	user := config.MustString(drivers.ConfigUser)
-	pass, _ := config.String(drivers.ConfigPass)
-	dbname := config.MustString(drivers.ConfigDBName)
-	host := config.MustString(drivers.ConfigHost)
-	port := config.DefaultInt(drivers.ConfigPort, 3306)
-	sslmode := config.DefaultString(drivers.ConfigSSLMode, "true")
+	user := config.MustString(ConfigUser)
+	pass, _ := config.String(ConfigPass)
+	dbname := config.MustString(ConfigDBName)
+	host := config.MustString(ConfigHost)
+	port := config.DefaultInt(ConfigPort, 3306)
+	sslmode := config.DefaultString(ConfigSSLMode, "true")
 
 	schema := dbname
-	whitelist, _ := config.StringSlice(drivers.ConfigWhitelist)
-	blacklist, _ := config.StringSlice(drivers.ConfigBlacklist)
+	whitelist, _ := config.StringSlice(ConfigWhitelist)
+	blacklist, _ := config.StringSlice(ConfigBlacklist)
 
 	tinyIntAsIntIntf, ok := config["tinyint_as_int"]
 	if ok {
@@ -116,7 +114,7 @@ func (m *MySQLDriver) TableNames(schema string, whitelist, blacklist []string) (
 	query := `select table_name from information_schema.tables where table_schema = ? and table_type = 'BASE TABLE'`
 	args := []interface{}{schema}
 	if len(whitelist) > 0 {
-		tables := drivers.TablesFromList(whitelist)
+		tables := TablesFromList(whitelist)
 		if len(tables) > 0 {
 			query += fmt.Sprintf(" and table_name in (%s)", strings.Repeat(",?", len(tables))[1:])
 			for _, w := range tables {
@@ -124,7 +122,7 @@ func (m *MySQLDriver) TableNames(schema string, whitelist, blacklist []string) (
 			}
 		}
 	} else if len(blacklist) > 0 {
-		tables := drivers.TablesFromList(blacklist)
+		tables := TablesFromList(blacklist)
 		if len(tables) > 0 {
 			query += fmt.Sprintf(" and table_name not in (%s)", strings.Repeat(",?", len(tables))[1:])
 			for _, b := range tables {
@@ -430,123 +428,4 @@ func (m *MySQLDriver) TranslateColumnType(c Column) Column {
 	}
 
 	return c
-}
-
-// Imports returns important imports for the driver
-func (MySQLDriver) Imports() (col importers.Collection, err error) {
-	col.All = importers.Set{
-		Standard: importers.List{
-			`"strconv"`,
-		},
-	}
-
-	col.Singleton = importers.Map{
-		"mysql_upsert": {
-			Standard: importers.List{
-				`"fmt"`,
-				`"strings"`,
-			},
-			ThirdParty: importers.List{
-				`"github.com/volatiletech/strmangle"`,
-				`"github.com/volatiletech/sqlboiler/v4/drivers"`,
-			},
-		},
-	}
-
-	col.TestSingleton = importers.Map{
-		"mysql_suites_test": {
-			Standard: importers.List{
-				`"testing"`,
-			},
-		},
-		"mysql_main_test": {
-			Standard: importers.List{
-				`"bytes"`,
-				`"database/sql"`,
-				`"fmt"`,
-				`"io"`,
-				`"io/ioutil"`,
-				`"os"`,
-				`"os/exec"`,
-				`"regexp"`,
-				`"strings"`,
-			},
-			ThirdParty: importers.List{
-				`"github.com/kat-co/vala"`,
-				`"github.com/friendsofgo/errors"`,
-				`"github.com/spf13/viper"`,
-				`"github.com/volatiletech/sqlboiler/v4/drivers/sqlboiler-mysql/driver"`,
-				`"github.com/volatiletech/randomize"`,
-				`_ "github.com/go-sql-driver/mysql"`,
-			},
-		},
-	}
-
-	col.BasedOnType = importers.Map{
-		"null.Float32": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Float64": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Int": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Int8": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Int16": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Int32": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Int64": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Uint": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Uint8": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Uint16": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Uint32": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Uint64": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.String": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Bool": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Time": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.Bytes": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-		"null.JSON": {
-			ThirdParty: importers.List{`"github.com/volatiletech/null/v8"`},
-		},
-
-		"time.Time": {
-			Standard: importers.List{`"time"`},
-		},
-		"types.JSON": {
-			ThirdParty: importers.List{`"github.com/volatiletech/sqlboiler/v4/types"`},
-		},
-		"types.Decimal": {
-			ThirdParty: importers.List{`"github.com/volatiletech/sqlboiler/v4/types"`},
-		},
-		"types.NullDecimal": {
-			ThirdParty: importers.List{`"github.com/volatiletech/sqlboiler/v4/types"`},
-		},
-	}
-	return col, err
 }

@@ -10,6 +10,20 @@ import (
 	"github.com/volatiletech/strmangle"
 )
 
+// These constants are used in the config map passed into the driver
+const (
+	ConfigBlacklist = "blacklist"
+	ConfigWhitelist = "whitelist"
+	ConfigSchema    = "schema"
+
+	ConfigUser    = "user"
+	ConfigPass    = "pass"
+	ConfigHost    = "host"
+	ConfigPort    = "port"
+	ConfigDBName  = "dbname"
+	ConfigSSLMode = "sslmode"
+)
+
 type DBInfo struct {
 	Schema string  `json:"schema"`
 	Tables []Table `json:"tables"`

@@ -16,7 +16,6 @@ import (
 	"github.com/olachat/gola/dolttpl"
 	"github.com/olachat/gola/mysqldriver"
 	"github.com/olachat/gola/structs"
-	"github.com/volatiletech/sqlboiler/v4/drivers"
 
 	"github.com/spf13/viper"
 )
@@ -36,7 +35,7 @@ func main() {
 	viper.AutomaticEnv()
 	driverName := "mysql"
 
-	var config drivers.Config = viper.GetStringMap(driverName)
+	var config mysqldriver.Config = viper.GetStringMap(driverName)
 
 	m := &mysqldriver.MySQLDriver{}
 	db, err := m.Assemble(config)
