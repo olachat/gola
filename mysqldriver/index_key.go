@@ -1,6 +1,10 @@
 package mysqldriver
 
-import "github.com/olachat/gola/structs"
+import (
+	"sort"
+
+	"github.com/olachat/gola/structs"
+)
 
 func (m *MySQLDriver) SetIndexAndKey(dbinfo *structs.DBInfo) (err error) {
 	for i := range dbinfo.Tables {
@@ -36,7 +40,46 @@ func (m *MySQLDriver) SetIndexAndKey(dbinfo *structs.DBInfo) (err error) {
 				&id.Sub_part, &id.Packed, &id.Null, &id.Index_type, &id.Comment, &id.Index_comment, &id.Visible, &id.Expression)
 			indexDesc = append(indexDesc, id)
 		}
+		t.Indexes = groupIndex(indexDesc)
 	}
 
 	return nil
+}
+
+func filterBy[T any](items []*T, isNeeded func(item *T) bool) []*T {
+	result := make([]*T, 0, len(items))
+
+	for _, item := range items {
+		if isNeeded(item) {
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
+
+func groupIndex(indexDesc []*structs.IndexDesc) map[string][]*structs.IndexDesc {
+	data := make(map[string][]*structs.IndexDesc, 0)
+
+	for _, idx := range indexDesc {
+		key := idx.Key_name
+		if _, ok := data[key]; !ok {
+			data[key] = []*structs.IndexDesc{}
+		}
+	}
+
+	for name := range data {
+		items := filterBy(indexDesc, func(item *structs.IndexDesc) bool {
+			return item.Key_name == name
+		})
+
+		sort.Slice(items, func(i, j int) bool {
+			return items[i].Seq_in_index < items[j].Seq_in_index
+		})
+
+		data[name] = items
+
+	}
+
+	return data
 }

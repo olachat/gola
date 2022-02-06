@@ -17,7 +17,7 @@ type Table struct {
 	FKeys []ForeignKey `json:"f_keys"`
 
 	IsJoinTable bool `json:"is_join_table"`
-	Indexes     []*IndexDesc
+	Indexes     map[string][]*IndexDesc
 	VERSION     string
 }
 

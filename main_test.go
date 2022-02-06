@@ -71,6 +71,25 @@ func init() {
 	}
 }
 
+func getDB() *structs.DBInfo {
+	var config mysqldriver.Config = map[string]interface{}{
+		"dbname":    testDBName,
+		"whitelist": "blogs",
+		"host":      "localhost",
+		"port":      testDBPort,
+		"user":      "root",
+		"pass":      "",
+		"sslmode":   "false",
+	}
+
+	m := &mysqldriver.MySQLDriver{}
+	db, err := m.Assemble(config)
+	if err != nil {
+		panic(err)
+	}
+	return db
+}
+
 type genMethod func(db *structs.DBInfo, t *structs.Table) map[string][]byte
 
 func testGen(t *testing.T, wd string, gen genMethod, db *structs.DBInfo, table *structs.Table) {
@@ -100,21 +119,7 @@ func testGen(t *testing.T, wd string, gen genMethod, db *structs.DBInfo, table *
 }
 
 func TestCodeGen(t *testing.T) {
-	var config mysqldriver.Config = map[string]interface{}{
-		"dbname":    testDBName,
-		"whitelist": testTables,
-		"host":      "localhost",
-		"port":      testDBPort,
-		"user":      "root",
-		"pass":      "",
-		"sslmode":   "false",
-	}
-
-	m := &mysqldriver.MySQLDriver{}
-	db, err := m.Assemble(config)
-	if err != nil {
-		panic(err)
-	}
+	db := getDB()
 
 	wd, err := os.Getwd()
 	if err != nil {
@@ -123,5 +128,60 @@ func TestCodeGen(t *testing.T) {
 
 	for _, table := range db.Tables {
 		testGen(t, wd, genORM, db, table)
+	}
+}
+
+func TestIdx(t *testing.T) {
+	db := getDB()
+
+	// KEY `user` (`user_id`),
+	// KEY `country_cate` (`country`, `category_id`, `is_vip`),
+	// KEY `cate_pinned` (`category_id`, `is_pinned`, `is_vip`),
+	// KEY `user_pinned_cate` (`user_id`, `is_pinned`, `category_id`),
+	// UNIQUE KEY `slug` (`slug`)
+
+	for _, tb := range db.Tables {
+		if tb.Name != "blogs" {
+			continue
+		}
+
+		if len(tb.Indexes) != 5 {
+			t.Error("Failed to parse blogs table's 5 indexes")
+		}
+
+		for idxName, data := range tb.Indexes {
+			switch idxName {
+			case "user":
+				if len(data) != 1 && data[0].Column_name != "user_id" {
+					t.Error("Failed to parse blogs.user index")
+				}
+
+				if data[0].Non_unique != 1 {
+					t.Error("Failed to parse blogs.user index unique")
+				}
+			case "slug":
+				if len(data) != 1 && data[0].Column_name != "slug" {
+					t.Error("Failed to parse blogs.slug index")
+				}
+
+				if data[0].Non_unique != 0 {
+					t.Error("Failed to parse blogs.slug index unique")
+				}
+			case "user_pinned_cate":
+				if len(data) != 3 {
+					t.Error("Failed to parse blogs.user_pinned_cate index")
+				}
+				if data[0].Column_name != "user_id" {
+					t.Error("Failed to parse blogs.user_pinned_cate index unique")
+				}
+				if data[1].Column_name != "is_pinned" {
+					t.Error("Failed to parse blogs.user_pinned_cate index unique")
+				}
+				if data[2].Column_name != "category_id" {
+					t.Error("Failed to parse blogs.user_pinned_cate index unique")
+				}
+
+			}
+		}
 	}
 }
