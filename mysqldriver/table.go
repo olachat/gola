@@ -7,7 +7,6 @@ import (
 	"sort"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/sqlboiler/v4/drivers"
 	"github.com/volatiletech/strmangle"
 )
 
@@ -20,14 +19,27 @@ type Table struct {
 	Name string `json:"name"`
 	// For dbs with real schemas, like Postgres.
 	// Example value: "schema_name"."table_name"
-	SchemaName string           `json:"schema_name"`
-	Columns    []drivers.Column `json:"columns"`
+	SchemaName string   `json:"schema_name"`
+	Columns    []Column `json:"columns"`
 
-	PKey  *drivers.PrimaryKey  `json:"p_key"`
-	FKeys []drivers.ForeignKey `json:"f_keys"`
+	PKey  *PrimaryKey  `json:"p_key"`
+	FKeys []ForeignKey `json:"f_keys"`
 
 	IsJoinTable bool `json:"is_join_table"`
 	Indexes     []*IndexDesc
+}
+
+// Constructor breaks down the functionality required to implement a driver
+// such that the drivers.Tables method can be used to reduce duplication in driver
+// implementations.
+type Constructor interface {
+	TableNames(schema string, whitelist, blacklist []string) ([]string, error)
+	Columns(schema, tableName string, whitelist, blacklist []string) ([]Column, error)
+	PrimaryKeyInfo(schema, tableName string) (*PrimaryKey, error)
+	ForeignKeyInfo(schema, tableName string) ([]ForeignKey, error)
+
+	// TranslateColumnType takes a Database column type and returns a go column type.
+	TranslateColumnType(Column) Column
 }
 
 // GetTable by name. Panics if not found (for use in templates mostly).
@@ -42,7 +54,7 @@ func GetTable(tables []Table, name string) (tbl Table) {
 }
 
 // GetColumn by name. Panics if not found (for use in templates mostly).
-func (t Table) GetColumn(name string) (col drivers.Column) {
+func (t Table) GetColumn(name string) (col Column) {
 	for _, c := range t.Columns {
 		if c.Name == name {
 			return c
@@ -52,7 +64,7 @@ func (t Table) GetColumn(name string) (col drivers.Column) {
 	panic(fmt.Sprintf("could not find column name: %s", name))
 }
 
-func Tables(c drivers.Constructor, schema string, whitelist, blacklist []string) ([]Table, error) {
+func Tables(c Constructor, schema string, whitelist, blacklist []string) ([]Table, error) {
 	var err error
 
 	names, err := c.TableNames(schema, whitelist, blacklist)
@@ -126,7 +138,7 @@ func setIsJoinTable(t *Table) {
 
 // filterForeignKeys filter FK whose ForeignTable is not in whitelist or in blacklist
 func filterForeignKeys(t *Table, whitelist, blacklist []string) {
-	var fkeys []drivers.ForeignKey
+	var fkeys []ForeignKey
 	for _, fkey := range t.FKeys {
 		if (len(whitelist) == 0 || strmangle.SetInclude(fkey.ForeignTable, whitelist)) &&
 			(len(blacklist) == 0 || !strmangle.SetInclude(fkey.ForeignTable, blacklist)) {

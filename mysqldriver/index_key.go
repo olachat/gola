@@ -1,9 +1,5 @@
 package mysqldriver
 
-import (
-	"github.com/volatiletech/sqlboiler/v4/drivers"
-)
-
 /*
 desc users;
 +------------+--------------+------+------+---------+----------------+
@@ -53,7 +49,7 @@ func (m *MySQLDriver) SetIndexAndKey(dbinfo *DBInfo) (err error) {
 
 		for _, rd := range tableDesc {
 			if rd.Key == "PRI" && t.PKey == nil {
-				t.PKey = &drivers.PrimaryKey{}
+				t.PKey = &PrimaryKey{}
 				t.PKey.Name = rd.Field
 				t.PKey.Columns = []string{rd.Field}
 			}

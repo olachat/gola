@@ -157,8 +157,8 @@ func (m *MySQLDriver) TableNames(schema string, whitelist, blacklist []string) (
 // from the database information_schema.columns. It retrieves the column names
 // and column types and returns those as a []Column after TranslateColumnType()
 // converts the SQL types to Go types, for example: "varchar" to "string"
-func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []string) ([]drivers.Column, error) {
-	var columns []drivers.Column
+func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []string) ([]Column, error) {
+	var columns []Column
 	args := []interface{}{tableName, schema}
 
 	query := `
@@ -178,7 +178,7 @@ func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []s
 	where table_name = ? and table_schema = ? and c.extra not like '%VIRTUAL%'`
 
 	if len(whitelist) > 0 {
-		cols := drivers.ColumnsFromList(whitelist, tableName)
+		cols := ColumnsFromList(whitelist, tableName)
 		if len(cols) > 0 {
 			query += fmt.Sprintf(" and c.column_name in (%s)", strings.Repeat(",?", len(cols))[1:])
 			for _, w := range cols {
@@ -186,7 +186,7 @@ func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []s
 			}
 		}
 	} else if len(blacklist) > 0 {
-		cols := drivers.ColumnsFromList(blacklist, tableName)
+		cols := ColumnsFromList(blacklist, tableName)
 		if len(cols) > 0 {
 			query += fmt.Sprintf(" and c.column_name not in (%s)", strings.Repeat(",?", len(cols))[1:])
 			for _, w := range cols {
@@ -211,7 +211,7 @@ func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []s
 			return nil, errors.Wrapf(err, "unable to scan for table %s", tableName)
 		}
 
-		column := drivers.Column{
+		column := Column{
 			Name:       colName,
 			Comment:    colComment,
 			FullDBType: colFullType, // example: tinyint(1) instead of tinyint
@@ -231,8 +231,8 @@ func (m *MySQLDriver) Columns(schema, tableName string, whitelist, blacklist []s
 }
 
 // PrimaryKeyInfo looks up the primary key for a table.
-func (m *MySQLDriver) PrimaryKeyInfo(schema, tableName string) (*drivers.PrimaryKey, error) {
-	pkey := &drivers.PrimaryKey{}
+func (m *MySQLDriver) PrimaryKeyInfo(schema, tableName string) (*PrimaryKey, error) {
+	pkey := &PrimaryKey{}
 	var err error
 
 	query := `
@@ -282,8 +282,8 @@ func (m *MySQLDriver) PrimaryKeyInfo(schema, tableName string) (*drivers.Primary
 }
 
 // ForeignKeyInfo retrieves the foreign keys for a given table name.
-func (m *MySQLDriver) ForeignKeyInfo(schema, tableName string) ([]drivers.ForeignKey, error) {
-	var fkeys []drivers.ForeignKey
+func (m *MySQLDriver) ForeignKeyInfo(schema, tableName string) ([]ForeignKey, error) {
+	var fkeys []ForeignKey
 
 	query := `
 	select constraint_name, table_name, column_name, referenced_table_name, referenced_column_name
@@ -299,7 +299,7 @@ func (m *MySQLDriver) ForeignKeyInfo(schema, tableName string) ([]drivers.Foreig
 	}
 
 	for rows.Next() {
-		var fkey drivers.ForeignKey
+		var fkey ForeignKey
 		var sourceTable string
 
 		fkey.Table = tableName
@@ -321,7 +321,7 @@ func (m *MySQLDriver) ForeignKeyInfo(schema, tableName string) ([]drivers.Foreig
 // TranslateColumnType converts mysql database types to Go types, for example
 // "varchar" to "string" and "bigint" to "int64". It returns this parsed data
 // as a Column object.
-func (m *MySQLDriver) TranslateColumnType(c drivers.Column) drivers.Column {
+func (m *MySQLDriver) TranslateColumnType(c Column) Column {
 	unsigned := strings.Contains(c.FullDBType, "unsigned")
 	if c.Nullable {
 		switch c.DBType {

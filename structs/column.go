@@ -6,11 +6,11 @@ import (
 
 	"github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/vitess/go/vt/sqlparser"
-	"github.com/volatiletech/sqlboiler/v4/drivers"
+	"github.com/olachat/gola/mysqldriver"
 )
 
 type ColumnStruct struct {
-	drivers.Column
+	mysqldriver.Column
 	table *TableStruct
 }
 
