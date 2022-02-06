@@ -36,7 +36,7 @@ type IndexDesc struct {
 	Non_unique, Seq_in_index, Cardinality                                                                                    int
 }
 
-func (m *MySQLDriver) SetIndexAndKey(dbinfo *drivers.DBInfo) (err error) {
+func (m *MySQLDriver) SetIndexAndKey(dbinfo *DBInfo) (err error) {
 	for i := range dbinfo.Tables {
 		t := &dbinfo.Tables[i]
 		var tableDesc []*RowDesc

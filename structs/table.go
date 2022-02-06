@@ -4,10 +4,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/volatiletech/sqlboiler/v4/drivers"
+	"github.com/olachat/gola/mysqldriver"
 )
 
-func NewTableStruct(DBInfo *drivers.DBInfo, t drivers.Table, version string) *TableStruct {
+func NewTableStruct(DBInfo *mysqldriver.DBInfo, t mysqldriver.Table, version string) *TableStruct {
 	columns := make([]ColumnStruct, 0, len(t.Columns))
 	ts := &TableStruct{DBInfo, t, nil, version}
 	for _, c := range t.Columns {
@@ -21,8 +21,8 @@ func NewTableStruct(DBInfo *drivers.DBInfo, t drivers.Table, version string) *Ta
 }
 
 type TableStruct struct {
-	dbinfo *drivers.DBInfo
-	drivers.Table
+	dbinfo *mysqldriver.DBInfo
+	mysqldriver.Table
 	sqlColumns []ColumnStruct
 	VERSION    string
 }

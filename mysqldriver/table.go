@@ -3,6 +3,7 @@ package mysqldriver
 // modified from: https://github.com/volatiletech/sqlboiler/blob/v4.6.0/drivers/sqlboiler-mysql/driver/interface.go
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/friendsofgo/errors"
@@ -10,7 +11,48 @@ import (
 	"github.com/volatiletech/strmangle"
 )
 
-func Tables(c drivers.Constructor, schema string, whitelist, blacklist []string) ([]drivers.Table, error) {
+type DBInfo struct {
+	Schema string  `json:"schema"`
+	Tables []Table `json:"tables"`
+}
+
+type Table struct {
+	Name string `json:"name"`
+	// For dbs with real schemas, like Postgres.
+	// Example value: "schema_name"."table_name"
+	SchemaName string           `json:"schema_name"`
+	Columns    []drivers.Column `json:"columns"`
+
+	PKey  *drivers.PrimaryKey  `json:"p_key"`
+	FKeys []drivers.ForeignKey `json:"f_keys"`
+
+	IsJoinTable bool `json:"is_join_table"`
+	Indexes     []*IndexDesc
+}
+
+// GetTable by name. Panics if not found (for use in templates mostly).
+func GetTable(tables []Table, name string) (tbl Table) {
+	for _, t := range tables {
+		if t.Name == name {
+			return t
+		}
+	}
+
+	panic(fmt.Sprintf("could not find table name: %s", name))
+}
+
+// GetColumn by name. Panics if not found (for use in templates mostly).
+func (t Table) GetColumn(name string) (col drivers.Column) {
+	for _, c := range t.Columns {
+		if c.Name == name {
+			return c
+		}
+	}
+
+	panic(fmt.Sprintf("could not find column name: %s", name))
+}
+
+func Tables(c drivers.Constructor, schema string, whitelist, blacklist []string) ([]Table, error) {
 	var err error
 
 	names, err := c.TableNames(schema, whitelist, blacklist)
@@ -20,9 +62,9 @@ func Tables(c drivers.Constructor, schema string, whitelist, blacklist []string)
 
 	sort.Strings(names)
 
-	var tables []drivers.Table
+	var tables []Table
 	for _, name := range names {
-		t := drivers.Table{
+		t := Table{
 			Name: name,
 		}
 
@@ -61,7 +103,7 @@ func Tables(c drivers.Constructor, schema string, whitelist, blacklist []string)
 // setIsJoinTable if there are:
 // A composite primary key involving two columns
 // Both primary key columns are also foreign keys
-func setIsJoinTable(t *drivers.Table) {
+func setIsJoinTable(t *Table) {
 	if t.PKey == nil || len(t.PKey.Columns) != 2 || len(t.FKeys) < 2 || len(t.Columns) > 2 {
 		return
 	}
@@ -83,7 +125,7 @@ func setIsJoinTable(t *drivers.Table) {
 }
 
 // filterForeignKeys filter FK whose ForeignTable is not in whitelist or in blacklist
-func filterForeignKeys(t *drivers.Table, whitelist, blacklist []string) {
+func filterForeignKeys(t *Table, whitelist, blacklist []string) {
 	var fkeys []drivers.ForeignKey
 	for _, fkey := range t.FKeys {
 		if (len(whitelist) == 0 || strmangle.SetInclude(fkey.ForeignTable, whitelist)) &&
@@ -94,10 +136,10 @@ func filterForeignKeys(t *drivers.Table, whitelist, blacklist []string) {
 	t.FKeys = fkeys
 }
 
-func setForeignKeyConstraints(t *drivers.Table, tables []drivers.Table) {
+func setForeignKeyConstraints(t *Table, tables []Table) {
 	for i, fkey := range t.FKeys {
 		localColumn := t.GetColumn(fkey.Column)
-		foreignTable := drivers.GetTable(tables, fkey.ForeignTable)
+		foreignTable := GetTable(tables, fkey.ForeignTable)
 		foreignColumn := foreignTable.GetColumn(fkey.ForeignColumn)
 
 		t.FKeys[i].Nullable = localColumn.Nullable

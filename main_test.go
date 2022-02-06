@@ -71,9 +71,9 @@ func init() {
 	}
 }
 
-type genMethod func(db *drivers.DBInfo, t drivers.Table) map[string][]byte
+type genMethod func(db *mysqldriver.DBInfo, t mysqldriver.Table) map[string][]byte
 
-func testGen(t *testing.T, wd string, gen genMethod, db *drivers.DBInfo, table drivers.Table) {
+func testGen(t *testing.T, wd string, gen genMethod, db *mysqldriver.DBInfo, table mysqldriver.Table) {
 	resultFiles := gen(db, table)
 	expectedFileFolder := testDataPath + table.Name + string(filepath.Separator)
 

@@ -16,7 +16,7 @@ import (
 
 // Assemble is more useful for calling into the library so you don't
 // have to instantiate an empty type.
-func Assemble(config drivers.Config) (dbinfo *drivers.DBInfo, err error) {
+func Assemble(config drivers.Config) (dbinfo *DBInfo, err error) {
 	driver := MySQLDriver{}
 	return driver.Assemble(config)
 }
@@ -31,7 +31,7 @@ type MySQLDriver struct {
 }
 
 // Assemble all the information we need to provide back to the driver
-func (m *MySQLDriver) Assemble(config drivers.Config) (dbinfo *drivers.DBInfo, err error) {
+func (m *MySQLDriver) Assemble(config drivers.Config) (dbinfo *DBInfo, err error) {
 	defer func() {
 		if r := recover(); r != nil && err == nil {
 			dbinfo = nil
@@ -70,15 +70,7 @@ func (m *MySQLDriver) Assemble(config drivers.Config) (dbinfo *drivers.DBInfo, e
 		}
 	}()
 
-	dbinfo = &drivers.DBInfo{
-		Dialect: drivers.Dialect{
-			LQ: '`',
-			RQ: '`',
-
-			UseLastInsertID: true,
-			UseSchema:       false,
-		},
-	}
+	dbinfo = &DBInfo{}
 
 	dbinfo.Schema = schema
 	dbinfo.Tables, err = Tables(m, schema, whitelist, blacklist)
