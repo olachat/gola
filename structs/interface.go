@@ -34,6 +34,7 @@ type DBInfo struct {
 type Constructor interface {
 	TableNames(schema string, whitelist, blacklist []string) ([]string, error)
 	Columns(schema string, table *Table, tableName string, whitelist, blacklist []string) ([]Column, error)
+	SetIndexAndKey(tables []*Table) (err error)
 	PrimaryKeyInfo(schema, tableName string) (*PrimaryKey, error)
 	ForeignKeyInfo(schema, tableName string) ([]ForeignKey, error)
 
@@ -108,6 +109,7 @@ func Tables(c Constructor, schema string, whitelist, blacklist []string) ([]*Tab
 		setForeignKeyConstraints(tbl, tables)
 	}
 
+	c.SetIndexAndKey(tables)
 	return tables, nil
 }
 
