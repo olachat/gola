@@ -2,11 +2,14 @@
 
 package users
 
+import "github.com/olachat/gola/corelib"
+
 type orderBy int
 
 type idxQuery[T any] struct {
 }
 
+// order by enum & interface
 const (
 	IdAsc orderBy = iota
 	IdDesc
@@ -26,6 +29,27 @@ const (
 	HobbyDesc
 )
 
+func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
+	return q
+}
+
+type order[T any] interface {
+	OrderBy(args ...orderBy) corelib.ReadQuery[T]
+}
+
+type iQuery1[T any] interface {
+	WhereEmailEQ(val string) idxQuery[T]
+	WhereEmailIN(vals ...string) idxQuery[T]
+	WhereNameEQ(val string) idxQuery[T]
+	WhereNameIN(vals ...string) idxQuery[T]
+	order[T]
+	corelib.ReadQuery[T]
+}
+
+// Find methods
+func Select[T any]() iQuery1[T] {
+	return new(idxQuery[T])
+}
 func (q *idxQuery[T]) WhereEmailEQ(val string) idxQuery[T] {
 	return q
 }
