@@ -145,8 +145,8 @@ func TestIdx(t *testing.T) {
 			continue
 		}
 
-		if len(tb.Indexes) != 5 {
-			t.Error("Failed to parse blogs table's 5 indexes")
+		if len(tb.Indexes) != 7 {
+			t.Error("Failed to parse blogs table's 7 indexes")
 		}
 
 		for idxName, data := range tb.Indexes {

@@ -11,7 +11,9 @@ CREATE TABLE `blogs` (
   `updated_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Updated Timestamp',
   PRIMARY KEY (`id`),
   KEY `user` (`user_id`),
+  KEY `user_vip` (`user_id`, `is_vip`),
   KEY `country_cate` (`country`, `category_id`, `is_vip`),
+  KEY `country_vip` (`country`, `is_vip`),
   KEY `cate_pinned` (`category_id`, `is_pinned`, `is_vip`),
   KEY `user_pinned_cate` (`user_id`, `is_pinned`, `category_id`),
   UNIQUE KEY `slug` (`slug`)
