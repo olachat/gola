@@ -38,26 +38,26 @@ type order[T any] interface {
 	OrderBy(args ...orderBy) corelib.ReadQuery[T]
 }
 
-type iQuery1[T any] interface {
+type iQuery[T any] interface {
 {{- range $i, $col := .FirstIdxColumns }}
-	Where{{ .GoName }}EQ(val {{ .GoType }}) *idxQuery[T]
-	Where{{ .GoName }}IN(vals ...{{ .GoType }}) *idxQuery[T]
+	Where{{ .GoName }}EQ(val {{ .GoType }}) *idxQuery{{ .Order }}[T]
+	Where{{ .GoName }}IN(vals ...{{ .GoType }}) *idxQuery{{ .Order }}[T]
 {{- end }}
 	order[T]
 	corelib.ReadQuery[T]
 }
 
 // Find methods
-func Select[T any]() *idxQuery[T] {
+func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 
 {{- range $i, $col := .FirstIdxColumns }}
-func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) *idxQuery[T] {
+func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) *idxQuery{{ .Order }}[T] {
 	return q
 }
 
-func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) *idxQuery[T] {
+func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) *idxQuery{{ .Order }}[T] {
 	return q
 }
 {{ end }}

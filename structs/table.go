@@ -55,15 +55,14 @@ func (t *Table) GetIndexRoot() *idxNode {
 	return t.idxRoot
 }
 
-func (t *Table) FirstIdxColumns() []Column {
+func (t *Table) FirstIdxColumns() []*idxNode {
 	cols := t.GetIndexRoot().Children
 
-	result := make([]Column, len(cols))
-	for i, col := range cols {
-		result[i] = t.GetColumn(col.ColName)
+	for _, col := range cols {
+		col.Column = t.GetColumn(col.ColName)
 	}
 
-	return result
+	return cols
 }
 
 func (t *Table) Imports() string {
