@@ -19,6 +19,7 @@ type Table struct {
 	IsJoinTable bool `json:"is_join_table"`
 	Indexes     map[string][]*IndexDesc
 	VERSION     string
+	idxRoot     *idxNode
 }
 
 func (t *Table) Package() string {
@@ -34,23 +35,33 @@ func (t *Table) ClassName() string {
 	return name
 }
 
-func (t *Table) FirstIdxColumns() []Column {
-	firstCols := make(map[string]bool)
+func (t *Table) GetIndexRoot() *idxNode {
+	if t.idxRoot != nil {
+		return t.idxRoot
+	}
+
+	root := &idxNode{
+		ColName: "",
+	}
 
 	for _, items := range t.Indexes {
-		firstCols[items[0].Column_name] = true
+		node := root
+		for _, item := range items {
+			node = node.GetChildren(item.Column_name)
+		}
 	}
 
-	result := make([]Column, len(firstCols))
-	i := 0
-	for colName := range firstCols {
-		result[i] = t.GetColumn(colName)
-		i++
-	}
+	t.idxRoot = root
+	return t.idxRoot
+}
 
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].Name < result[j].Name
-	})
+func (t *Table) FirstIdxColumns() []Column {
+	cols := t.GetIndexRoot().Children
+
+	result := make([]Column, len(cols))
+	for i, col := range cols {
+		result[i] = t.GetColumn(col.ColName)
+	}
 
 	return result
 }
