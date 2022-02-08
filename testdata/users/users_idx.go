@@ -38,30 +38,30 @@ type order[T any] interface {
 }
 
 type iQuery1[T any] interface {
-	WhereEmailEQ(val string) idxQuery[T]
-	WhereEmailIN(vals ...string) idxQuery[T]
-	WhereNameEQ(val string) idxQuery[T]
-	WhereNameIN(vals ...string) idxQuery[T]
+	WhereEmailEQ(val string) *idxQuery[T]
+	WhereEmailIN(vals ...string) *idxQuery[T]
+	WhereNameEQ(val string) *idxQuery[T]
+	WhereNameIN(vals ...string) *idxQuery[T]
 	order[T]
 	corelib.ReadQuery[T]
 }
 
 // Find methods
-func Select[T any]() iQuery1[T] {
+func Select[T any]() *idxQuery[T] {
 	return new(idxQuery[T])
 }
-func (q *idxQuery[T]) WhereEmailEQ(val string) idxQuery[T] {
+func (q *idxQuery[T]) WhereEmailEQ(val string) *idxQuery[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereEmailIN(vals ...string) idxQuery[T] {
+func (q *idxQuery[T]) WhereEmailIN(vals ...string) *idxQuery[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereNameEQ(val string) idxQuery[T] {
+func (q *idxQuery[T]) WhereNameEQ(val string) *idxQuery[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereNameIN(vals ...string) idxQuery[T] {
+func (q *idxQuery[T]) WhereNameIN(vals ...string) *idxQuery[T] {
 	return q
 }
