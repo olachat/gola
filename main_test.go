@@ -99,7 +99,7 @@ func testGen(t *testing.T, wd string, gen genMethod, db *structs.DBInfo, table *
 	if *update {
 		for path, data := range resultFiles {
 			pos := strings.LastIndex(path, string(filepath.Separator))
-			expectedFileFolder = testDataPath + path[0:pos-1]
+			expectedFileFolder = testDataPath + path[0:pos]
 			os.Mkdir(expectedFileFolder, os.ModePerm)
 			err := ioutil.WriteFile(testDataPath+path, data, 0644)
 			if err != nil {

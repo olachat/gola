@@ -59,7 +59,15 @@ func main() {
 		switch gentype {
 		case "orm":
 			files := genORM(db, t)
+			needMkdir := true
 			for path, data := range files {
+				if needMkdir {
+					pos := strings.LastIndex(path, string(filepath.Separator))
+					expectedFileFolder := output + path[0:pos]
+					os.Mkdir(expectedFileFolder, os.ModePerm)
+					needMkdir = false
+				}
+
 				ioutil.WriteFile(output+path, data, 0644)
 			}
 		}
