@@ -43,7 +43,7 @@ func (t *Table) FirstIdxColumns() []Column {
 
 	result := make([]Column, len(firstCols))
 	i := 0
-	for colName, _ := range firstCols {
+	for colName := range firstCols {
 		result[i] = t.GetColumn(colName)
 		i++
 	}
