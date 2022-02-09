@@ -45,7 +45,7 @@ type order[T any] interface {
 	OrderBy(args ...orderBy) corelib.ReadQuery[T]
 }
 
-type iQuery1[T any] interface {
+type iQuery[T any] interface {
 	WhereEmailEQ(val string) *idxQuery1[T]
 	WhereEmailIN(vals ...string) *idxQuery1[T]
 	WhereNameEQ(val string) *idxQuery2[T]
@@ -55,7 +55,7 @@ type iQuery1[T any] interface {
 }
 
 // Find methods
-func Select[T any]() *idxQuery[T] {
+func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 func (q *idxQuery[T]) WhereEmailEQ(val string) *idxQuery1[T] {
