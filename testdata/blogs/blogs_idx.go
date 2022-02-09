@@ -70,11 +70,13 @@ type idxQuery1[T any] interface {
 	AndIsPinnedIN(vals ...int8) idxQuery2[T]
 	orderReadQuery[T]
 }
+
 type idxQuery2[T any] interface {
 	AndIsVipEQ(val int8) orderReadQuery[T]
 	AndIsVipIN(vals ...int8) orderReadQuery[T]
 	orderReadQuery[T]
 }
+
 type idxQuery4[T any] interface {
 	AndCategoryIdEQ(val int) idxQuery5[T]
 	AndCategoryIdIN(vals ...int) idxQuery5[T]
@@ -82,11 +84,13 @@ type idxQuery4[T any] interface {
 	AndIsVipIN(vals ...int8) orderReadQuery[T]
 	orderReadQuery[T]
 }
+
 type idxQuery5[T any] interface {
 	AndIsVipEQ(val int8) orderReadQuery[T]
 	AndIsVipIN(vals ...int8) orderReadQuery[T]
 	orderReadQuery[T]
 }
+
 type idxQuery9[T any] interface {
 	AndIsPinnedEQ(val int8) idxQuery10[T]
 	AndIsPinnedIN(vals ...int8) idxQuery10[T]
@@ -94,6 +98,7 @@ type idxQuery9[T any] interface {
 	AndIsVipIN(vals ...int8) orderReadQuery[T]
 	orderReadQuery[T]
 }
+
 type idxQuery10[T any] interface {
 	AndCategoryIdEQ(val int) orderReadQuery[T]
 	AndCategoryIdIN(vals ...int) orderReadQuery[T]
@@ -104,6 +109,7 @@ type idxQuery10[T any] interface {
 func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
+
 func (q *idxQuery[T]) WhereCategoryIdEQ(val int) idxQuery1[T] {
 	return q
 }

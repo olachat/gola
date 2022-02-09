@@ -62,6 +62,7 @@ type iQuery[T any] interface {
 func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
+
 func (q *idxQuery[T]) WhereEmailEQ(val string) idxQuery1[T] {
 	return q
 }
