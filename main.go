@@ -13,8 +13,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/olachat/gola/dolttpl"
 	"github.com/olachat/gola/mysqldriver"
+	"github.com/olachat/gola/ormtpl"
 	"github.com/olachat/gola/structs"
 
 	"github.com/spf13/viper"
@@ -77,7 +77,7 @@ func main() {
 func genTPL(t *structs.Table, tplName string) []byte {
 	buf := bytes.NewBufferString("")
 	t.VERSION = VERSION
-	err := dolttpl.GetTpl(tplName).Execute(buf, t)
+	err := ormtpl.GetTpl(tplName).Execute(buf, t)
 	if err != nil {
 		panic(err)
 	}
