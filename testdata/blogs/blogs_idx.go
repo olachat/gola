@@ -50,14 +50,14 @@ type order[T any] interface {
 }
 
 type iQuery[T any] interface {
-	WhereCategoryIdEQ(val int) *idxQuery3[T]
-	WhereCategoryIdIN(vals ...int) *idxQuery3[T]
-	WhereCountryEQ(val string) *idxQuery6[T]
-	WhereCountryIN(vals ...string) *idxQuery6[T]
-	WhereSlugEQ(val string) *idxQuery10[T]
-	WhereSlugIN(vals ...string) *idxQuery10[T]
-	WhereUserIdEQ(val int) *idxQuery1[T]
-	WhereUserIdIN(vals ...int) *idxQuery1[T]
+	WhereCategoryIdEQ(val int) *idxQuery1[T]
+	WhereCategoryIdIN(vals ...int) *idxQuery1[T]
+	WhereCountryEQ(val string) *idxQuery4[T]
+	WhereCountryIN(vals ...string) *idxQuery4[T]
+	WhereSlugEQ(val string) *idxQuery8[T]
+	WhereSlugIN(vals ...string) *idxQuery8[T]
+	WhereUserIdEQ(val int) *idxQuery9[T]
+	WhereUserIdIN(vals ...int) *idxQuery9[T]
 	order[T]
 	corelib.ReadQuery[T]
 }
@@ -66,34 +66,34 @@ type iQuery[T any] interface {
 func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
-func (q *idxQuery[T]) WhereCategoryIdEQ(val int) *idxQuery3[T] {
+func (q *idxQuery[T]) WhereCategoryIdEQ(val int) *idxQuery1[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereCategoryIdIN(vals ...int) *idxQuery3[T] {
+func (q *idxQuery[T]) WhereCategoryIdIN(vals ...int) *idxQuery1[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereCountryEQ(val string) *idxQuery6[T] {
+func (q *idxQuery[T]) WhereCountryEQ(val string) *idxQuery4[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereCountryIN(vals ...string) *idxQuery6[T] {
+func (q *idxQuery[T]) WhereCountryIN(vals ...string) *idxQuery4[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereSlugEQ(val string) *idxQuery10[T] {
+func (q *idxQuery[T]) WhereSlugEQ(val string) *idxQuery8[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereSlugIN(vals ...string) *idxQuery10[T] {
+func (q *idxQuery[T]) WhereSlugIN(vals ...string) *idxQuery8[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereUserIdEQ(val int) *idxQuery1[T] {
+func (q *idxQuery[T]) WhereUserIdEQ(val int) *idxQuery9[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereUserIdIN(vals ...int) *idxQuery1[T] {
+func (q *idxQuery[T]) WhereUserIdIN(vals ...int) *idxQuery9[T] {
 	return q
 }

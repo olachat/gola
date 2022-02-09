@@ -44,7 +44,17 @@ func (t *Table) GetIndexRoot() *idxNode {
 		ColName: "",
 	}
 
-	for _, items := range t.Indexes {
+	idxNames := make([]string, 0, len(t.Indexes))
+	for idxName := range t.Indexes {
+		idxNames = append(idxNames, idxName)
+	}
+
+	sort.Slice(idxNames, func(i, j int) bool {
+		return idxNames[i] < idxNames[j]
+	})
+
+	for _, idxName := range idxNames {
+		items := t.Indexes[idxName]
 		node := root
 		for _, item := range items {
 			node = node.GetChildren(item.Column_name)
