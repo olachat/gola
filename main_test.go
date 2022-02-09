@@ -90,16 +90,15 @@ func getDB() *structs.DBInfo {
 	return db
 }
 
-type genMethod func(db *structs.DBInfo, t *structs.Table) map[string][]byte
+type genMethod func(t *structs.Table) map[string][]byte
 
 func testGen(t *testing.T, wd string, gen genMethod, db *structs.DBInfo, table *structs.Table) {
-	resultFiles := gen(db, table)
-	expectedFileFolder := testDataPath + table.Name + string(filepath.Separator)
+	resultFiles := gen(table)
 
 	if *update {
 		for path, data := range resultFiles {
 			pos := strings.LastIndex(path, string(filepath.Separator))
-			expectedFileFolder = testDataPath + path[0:pos]
+			expectedFileFolder := testDataPath + path[0:pos]
 			os.Mkdir(expectedFileFolder, os.ModePerm)
 			err := ioutil.WriteFile(testDataPath+path, data, 0644)
 			if err != nil {

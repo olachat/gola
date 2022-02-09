@@ -58,7 +58,7 @@ func main() {
 		println(t.Name)
 		switch gentype {
 		case "orm":
-			files := genORM(db, t)
+			files := genORM(t)
 			needMkdir := true
 			for path, data := range files {
 				if needMkdir {
@@ -74,7 +74,7 @@ func main() {
 	}
 }
 
-func genTPL(db *structs.DBInfo, t *structs.Table, tplName string) []byte {
+func genTPL(t *structs.Table, tplName string) []byte {
 	buf := bytes.NewBufferString("")
 	t.VERSION = VERSION
 	err := dolttpl.GetTpl(tplName).Execute(buf, t)
@@ -84,7 +84,7 @@ func genTPL(db *structs.DBInfo, t *structs.Table, tplName string) []byte {
 	return buf.Bytes()
 }
 
-func genORM(db *structs.DBInfo, t *structs.Table) map[string][]byte {
+func genORM(t *structs.Table) map[string][]byte {
 	files := make(map[string][]byte)
 
 	tableFolder := t.Name + string(filepath.Separator)
@@ -95,7 +95,7 @@ func genORM(db *structs.DBInfo, t *structs.Table) map[string][]byte {
 	}
 
 	for genTpl, genPath := range genFiles {
-		data := formatBuffer(genTPL(db, t, genTpl))
+		data := formatBuffer(genTPL(t, genTpl))
 		files[genPath] = data
 	}
 
