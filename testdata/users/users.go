@@ -39,7 +39,7 @@ func FetchUserById(id int) *User {
 	return corelib.FetchById[User](id)
 }
 
-func FetchById[T any, PT corelib.PointerType[T]](id int) *T {
+func FetchById[T any](id int) *T {
 	return corelib.FetchById[T](id)
 }
 
@@ -47,7 +47,7 @@ func FetchUserByIds(ids []int) []*User {
 	return corelib.FetchByIds[User](ids)
 }
 
-func FetchByIds[T any, PT corelib.PointerType[T]](ids []int) []*T {
+func FetchByIds[T any](ids []int) []*T {
 	return corelib.FetchByIds[T](ids)
 }
 

@@ -17,13 +17,12 @@ func Setup(connstr string) {
 var typeColumnNames = make(map[reflect.Type]string)
 var typeTableNames = make(map[reflect.Type]string)
 
-func FetchById[T any, PT PointerType[T]](id int) PT {
+func FetchById[T any](id int) *T {
 	db, err := sql.Open("mysql", _connstr)
-	defer db.Close()
-
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
@@ -42,7 +41,7 @@ func FetchById[T any, PT PointerType[T]](id int) PT {
 	return u
 }
 
-func FetchByIds[T any, PT PointerType[T]](ids []int) []*T {
+func FetchByIds[T any](ids []int) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
 	idstr := JoinInts(ids, ",")
@@ -51,13 +50,46 @@ func FetchByIds[T any, PT PointerType[T]](ids []int) []*T {
 	return Query[T](query)
 }
 
-func Query[T any, PT PointerType[T]](query string) []*T {
+func FindOne[T any](where WhereQuery) *T {
 	db, err := sql.Open("mysql", _connstr)
-	defer db.Close()
-
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
+
+	u := new(T)
+	tableName, columnsNames := GetTableAndColumnsNames[T]()
+	data := StrutForScan(u)
+
+	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
+		tableName, where.GetWhere())
+	err2 := db.QueryRow(query).Scan(data...)
+
+	if err2 != nil {
+		if err2 == sql.ErrNoRows {
+			return nil
+		}
+		log.Fatal(err2)
+	}
+
+	return u
+}
+
+func Find[T any](where WhereQuery) []*T {
+	tableName, columnsNames := GetTableAndColumnsNames[T]()
+
+	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
+		tableName, where.GetWhere())
+
+	return Query[T](query)
+}
+
+func Query[T any](query string) []*T {
+	db, err := sql.Open("mysql", _connstr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
 	var result []*T
 	var u *T
@@ -78,7 +110,7 @@ func Query[T any, PT PointerType[T]](query string) []*T {
 	return result
 }
 
-func GetTableAndColumnsNames[T any, PT PointerType[T]]() (tableName string, joinedColumnNames string) {
+func GetTableAndColumnsNames[T any]() (tableName string, joinedColumnNames string) {
 	var o *T
 	t := reflect.TypeOf(o)
 	joinedColumnNames, ok := typeColumnNames[t]
@@ -107,7 +139,7 @@ func GetTableAndColumnsNames[T any, PT PointerType[T]]() (tableName string, join
 	return
 }
 
-func StrutForScan[T any, PT PointerType[T]](u PT) (pointers []interface{}) {
+func StrutForScan[T any](u *T) (pointers []interface{}) {
 	val := reflect.ValueOf(u).Elem()
 	pointers = make([]interface{}, 0, val.NumField())
 	for i := 0; i < val.NumField(); i++ {

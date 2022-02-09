@@ -2,7 +2,7 @@
 ![Coverage](badges/coverage.svg)
 ![Go Report Card](badges/go-report-card.svg)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/olachat/gola)
-![GitHub repo size](https://img.shields.io/github/repo-size/olachat/gola) 
+![GitHub repo size](https://img.shields.io/github/repo-size/olachat/gola)
 ![GitHub issues](https://img.shields.io/github/issues-raw/olachat/gola)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/olachat/gola)
 ![GitHub](https://img.shields.io/github/license/olachat/gola)
@@ -39,6 +39,7 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
     * [ ] index
     * [ ] uniuqe index
     * [ ] paging & order
+      * [ ] paging using cursor
 * [ ] better primary key support
   * [ ] Single Key types / names
   * [ ] Composite key
@@ -47,7 +48,7 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
   * [ ] float
   * [ ] enum
   * [ ] set
-* [ ] Remove sqlboiler dependency in code gen
+* [X] Remove sqlboiler dependency in code gen
 * [ ] Project badges
 * [ ] Tests
   * [ ] Use sql to create table & insert testdata

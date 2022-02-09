@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"database/sql"
@@ -21,7 +22,7 @@ import (
 	gsql "github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	"github.com/olachat/gola/mysqldriver"
-	"github.com/volatiletech/sqlboiler/v4/drivers"
+	"github.com/olachat/gola/structs"
 )
 
 //go:embed testdata
@@ -29,7 +30,7 @@ var fixtures embed.FS
 var s *server.Server
 var testDBPort int = 33066
 var testDBName string = "testdb"
-var testTables = []string{"users"}
+var testTables = []string{"blogs", "users"}
 var testDataPath = "testdata" + string(filepath.Separator)
 
 var update = flag.Bool("update", false, "update generated files")
@@ -70,32 +71,10 @@ func init() {
 	}
 }
 
-type genMethod func(db *drivers.DBInfo, t drivers.Table) []byte
-
-func testGen(t *testing.T, wd string, gen genMethod, db *drivers.DBInfo, table drivers.Table, extName string) {
-	resultFile := gen(db, table)
-	expectedFileFolder := testDataPath + table.Name + string(filepath.Separator)
-	expectedFilePath := expectedFileFolder + table.Name + "." + extName
-
-	if *update {
-		os.Mkdir(expectedFileFolder, os.ModePerm)
-		err := ioutil.WriteFile(expectedFilePath, resultFile, 0644)
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		expectedFile, _ := fixtures.ReadFile(expectedFilePath)
-		if diff := cmp.Diff(resultFile, expectedFile); diff != "" {
-			t.Error("file different: ", expectedFilePath)
-			fmt.Println(diff)
-		}
-	}
-}
-
-func TestCodeGen(t *testing.T) {
-	var config drivers.Config = map[string]interface{}{
+func getDB() *structs.DBInfo {
+	var config mysqldriver.Config = map[string]interface{}{
 		"dbname":    testDBName,
-		"whitelist": testTables,
+		"whitelist": "blogs",
 		"host":      "localhost",
 		"port":      testDBPort,
 		"user":      "root",
@@ -108,6 +87,38 @@ func TestCodeGen(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	return db
+}
+
+type genMethod func(t *structs.Table) map[string][]byte
+
+func testGen(t *testing.T, wd string, gen genMethod, db *structs.DBInfo, table *structs.Table) {
+	resultFiles := gen(table)
+
+	if *update {
+		for path, data := range resultFiles {
+			pos := strings.LastIndex(path, string(filepath.Separator))
+			expectedFileFolder := testDataPath + path[0:pos]
+			os.Mkdir(expectedFileFolder, os.ModePerm)
+			err := ioutil.WriteFile(testDataPath+path, data, 0644)
+			if err != nil {
+				panic(err)
+			}
+		}
+	} else {
+		for path, data := range resultFiles {
+			expectedFilePath := testDataPath + path
+			expectedFile, _ := fixtures.ReadFile(expectedFilePath)
+			if diff := cmp.Diff(expectedFile, data); diff != "" {
+				t.Error("file different: ", expectedFilePath)
+				fmt.Println(diff)
+			}
+		}
+	}
+}
+
+func TestCodeGen(t *testing.T) {
+	db := getDB()
 
 	wd, err := os.Getwd()
 	if err != nil {
@@ -115,6 +126,79 @@ func TestCodeGen(t *testing.T) {
 	}
 
 	for _, table := range db.Tables {
-		testGen(t, wd, genORM, db, table, "go")
+		testGen(t, wd, genORM, db, table)
+	}
+}
+
+func TestIdx(t *testing.T) {
+	db := getDB()
+
+	// KEY `user` (`user_id`),
+	// KEY `country_cate` (`country`, `category_id`, `is_vip`),
+	// KEY `cate_pinned` (`category_id`, `is_pinned`, `is_vip`),
+	// KEY `user_pinned_cate` (`user_id`, `is_pinned`, `category_id`),
+	// UNIQUE KEY `slug` (`slug`)
+
+	for _, tb := range db.Tables {
+		if tb.Name != "blogs" {
+			continue
+		}
+
+		if len(tb.Indexes) != 7 {
+			t.Error("Failed to parse blogs table's 7 indexes")
+		}
+
+		for idxName, data := range tb.Indexes {
+			switch idxName {
+			case "user":
+				if len(data) != 1 && data[0].Column_name != "user_id" {
+					t.Error("Failed to parse blogs.user index")
+				}
+
+				if data[0].Non_unique != 1 {
+					t.Error("Failed to parse blogs.user index unique")
+				}
+			case "slug":
+				if len(data) != 1 && data[0].Column_name != "slug" {
+					t.Error("Failed to parse blogs.slug index")
+				}
+
+				if data[0].Non_unique != 0 {
+					t.Error("Failed to parse blogs.slug index unique")
+				}
+			case "user_pinned_cate":
+				if len(data) != 3 {
+					t.Error("Failed to parse blogs.user_pinned_cate index")
+				}
+				if data[0].Column_name != "user_id" {
+					t.Error("Failed to parse blogs.user_pinned_cate index user_id column")
+				}
+				if data[1].Column_name != "is_pinned" {
+					t.Error("Failed to parse blogs.user_pinned_cate index is_pinned column")
+				}
+				if data[2].Column_name != "category_id" {
+					t.Error("Failed to parse blogs.user_pinned_cate index category_id column")
+				}
+
+			}
+		}
+	}
+}
+
+func TestIdx2(t *testing.T) {
+	db := getDB()
+
+	for _, tb := range db.Tables {
+		if tb.Name != "blogs" {
+			continue
+		}
+
+		println(tb.GetIndexRoot().String(""))
+		nodes := tb.GetIndexNodes()
+
+		for _, n := range nodes {
+			fmt.Printf("%s[%d] %s\n", n.GoName(), n.Order, n.InterfaceName())
+		}
+
 	}
 }

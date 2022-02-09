@@ -10,7 +10,7 @@ import (
 
 // {{.ClassName}} represents {{.Name}} table
 type {{.ClassName}} struct {
-	{{- range .SqlColumns }}
+	{{- range .Columns }}
 	// {{.Comment}} {{.DBType}}
 	{{.GoName}}
 	{{- end }}
@@ -29,7 +29,7 @@ func Fetch{{.ClassName}}ById(id int) *{{.ClassName}} {
 	return corelib.FetchById[{{.ClassName}}](id)
 }
 
-func FetchById[T any, PT corelib.PointerType[T]](id int) *T {
+func FetchById[T any](id int) *T {
 	return corelib.FetchById[T](id)
 }
 
@@ -37,13 +37,13 @@ func Fetch{{.ClassName}}ByIds(ids []int) []*{{.ClassName}} {
 	return corelib.FetchByIds[{{.ClassName}}](ids)
 }
 
-func FetchByIds[T any, PT corelib.PointerType[T]](ids []int) []*T {
+func FetchByIds[T any](ids []int) []*T {
 	return corelib.FetchByIds[T](ids)
 }
 
 // Column types
 
-{{- range .SqlColumns }}
+{{- range .Columns }}
 	{{- if .IsEnum}}
 type {{$table.ClassName}}{{.GoName}} string
 const (
@@ -52,7 +52,7 @@ const (
 	{{- end }}
 {{- end }}
 
-{{- range .SqlColumns }}
+{{- range .Columns }}
 
 // {{.GoName}} field
 // {{.Comment}}
@@ -87,7 +87,7 @@ func (c *{{.GoName}}) GetTableType() corelib.TableType {
 
 func New{{.ClassName}}() *{{.ClassName}} {
 	return &{{.ClassName}}{
-	{{- range .SqlColumns }}
+	{{- range .Columns }}
 	{{- if .HasDefault}}
 	{{.GoName}}{val:{{.GoDefaultValue}}},
 	{{- else}}

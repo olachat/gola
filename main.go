@@ -16,7 +16,6 @@ import (
 	"github.com/olachat/gola/dolttpl"
 	"github.com/olachat/gola/mysqldriver"
 	"github.com/olachat/gola/structs"
-	"github.com/volatiletech/sqlboiler/v4/drivers"
 
 	"github.com/spf13/viper"
 )
@@ -36,7 +35,7 @@ func main() {
 	viper.AutomaticEnv()
 	driverName := "mysql"
 
-	var config drivers.Config = viper.GetStringMap(driverName)
+	var config mysqldriver.Config = viper.GetStringMap(driverName)
 
 	m := &mysqldriver.MySQLDriver{}
 	db, err := m.Assemble(config)
@@ -59,22 +58,48 @@ func main() {
 		println(t.Name)
 		switch gentype {
 		case "orm":
-			ioutil.WriteFile(output+t.Name+".go", genORM(db, t), 0644)
+			files := genORM(t)
+			needMkdir := true
+			for path, data := range files {
+				if needMkdir {
+					pos := strings.LastIndex(path, string(filepath.Separator))
+					expectedFileFolder := output + path[0:pos]
+					os.Mkdir(expectedFileFolder, os.ModePerm)
+					needMkdir = false
+				}
+
+				ioutil.WriteFile(output+path, data, 0644)
+			}
 		}
 	}
 }
 
-func genTPL(db *drivers.DBInfo, t drivers.Table, tplName string) []byte {
+func genTPL(t *structs.Table, tplName string) []byte {
 	buf := bytes.NewBufferString("")
-	err := dolttpl.GetTpl(tplName).Execute(buf, structs.NewTableStruct(db, t, VERSION))
+	t.VERSION = VERSION
+	err := dolttpl.GetTpl(tplName).Execute(buf, t)
 	if err != nil {
 		panic(err)
 	}
 	return buf.Bytes()
 }
 
-func genORM(db *drivers.DBInfo, t drivers.Table) []byte {
-	return formatBuffer(genTPL(db, t, "00_struct.gogo"))
+func genORM(t *structs.Table) map[string][]byte {
+	files := make(map[string][]byte)
+
+	tableFolder := t.Name + string(filepath.Separator)
+
+	genFiles := map[string]string{
+		"00_struct.gogo":     tableFolder + t.Name + ".go",
+		"01_struct_idx.gogo": tableFolder + t.Name + "_idx.go",
+	}
+
+	for genTpl, genPath := range genFiles {
+		data := formatBuffer(genTPL(t, genTpl))
+		files[genPath] = data
+	}
+
+	return files
 }
 
 var (
