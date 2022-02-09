@@ -61,17 +61,49 @@ type {{ $col.InterfaceName }}[T any] interface {
 }
 {{ end }}
 
+{{- range $i, $col := .GetIndexNodes }}
+type {{ $col.StructName }}[T any] struct {
+	*idxQuery[T]
+}
+
+{{- range $col.Children }}
+func (q *{{$col.StructName}}[T]) And{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T] {
+	{{- if eq .InterfaceName "orderReadQuery" }}
+	return q.idxQuery
+	{{- else }}
+	return &{{ .StructName }}[T]{q.idxQuery}
+	{{- end}}
+}
+
+func (q *{{$col.StructName}}[T]) And{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T] {
+	{{- if eq .InterfaceName "orderReadQuery" }}
+	return q.idxQuery
+	{{- else }}
+	return &{{ .StructName }}[T]{q.idxQuery}
+	{{- end}}
+}
+{{ end }}
+{{ end }}
+
 // Find methods
 func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 
 {{range $i, $col := .FirstIdxColumns }}
-func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) idxQuery{{ .Order }}[T] {
+func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T] {
+	{{- if eq .InterfaceName "orderReadQuery" }}
 	return q
+	{{- else }}
+	return &{{ .StructName }}[T]{q}
+	{{- end}}
 }
 
-func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) idxQuery{{ .Order }}[T] {
+func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T] {
+	{{- if eq .InterfaceName "orderReadQuery" }}
 	return q
+	{{- else }}
+	return &{{ .StructName }}[T]{q}
+	{{- end}}
 }
 {{ end }}

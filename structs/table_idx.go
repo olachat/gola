@@ -47,6 +47,10 @@ func (n *idxNode) InterfaceName() string {
 	if len(n.Children) == 0 {
 		return "orderReadQuery"
 	}
+	return fmt.Sprintf("iQuery%d", n.Order)
+}
+
+func (n *idxNode) StructName() string {
 	return fmt.Sprintf("idxQuery%d", n.Order)
 }
 

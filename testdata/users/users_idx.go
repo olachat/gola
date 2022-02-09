@@ -63,18 +63,18 @@ func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 
-func (q *idxQuery[T]) WhereEmailEQ(val string) idxQuery1[T] {
+func (q *idxQuery[T]) WhereEmailEQ(val string) orderReadQuery[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereEmailIN(vals ...string) idxQuery1[T] {
+func (q *idxQuery[T]) WhereEmailIN(vals ...string) orderReadQuery[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereNameEQ(val string) idxQuery2[T] {
+func (q *idxQuery[T]) WhereNameEQ(val string) orderReadQuery[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereNameIN(vals ...string) idxQuery2[T] {
+func (q *idxQuery[T]) WhereNameIN(vals ...string) orderReadQuery[T] {
 	return q
 }
