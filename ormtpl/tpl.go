@@ -1,4 +1,4 @@
-package dolttpl
+package ormtpl
 
 import (
 	"embed"
