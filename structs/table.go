@@ -65,6 +65,8 @@ func (t *Table) GetIndexRoot() *idxNode {
 	return t.idxRoot
 }
 
+// GetIndexNodes returns all index nodes need customized interface
+// i.e. has non-empty children nodes
 func (t *Table) GetIndexNodes() []*idxNode {
 	allNodes := t.GetIndexRoot().GetAllChildren()
 	nodes := make([]*idxNode, 0, len(allNodes))
