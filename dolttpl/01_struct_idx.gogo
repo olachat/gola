@@ -38,14 +38,28 @@ type order[T any] interface {
 	OrderBy(args ...orderBy) corelib.ReadQuery[T]
 }
 
-type iQuery[T any] interface {
-{{- range $i, $col := .FirstIdxColumns }}
-	Where{{ .GoName }}EQ(val {{ .GoType }}) *idxQuery{{ .Order }}[T]
-	Where{{ .GoName }}IN(vals ...{{ .GoType }}) *idxQuery{{ .Order }}[T]
-{{- end }}
+type orderReadQuery[T any] interface {
 	order[T]
 	corelib.ReadQuery[T]
 }
+
+type iQuery[T any] interface {
+{{- range $i, $col := .FirstIdxColumns }}
+	Where{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T]
+	Where{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T]
+{{- end }}
+	orderReadQuery[T]
+}
+
+{{- range $i, $col := .GetIndexNodes }}
+type {{ $col.InterfaceName }}[T any] interface {
+{{- range $col.Children }}
+	And{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T]
+	And{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T]
+{{- end }}
+	orderReadQuery[T]
+}
+{{- end }}
 
 // Find methods
 func Select[T any]() iQuery[T] {
@@ -53,11 +67,11 @@ func Select[T any]() iQuery[T] {
 }
 
 {{- range $i, $col := .FirstIdxColumns }}
-func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) *idxQuery{{ .Order }}[T] {
+func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) idxQuery{{ .Order }}[T] {
 	return q
 }
 
-func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) *idxQuery{{ .Order }}[T] {
+func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) idxQuery{{ .Order }}[T] {
 	return q
 }
 {{ end }}

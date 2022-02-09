@@ -1,6 +1,9 @@
 package structs
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+)
 
 type idxNode struct {
 	Column
@@ -40,9 +43,28 @@ func (n *idxNode) GetNewOrder() int {
 	return n.maxOrder
 }
 
+func (n *idxNode) InterfaceName() string {
+	if len(n.Children) == 0 {
+		return "orderReadQuery"
+	}
+	return fmt.Sprintf("idxQuery%d", n.Order)
+}
+
+func (n *idxNode) GetAllChildren() []*idxNode {
+	result := n.Children
+	for _, child := range n.Children {
+		result = append(result, child.GetAllChildren()...)
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Order < result[j].Order
+	})
+	return result
+}
+
 func (n *idxNode) String(prefix string) string {
 	s := prefix
-	s += n.ColName + "\n"
+	s += fmt.Sprintf("%s[%d]\n", n.ColName, n.Order)
 
 	for _, c := range n.Children {
 		s += c.String(prefix + "\t")

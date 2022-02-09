@@ -65,6 +65,22 @@ func (t *Table) GetIndexRoot() *idxNode {
 	return t.idxRoot
 }
 
+func (t *Table) GetIndexNodes() []*idxNode {
+	allNodes := t.GetIndexRoot().GetAllChildren()
+	nodes := make([]*idxNode, 0, len(allNodes))
+	for _, n := range allNodes {
+		if len(n.Children) > 0 {
+			n.Column = t.GetColumn(n.ColName)
+			for _, c := range n.Children {
+				c.Column = t.GetColumn(c.ColName)
+			}
+			nodes = append(nodes, n)
+		}
+
+	}
+	return nodes
+}
+
 func (t *Table) FirstIdxColumns() []*idxNode {
 	cols := t.GetIndexRoot().Children
 

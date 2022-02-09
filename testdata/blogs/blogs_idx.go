@@ -49,51 +49,89 @@ type order[T any] interface {
 	OrderBy(args ...orderBy) corelib.ReadQuery[T]
 }
 
-type iQuery[T any] interface {
-	WhereCategoryIdEQ(val int) *idxQuery1[T]
-	WhereCategoryIdIN(vals ...int) *idxQuery1[T]
-	WhereCountryEQ(val string) *idxQuery4[T]
-	WhereCountryIN(vals ...string) *idxQuery4[T]
-	WhereSlugEQ(val string) *idxQuery8[T]
-	WhereSlugIN(vals ...string) *idxQuery8[T]
-	WhereUserIdEQ(val int) *idxQuery9[T]
-	WhereUserIdIN(vals ...int) *idxQuery9[T]
+type orderReadQuery[T any] interface {
 	order[T]
 	corelib.ReadQuery[T]
+}
+
+type iQuery[T any] interface {
+	WhereCategoryIdEQ(val int) idxQuery1[T]
+	WhereCategoryIdIN(vals ...int) idxQuery1[T]
+	WhereCountryEQ(val string) idxQuery4[T]
+	WhereCountryIN(vals ...string) idxQuery4[T]
+	WhereSlugEQ(val string) orderReadQuery[T]
+	WhereSlugIN(vals ...string) orderReadQuery[T]
+	WhereUserIdEQ(val int) idxQuery9[T]
+	WhereUserIdIN(vals ...int) idxQuery9[T]
+	orderReadQuery[T]
+}
+type idxQuery1[T any] interface {
+	AndIsPinnedEQ(val int8) idxQuery2[T]
+	AndIsPinnedIN(vals ...int8) idxQuery2[T]
+	orderReadQuery[T]
+}
+type idxQuery2[T any] interface {
+	AndIsVipEQ(val int8) orderReadQuery[T]
+	AndIsVipIN(vals ...int8) orderReadQuery[T]
+	orderReadQuery[T]
+}
+type idxQuery4[T any] interface {
+	AndCategoryIdEQ(val int) idxQuery5[T]
+	AndCategoryIdIN(vals ...int) idxQuery5[T]
+	AndIsVipEQ(val int8) orderReadQuery[T]
+	AndIsVipIN(vals ...int8) orderReadQuery[T]
+	orderReadQuery[T]
+}
+type idxQuery5[T any] interface {
+	AndIsVipEQ(val int8) orderReadQuery[T]
+	AndIsVipIN(vals ...int8) orderReadQuery[T]
+	orderReadQuery[T]
+}
+type idxQuery9[T any] interface {
+	AndIsPinnedEQ(val int8) idxQuery10[T]
+	AndIsPinnedIN(vals ...int8) idxQuery10[T]
+	AndIsVipEQ(val int8) orderReadQuery[T]
+	AndIsVipIN(vals ...int8) orderReadQuery[T]
+	orderReadQuery[T]
+}
+type idxQuery10[T any] interface {
+	AndCategoryIdEQ(val int) orderReadQuery[T]
+	AndCategoryIdIN(vals ...int) orderReadQuery[T]
+	orderReadQuery[T]
 }
 
 // Find methods
 func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
-func (q *idxQuery[T]) WhereCategoryIdEQ(val int) *idxQuery1[T] {
+func (q *idxQuery[T]) WhereCategoryIdEQ(val int) idxQuery1[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereCategoryIdIN(vals ...int) *idxQuery1[T] {
+func (q *idxQuery[T]) WhereCategoryIdIN(vals ...int) idxQuery1[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereCountryEQ(val string) *idxQuery4[T] {
+func (q *idxQuery[T]) WhereCountryEQ(val string) idxQuery4[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereCountryIN(vals ...string) *idxQuery4[T] {
+func (q *idxQuery[T]) WhereCountryIN(vals ...string) idxQuery4[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereSlugEQ(val string) *idxQuery8[T] {
+func (q *idxQuery[T]) WhereSlugEQ(val string) idxQuery8[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereSlugIN(vals ...string) *idxQuery8[T] {
+func (q *idxQuery[T]) WhereSlugIN(vals ...string) idxQuery8[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereUserIdEQ(val int) *idxQuery9[T] {
+func (q *idxQuery[T]) WhereUserIdEQ(val int) idxQuery9[T] {
 	return q
 }
 
-func (q *idxQuery[T]) WhereUserIdIN(vals ...int) *idxQuery9[T] {
+func (q *idxQuery[T]) WhereUserIdIN(vals ...int) idxQuery9[T] {
 	return q
 }
