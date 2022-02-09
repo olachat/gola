@@ -184,3 +184,21 @@ func TestIdx(t *testing.T) {
 		}
 	}
 }
+
+func TestIdx2(t *testing.T) {
+	db := getDB()
+
+	for _, tb := range db.Tables {
+		if tb.Name != "blogs" {
+			continue
+		}
+
+		println(tb.GetIndexRoot().String(""))
+		nodes := tb.GetIndexNodes()
+
+		for _, n := range nodes {
+			fmt.Printf("%s[%d] %s\n", n.GoName(), n.Order, n.InterfaceName())
+		}
+
+	}
+}

@@ -23,35 +23,62 @@ func createTestDatabase() *memory.Database {
 	return db
 }
 
-type User struct {
-	Name
+type idxQuery struct {
 }
 
-type Name string
-
-func (c Name) GetName() string {
-	return string(c)
+func (c *idxQuery) WhereNameEQ() idxQuery2 {
+	return c
 }
 
-func (c *Name) SetName(val string) {
-	*c = Name(val)
+func (c *idxQuery) AndSlugEQ() idxQuery3 {
+	return c
 }
 
-func (c Name) GetValPointer() interface{} {
-	return &c
+func (c *idxQuery) AndIsVipEQ() idxQuery4 {
+	return &idx2{c}
+}
+
+type idx2 struct {
+	*idxQuery
+}
+
+func (c *idx2) AndSlugEQ() idxQuery1 {
+	return c
+}
+
+type idxQuery1 interface {
+	WhereNameEQ() idxQuery2
+}
+
+type idxQuery2 interface {
+	AndSlugEQ() idxQuery3
+}
+
+type idxQuery3 interface {
+	AndIsVipEQ() idxQuery4
+}
+
+type idxQuery4 interface {
+	AndSlugEQ() idxQuery1
+}
+
+func Select() idxQuery1 {
+	return new(idxQuery)
 }
 
 func main() {
-	var c Name = "hello"
+	s := Select()
+	fmt.Printf("s: %v\n", s)
+	a := s.WhereNameEQ()
+	fmt.Printf("a: %v\n", a)
+	b := a.AndSlugEQ()
+	fmt.Printf("b: %v\n", b)
+	c := b.AndIsVipEQ()
 	fmt.Printf("c: %v\n", c)
-	c.SetName("world")
-	fmt.Printf("c: %v\n", c)
-
-	u := new(User)
-	u.Name = "foo"
-	fmt.Printf("u: %v\n", u)
-	u.SetName("bar")
-	fmt.Printf("u: %v\n", u)
+	d := c.AndSlugEQ()
+	fmt.Printf("d: %v\n", d)
+	e := d.WhereNameEQ()
+	fmt.Printf("e: %v\n", e)
 }
 
 func main1() {
