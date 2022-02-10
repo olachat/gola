@@ -7,6 +7,9 @@ import "github.com/olachat/gola/corelib"
 type orderBy int
 
 type idxQuery[T any] struct {
+	whereSql    string
+	orders      []orderBy
+	whereParams []interface{}
 }
 
 // order by enum & interface

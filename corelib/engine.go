@@ -60,10 +60,10 @@ func FindOne[T any](where WhereQuery) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
-
+	whereSql, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
-		tableName, where.GetWhere())
-	err2 := db.QueryRow(query).Scan(data...)
+		tableName, whereSql)
+	err2 := db.QueryRow(query, params...).Scan(data...)
 
 	if err2 != nil {
 		if err2 == sql.ErrNoRows {
@@ -77,14 +77,14 @@ func FindOne[T any](where WhereQuery) *T {
 
 func Find[T any](where WhereQuery) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
-
+	whereSql, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
-		tableName, where.GetWhere())
+		tableName, whereSql)
 
-	return Query[T](query)
+	return Query[T](query, params...)
 }
 
-func Query[T any](query string) []*T {
+func Query[T any](query string, params ...interface{}) []*T {
 	db, err := sql.Open("mysql", _connstr)
 	if err != nil {
 		log.Fatal(err)
@@ -94,7 +94,7 @@ func Query[T any](query string) []*T {
 	var result []*T
 	var u *T
 
-	rows, err2 := db.Query(query)
+	rows, err2 := db.Query(query, params...)
 
 	if err2 != nil {
 		log.Fatal(err2)

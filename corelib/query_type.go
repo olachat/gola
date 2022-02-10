@@ -1,7 +1,7 @@
 package corelib
 
 type WhereQuery interface {
-	GetWhere() string
+	GetWhere() (whereSql string, params []interface{})
 }
 
 type ReadQuery[T any] interface {
