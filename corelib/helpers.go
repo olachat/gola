@@ -13,3 +13,12 @@ func JoinInts(vals []int, join string) string {
 
 	return strings.Join(strs, join)
 }
+
+func GetParamPlaceHolder(count int) string {
+	strs := make([]string, count)
+	for i := range strs {
+		strs[i] = "?"
+	}
+
+	return strings.Join(strs, ",")
+}
