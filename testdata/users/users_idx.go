@@ -116,7 +116,7 @@ func Select[T any]() iQuery[T] {
 }
 
 func (q *idxQuery[T]) WhereEmailEQ(val string) orderReadQuery[T] {
-	q.whereSql = " where email = ?"
+	q.whereSql += " where email = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q
 }
@@ -130,7 +130,7 @@ func (q *idxQuery[T]) WhereEmailIN(vals ...string) orderReadQuery[T] {
 }
 
 func (q *idxQuery[T]) WhereNameEQ(val string) orderReadQuery[T] {
-	q.whereSql = " where name = ?"
+	q.whereSql += " where name = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q
 }

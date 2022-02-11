@@ -96,7 +96,7 @@ func (q *{{$col.StructName}}[T]) And{{ .GoName }}EQ(val {{ .GoType }}) {{ .Inter
 }
 
 func (q *{{$col.StructName}}[T]) And{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T] {
-	q.whereSql = " and {{ $col.Name }} in (" + corelib.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and {{ $col.Name }} in (" + corelib.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -116,7 +116,7 @@ func Select[T any]() iQuery[T] {
 
 {{range $i, $col := .FirstIdxColumns }}
 func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T] {
-	q.whereSql = " where {{ .Name }} = ?"
+	q.whereSql += " where {{ .Name }} = ?"
 	q.whereParams = append(q.whereParams, val)
 	{{- if eq .InterfaceName "orderReadQuery" }}
 	return q
