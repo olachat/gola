@@ -2,7 +2,11 @@
 
 package {{.Package}}
 
-import "github.com/olachat/gola/corelib"
+import (
+	"strings"
+
+	"github.com/olachat/gola/corelib"
+)
 
 type orderBy int
 
