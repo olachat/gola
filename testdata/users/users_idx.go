@@ -8,7 +8,7 @@ type orderBy int
 
 type idxQuery[T any] struct {
 	whereSql    string
-	orders      []orderBy
+	orders      []string
 	whereParams []interface{}
 }
 
@@ -41,6 +41,43 @@ const (
 )
 
 func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
+	q.orders = make([]string, len(args))
+	for i, arg := range args {
+		switch arg {
+		case IdAsc:
+			q.orders[i] = "id asc"
+		case IdDesc:
+			q.orders[i] = "id desc"
+		case NameAsc:
+			q.orders[i] = "name asc"
+		case NameDesc:
+			q.orders[i] = "name desc"
+		case EmailAsc:
+			q.orders[i] = "email asc"
+		case EmailDesc:
+			q.orders[i] = "email desc"
+		case CreatedAtAsc:
+			q.orders[i] = "created_at asc"
+		case CreatedAtDesc:
+			q.orders[i] = "created_at desc"
+		case UpdatedAtAsc:
+			q.orders[i] = "updated_at asc"
+		case UpdatedAtDesc:
+			q.orders[i] = "updated_at desc"
+		case FloatTypeAsc:
+			q.orders[i] = "float_type asc"
+		case FloatTypeDesc:
+			q.orders[i] = "float_type desc"
+		case DoubleTypeAsc:
+			q.orders[i] = "double_type asc"
+		case DoubleTypeDesc:
+			q.orders[i] = "double_type desc"
+		case HobbyAsc:
+			q.orders[i] = "hobby asc"
+		case HobbyDesc:
+			q.orders[i] = "hobby desc"
+		}
+	}
 	return q
 }
 
@@ -103,5 +140,9 @@ func (q *idxQuery[T]) WhereNameIN(vals ...string) orderReadQuery[T] {
 }
 
 func (q *idxQuery[T]) GetWhere() (whereSql string, params []interface{}) {
-	return q.whereSql, q.whereParams
+	var orderSql string
+	if len(q.orders) > 0 {
+		orderSql = " order by " + strings.Join(q.orders, ",")
+	}
+	return q.whereSql + orderSql, q.whereParams
 }

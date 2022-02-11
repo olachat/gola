@@ -8,7 +8,7 @@ type orderBy int
 
 type idxQuery[T any] struct {
 	whereSql    string
-	orders      []orderBy
+	orders      []string
 	whereParams []interface{}
 }
 
@@ -37,6 +37,51 @@ const (
 )
 
 func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
+	q.orders = make([]string, len(args))
+	for i, arg := range args {
+		switch arg {
+		case IdAsc:
+			q.orders[i] = "id asc"
+		case IdDesc:
+			q.orders[i] = "id desc"
+		case UserIdAsc:
+			q.orders[i] = "user_id asc"
+		case UserIdDesc:
+			q.orders[i] = "user_id desc"
+		case SlugAsc:
+			q.orders[i] = "slug asc"
+		case SlugDesc:
+			q.orders[i] = "slug desc"
+		case TitleAsc:
+			q.orders[i] = "title asc"
+		case TitleDesc:
+			q.orders[i] = "title desc"
+		case CategoryIdAsc:
+			q.orders[i] = "category_id asc"
+		case CategoryIdDesc:
+			q.orders[i] = "category_id desc"
+		case IsPinnedAsc:
+			q.orders[i] = "is_pinned asc"
+		case IsPinnedDesc:
+			q.orders[i] = "is_pinned desc"
+		case IsVipAsc:
+			q.orders[i] = "is_vip asc"
+		case IsVipDesc:
+			q.orders[i] = "is_vip desc"
+		case CountryAsc:
+			q.orders[i] = "country asc"
+		case CountryDesc:
+			q.orders[i] = "country desc"
+		case CreatedAtAsc:
+			q.orders[i] = "created_at asc"
+		case CreatedAtDesc:
+			q.orders[i] = "created_at desc"
+		case UpdatedAtAsc:
+			q.orders[i] = "updated_at asc"
+		case UpdatedAtDesc:
+			q.orders[i] = "updated_at desc"
+		}
+	}
 	return q
 }
 
@@ -306,5 +351,9 @@ func (q *idxQuery[T]) WhereUserIdIN(vals ...int) iQuery9[T] {
 }
 
 func (q *idxQuery[T]) GetWhere() (whereSql string, params []interface{}) {
-	return q.whereSql, q.whereParams
+	var orderSql string
+	if len(q.orders) > 0 {
+		orderSql = " order by " + strings.Join(q.orders, ",")
+	}
+	return q.whereSql + orderSql, q.whereParams
 }

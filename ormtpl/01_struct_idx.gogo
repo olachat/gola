@@ -8,7 +8,7 @@ type orderBy int
 
 type idxQuery[T any] struct {
 	whereSql string
-	orders []orderBy
+	orders []string
 	whereParams []interface{}
 }
 
@@ -26,6 +26,17 @@ const (
 )
 
 func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
+	q.orders = make([]string, len(args))
+	for i, arg := range args {
+		switch arg{
+{{- range $i, $col := .Columns }}
+		case {{$col.GoName}}Asc:
+			q.orders[i] = "{{ $col.Name}} asc"
+		case {{$col.GoName}}Desc:
+			q.orders[i] = "{{ $col.Name}} desc"
+{{- end }}
+		}
+	}
 	return q
 }
 
@@ -124,5 +135,9 @@ func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceN
 {{ end }}
 
 func (q *idxQuery[T]) GetWhere() (whereSql string, params []interface{}) {
-	return q.whereSql, q.whereParams
+	var orderSql string
+	if len(q.orders) > 0 {
+		orderSql = " order by " + strings.Join(q.orders, ",")
+	}
+	return q.whereSql + orderSql, q.whereParams
 }
