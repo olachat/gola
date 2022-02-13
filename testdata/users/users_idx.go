@@ -27,6 +27,14 @@ const (
 	DoubleTypeDesc
 	HobbyAsc
 	HobbyDesc
+	HobbyNoDefaultAsc
+	HobbyNoDefaultDesc
+	SportsAsc
+	SportsDesc
+	Sports2Asc
+	Sports2Desc
+	SportsNoDefaultAsc
+	SportsNoDefaultDesc
 )
 
 func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
