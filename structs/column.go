@@ -179,6 +179,10 @@ func (c Column) GoType() string {
 		return c.Table.ClassName() + c.GoName()
 	}
 
+	if c.IsSet() {
+		return c.table.ClassName() + c.GoName()
+	}
+
 	if strings.HasPrefix(c.DBType, "set") {
 		return "string"
 	}
@@ -266,11 +270,19 @@ func (c Column) HasDefault() bool {
 
 func (c Column) GoDefaultValue() string {
 	goType := c.GoType()
+	lowerCaseDefault := strings.ToLower(c.Default)
 	if goType == "string" || c.IsEnum() {
-		if strings.HasPrefix(c.Default, "\"") && strings.HasSuffix(c.Default, "\"") {
-			return c.Default
+		if strings.HasPrefix(lowerCaseDefault, "\"") && strings.HasSuffix(lowerCaseDefault, "\"") {
+			return lowerCaseDefault
 		}
-		return "\"" + c.Default + "\""
+		return "\"" + lowerCaseDefault + "\""
+	}
+	if goType == "string" || c.IsSet() {
+		lowerCaseNoSpaceDefault := strings.ReplaceAll(lowerCaseDefault, " ", "")
+		if strings.HasPrefix(lowerCaseNoSpaceDefault, "(") && strings.HasSuffix(lowerCaseNoSpaceDefault, ")") {
+			return lowerCaseNoSpaceDefault[1 : len(lowerCaseNoSpaceDefault)-1]
+		}
+		return lowerCaseNoSpaceDefault
 	}
 
 	if goType == "time.Time" {
@@ -298,8 +310,21 @@ func (c Column) GetColumnDefault() string {
 func (c Column) IsEnum() bool {
 	return strings.HasPrefix(c.DBType, "enum")
 }
+func (c ColumnStruct) IsSet() bool {
+	return strings.HasPrefix(c.DBType, "set")
+}
 
 func (c Column) GetEnumConst() string {
+	enums := strings.Split(strings.ReplaceAll(getValue(c.FullDBType), "'", ""), ",")
+	elements := make([]string, len(enums))
+	for i, enum := range enums {
+		elements[i] = c.GoType() + getGoName(enum) + " " + c.GoType() + " = " + `"` + enum + `"`
+	}
+
+	return strings.Join(elements, "\n")
+}
+
+func (c Column) GetSetConst() string {
 	enums := strings.Split(strings.ReplaceAll(getValue(c.FullDBType), "'", ""), ",")
 	elements := make([]string, len(enums))
 	for i, enum := range enums {
