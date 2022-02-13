@@ -180,7 +180,7 @@ func (c Column) GoType() string {
 	}
 
 	if c.IsSet() {
-		return c.table.ClassName() + c.GoName()
+		return c.Table.ClassName() + c.GoName()
 	}
 
 	if strings.HasPrefix(c.DBType, "set") {
@@ -310,7 +310,7 @@ func (c Column) GetColumnDefault() string {
 func (c Column) IsEnum() bool {
 	return strings.HasPrefix(c.DBType, "enum")
 }
-func (c ColumnStruct) IsSet() bool {
+func (c Column) IsSet() bool {
 	return strings.HasPrefix(c.DBType, "set")
 }
 
