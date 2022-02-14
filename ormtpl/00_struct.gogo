@@ -50,12 +50,40 @@ const (
 	{{.GetEnumConst}}
 )
 	{{- end }}
+	{{- if .IsSet}}
+type {{$table.ClassName}}{{.GoName}} string
+const (
+	{{.GetSetConst}}
+)
+	{{- end }}
 {{- end }}
 
 {{- range .Columns }}
 
 // {{.GoName}} field
 // {{.Comment}}
+{{- if .IsSet}}
+type {{.GoName}} struct {
+	val string
+}
+
+func (c *{{.GoName}}) Get{{.GoName}}() []{{.GoType}} {
+	strSlice := strings.Split(c.val, ",")
+	valSlice := make([]{{.GoType}}, 0, len(strSlice))
+	for _, s := range strSlice {
+		valSlice = append(valSlice, {{.GoType}}(strings.ToLower(s)))
+	}
+	return valSlice
+}
+
+func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) {
+	strSlice := make([]string, 0, len(val))
+	for _, v := range val {
+		strSlice = append(strSlice, string(v))
+	}
+	c.val = strings.Join(strSlice, ",")
+}
+{{else}}
 type {{.GoName}} struct {
 	val {{.GoType}}
 }
@@ -67,7 +95,7 @@ func (c *{{.GoName}}) Get{{.GoName}}() {{.GoType}} {
 func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) {
 	c.val = val
 }
-
+{{end}}
 func (c *{{.GoName}}) GetColumnName() string {
 	return "{{.Name}}"
 }

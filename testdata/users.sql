@@ -7,6 +7,10 @@ CREATE TABLE `users` (
   `float_type` float NOT NULL DEFAULT 0.0 COMMENT 'float',
   `double_type` double NOT NULL DEFAULT 0.0 COMMENT 'double',
   `hobby` enum ('swimming', 'running', 'singing') NOT NULL DEFAULT 'swimming' COMMENT 'user hobby',
+  `hobby_no_default` enum ('swimming', 'running', 'singing') NOT NULL COMMENT 'user hobby',
+  `sports` SET('SWIM', 'TENNIS', 'BASKETBALL', 'FOOTBALL', 'SQUASH', 'BADMINTON') NOT NULL DEFAULT ("SWIM, FOOTBALL") COMMENT 'user sports',
+  `sports2` SET('SWIM', 'TENNIS', 'BASKETBALL', 'FOOTBALL', 'SQUASH', 'BADMINTON') NOT NULL DEFAULT "SWIM,FOOTBALL" COMMENT 'user sports',
+  `sports_no_default` SET('SWIM', 'TENNIS', 'BASKETBALL', 'FOOTBALL', 'SQUASH', 'BADMINTON') NOT NULL COMMENT 'user sports',
   PRIMARY KEY (`id`),
   KEY `name` (`name`),
   UNIQUE KEY `email` (`email`)

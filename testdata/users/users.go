@@ -4,6 +4,8 @@ package users
 
 import (
 	"github.com/olachat/gola/corelib"
+
+	"strings"
 )
 
 // User represents users table
@@ -24,6 +26,14 @@ type User struct {
 	DoubleType
 	// user hobby enum('swimming','running','singing')
 	Hobby
+	// user hobby enum('swimming','running','singing')
+	HobbyNoDefault
+	// user sports set('swim','tennis','basketball','football','squash','badminton')
+	Sports
+	// user sports set('swim','tennis','basketball','football','squash','badminton')
+	Sports2
+	// user sports set('swim','tennis','basketball','football','squash','badminton')
+	SportsNoDefault
 }
 
 type UserTable struct{}
@@ -58,6 +68,47 @@ const (
 	UserHobbySwimming UserHobby = "swimming"
 	UserHobbyRunning  UserHobby = "running"
 	UserHobbySinging  UserHobby = "singing"
+)
+
+type UserHobbyNoDefault string
+
+const (
+	UserHobbyNoDefaultSwimming UserHobbyNoDefault = "swimming"
+	UserHobbyNoDefaultRunning  UserHobbyNoDefault = "running"
+	UserHobbyNoDefaultSinging  UserHobbyNoDefault = "singing"
+)
+
+type UserSports string
+
+const (
+	UserSportsSwim       UserSports = "swim"
+	UserSportsTennis     UserSports = "tennis"
+	UserSportsBasketball UserSports = "basketball"
+	UserSportsFootball   UserSports = "football"
+	UserSportsSquash     UserSports = "squash"
+	UserSportsBadminton  UserSports = "badminton"
+)
+
+type UserSports2 string
+
+const (
+	UserSports2Swim       UserSports2 = "swim"
+	UserSports2Tennis     UserSports2 = "tennis"
+	UserSports2Basketball UserSports2 = "basketball"
+	UserSports2Football   UserSports2 = "football"
+	UserSports2Squash     UserSports2 = "squash"
+	UserSports2Badminton  UserSports2 = "badminton"
+)
+
+type UserSportsNoDefault string
+
+const (
+	UserSportsNoDefaultSwim       UserSportsNoDefault = "swim"
+	UserSportsNoDefaultTennis     UserSportsNoDefault = "tennis"
+	UserSportsNoDefaultBasketball UserSportsNoDefault = "basketball"
+	UserSportsNoDefaultFootball   UserSportsNoDefault = "football"
+	UserSportsNoDefaultSquash     UserSportsNoDefault = "squash"
+	UserSportsNoDefaultBadminton  UserSportsNoDefault = "badminton"
 )
 
 // Id field
@@ -300,6 +351,153 @@ func (c *Hobby) GetTableType() corelib.TableType {
 	return table
 }
 
+// HobbyNoDefault field
+// user hobby
+type HobbyNoDefault struct {
+	val UserHobbyNoDefault
+}
+
+func (c *HobbyNoDefault) GetHobbyNoDefault() UserHobbyNoDefault {
+	return c.val
+}
+
+func (c *HobbyNoDefault) SetHobbyNoDefault(val UserHobbyNoDefault) {
+	c.val = val
+}
+
+func (c *HobbyNoDefault) GetColumnName() string {
+	return "hobby_no_default"
+}
+
+func (c *HobbyNoDefault) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *HobbyNoDefault) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *HobbyNoDefault) GetTableType() corelib.TableType {
+	return table
+}
+
+// Sports field
+// user sports
+type Sports struct {
+	val string
+}
+
+func (c *Sports) GetSports() []UserSports {
+	strSlice := strings.Split(c.val, ",")
+	valSlice := make([]UserSports, 0, len(strSlice))
+	for _, s := range strSlice {
+		valSlice = append(valSlice, UserSports(strings.ToLower(s)))
+	}
+	return valSlice
+}
+
+func (c *Sports) SetSports(val []UserSports) {
+	strSlice := make([]string, 0, len(val))
+	for _, v := range val {
+		strSlice = append(strSlice, string(v))
+	}
+	c.val = strings.Join(strSlice, ",")
+}
+
+func (c *Sports) GetColumnName() string {
+	return "sports"
+}
+
+func (c *Sports) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Sports) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *Sports) GetTableType() corelib.TableType {
+	return table
+}
+
+// Sports2 field
+// user sports
+type Sports2 struct {
+	val string
+}
+
+func (c *Sports2) GetSports2() []UserSports2 {
+	strSlice := strings.Split(c.val, ",")
+	valSlice := make([]UserSports2, 0, len(strSlice))
+	for _, s := range strSlice {
+		valSlice = append(valSlice, UserSports2(strings.ToLower(s)))
+	}
+	return valSlice
+}
+
+func (c *Sports2) SetSports2(val []UserSports2) {
+	strSlice := make([]string, 0, len(val))
+	for _, v := range val {
+		strSlice = append(strSlice, string(v))
+	}
+	c.val = strings.Join(strSlice, ",")
+}
+
+func (c *Sports2) GetColumnName() string {
+	return "sports2"
+}
+
+func (c *Sports2) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Sports2) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *Sports2) GetTableType() corelib.TableType {
+	return table
+}
+
+// SportsNoDefault field
+// user sports
+type SportsNoDefault struct {
+	val string
+}
+
+func (c *SportsNoDefault) GetSportsNoDefault() []UserSportsNoDefault {
+	strSlice := strings.Split(c.val, ",")
+	valSlice := make([]UserSportsNoDefault, 0, len(strSlice))
+	for _, s := range strSlice {
+		valSlice = append(valSlice, UserSportsNoDefault(strings.ToLower(s)))
+	}
+	return valSlice
+}
+
+func (c *SportsNoDefault) SetSportsNoDefault(val []UserSportsNoDefault) {
+	strSlice := make([]string, 0, len(val))
+	for _, v := range val {
+		strSlice = append(strSlice, string(v))
+	}
+	c.val = strings.Join(strSlice, ",")
+}
+
+func (c *SportsNoDefault) GetColumnName() string {
+	return "sports_no_default"
+}
+
+func (c *SportsNoDefault) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *SportsNoDefault) GetValPointer() interface{} {
+	return &c.val
+}
+
+func (c *SportsNoDefault) GetTableType() corelib.TableType {
+	return table
+}
+
 func NewUser() *User {
 	return &User{
 		Id{},
@@ -310,5 +508,9 @@ func NewUser() *User {
 		FloatType{val: float32(0)},
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
+		HobbyNoDefault{},
+		Sports{val: "swim,football"},
+		Sports2{val: "swim,football"},
+		SportsNoDefault{},
 	}
 }
