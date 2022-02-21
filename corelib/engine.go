@@ -78,7 +78,7 @@ func FindOne[T any](where WhereQuery) *T {
 func Find[T any](where WhereQuery) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	whereSql, params := where.GetWhere()
-	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
+	query := fmt.Sprintf("SELECT %s from %s %s", columnsNames,
 		tableName, whereSql)
 
 	return Query[T](query, params...)

@@ -3,6 +3,7 @@
 package blogs
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/olachat/gola/corelib"
@@ -12,6 +13,7 @@ type orderBy int
 
 type idxQuery[T any] struct {
 	whereSql    string
+	limitSql    string
 	orders      []string
 	whereParams []interface{}
 }
@@ -90,11 +92,12 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
 }
 
 func (q *idxQuery[T]) All() []*T {
-	return nil
+	return corelib.Find[T](q)
 }
 
-func (q *idxQuery[T]) Limit(limit, offset int) []*T {
-	return nil
+func (q *idxQuery[T]) Limit(offset, count int) []*T {
+	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, count)
+	return corelib.Find[T](q)
 }
 
 type order[T any] interface {
@@ -359,5 +362,5 @@ func (q *idxQuery[T]) GetWhere() (whereSql string, params []interface{}) {
 	if len(q.orders) > 0 {
 		orderSql = " order by " + strings.Join(q.orders, ",")
 	}
-	return q.whereSql + orderSql, q.whereParams
+	return q.whereSql + orderSql + q.limitSql, q.whereParams
 }
