@@ -2,11 +2,20 @@
 
 package {{.Package}}
 
-import "github.com/olachat/gola/corelib"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/olachat/gola/corelib"
+)
 
 type orderBy int
 
 type idxQuery[T any] struct {
+	whereSql string
+	limitSql string
+	orders []string
+	whereParams []interface{}
 }
 
 // order by enum & interface
@@ -23,15 +32,27 @@ const (
 )
 
 func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
+	q.orders = make([]string, len(args))
+	for i, arg := range args {
+		switch arg{
+{{- range $i, $col := .Columns }}
+		case {{$col.GoName}}Asc:
+			q.orders[i] = "{{ $col.Name}} asc"
+		case {{$col.GoName}}Desc:
+			q.orders[i] = "{{ $col.Name}} desc"
+{{- end }}
+		}
+	}
 	return q
 }
 
 func (q *idxQuery[T]) All() []*T {
-	return nil
+	return corelib.Find[T](q)
 }
 
-func (q *idxQuery[T]) Limit(limit, offset int) []*T {
-	return nil
+func (q *idxQuery[T]) Limit(offset, count int) []*T {
+	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, count)
+	return corelib.Find[T](q)
 }
 
 type order[T any] interface {
@@ -68,6 +89,8 @@ type {{ $col.StructName }}[T any] struct {
 
 {{- range $col.Children }}
 func (q *{{$col.StructName}}[T]) And{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T] {
+	q.whereSql = " and {{ $col.Name }} = ?"
+	q.whereParams = append(q.whereParams, val)
 	{{- if eq .InterfaceName "orderReadQuery" }}
 	return q.idxQuery
 	{{- else }}
@@ -76,6 +99,10 @@ func (q *{{$col.StructName}}[T]) And{{ .GoName }}EQ(val {{ .GoType }}) {{ .Inter
 }
 
 func (q *{{$col.StructName}}[T]) And{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T] {
+	q.whereSql += " and {{ $col.Name }} in (" + corelib.GetParamPlaceHolder(len(vals)) + ")"
+	for _, val := range vals {
+		q.whereParams = append(q.whereParams, val)
+	}
 	{{- if eq .InterfaceName "orderReadQuery" }}
 	return q.idxQuery
 	{{- else }}
@@ -92,6 +119,8 @@ func Select[T any]() iQuery[T] {
 
 {{range $i, $col := .FirstIdxColumns }}
 func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T] {
+	q.whereSql += " where {{ .Name }} = ?"
+	q.whereParams = append(q.whereParams, val)
 	{{- if eq .InterfaceName "orderReadQuery" }}
 	return q
 	{{- else }}
@@ -100,6 +129,10 @@ func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName 
 }
 
 func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T] {
+	q.whereSql = " where {{ .Name }} in (" + corelib.GetParamPlaceHolder(len(vals)) + ")"
+	for _, val := range vals {
+		q.whereParams = append(q.whereParams, val)
+	}
 	{{- if eq .InterfaceName "orderReadQuery" }}
 	return q
 	{{- else }}
@@ -107,3 +140,11 @@ func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceN
 	{{- end}}
 }
 {{ end }}
+
+func (q *idxQuery[T]) GetWhere() (whereSql string, params []interface{}) {
+	var orderSql string
+	if len(q.orders) > 0 {
+		orderSql = " order by " + strings.Join(q.orders, ",")
+	}
+	return q.whereSql + orderSql + q.limitSql, q.whereParams
+}
