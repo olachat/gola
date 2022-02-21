@@ -82,6 +82,22 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
 			q.orders[i] = "hobby asc"
 		case HobbyDesc:
 			q.orders[i] = "hobby desc"
+		case HobbyNoDefaultAsc:
+			q.orders[i] = "hobby_no_default asc"
+		case HobbyNoDefaultDesc:
+			q.orders[i] = "hobby_no_default desc"
+		case SportsAsc:
+			q.orders[i] = "sports asc"
+		case SportsDesc:
+			q.orders[i] = "sports desc"
+		case Sports2Asc:
+			q.orders[i] = "sports2 asc"
+		case Sports2Desc:
+			q.orders[i] = "sports2 desc"
+		case SportsNoDefaultAsc:
+			q.orders[i] = "sports_no_default asc"
+		case SportsNoDefaultDesc:
+			q.orders[i] = "sports_no_default desc"
 		}
 	}
 	return q
