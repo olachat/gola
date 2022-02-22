@@ -26,6 +26,8 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
 
 * [ ] CURD
   * [ ] Insert
+    * [ ] Default Value
+    * [ ] LAST_INSERT_ID()
   * [ ] Update
   * [ ] Delete
 * [ ] Connection Pool
@@ -36,22 +38,23 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
 * [X] code gen template
   * [X] struct
   * [ ] index query methods
-    * [ ] index
+    * [X] index
     * [ ] uniuqe index
-    * [ ] paging & order
+    * [X] paging & order
       * [ ] paging using cursor
 * [ ] better primary key support
   * [ ] Single Key types / names
   * [ ] Composite key
 * [ ] db types
   * [ ] timestamp
+  * [ ] boolean
   * [ ] float
-  * [ ] enum
-  * [ ] set
+  * [X] enum
+  * [X] set
 * [X] Remove sqlboiler dependency in code gen
-* [ ] Project badges
+* [X] Project badges
 * [ ] Tests
-  * [ ] Use sql to create table & insert testdata
+  * [X] Use sql to create table & insert testdata
   * [ ] Performance test
 * [ ] context support
 * [ ] transaction support
