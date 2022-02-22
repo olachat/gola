@@ -3,8 +3,9 @@
 package users
 
 import (
+	"database/sql"
+	"fmt"
 	"github.com/olachat/gola/corelib"
-
 	"strings"
 )
 
@@ -513,4 +514,24 @@ func NewUser() *User {
 		Sports2{val: "swim,football"},
 		SportsNoDefault{},
 	}
+}
+
+func (c *User) Insert() (sql.Result, error) {
+	tableName, columnNames := corelib.GetTableAndColumnsNames[User]()
+	sql := `INSERT INTO ` + tableName + ` (` + columnNames + `) value (`
+	values := make([]string, 0)
+	values = append(values, fmt.Sprintf("%v", c.GetId()))
+	values = append(values, fmt.Sprintf("%v", c.GetName()))
+	values = append(values, fmt.Sprintf("%v", c.GetEmail()))
+	values = append(values, fmt.Sprintf("%v", c.GetCreatedAt()))
+	values = append(values, fmt.Sprintf("%v", c.GetUpdatedAt()))
+	values = append(values, fmt.Sprintf("%v", c.GetFloatType()))
+	values = append(values, fmt.Sprintf("%v", c.GetDoubleType()))
+	values = append(values, fmt.Sprintf("%v", c.GetHobby()))
+	values = append(values, fmt.Sprintf("%v", c.GetHobbyNoDefault()))
+	values = append(values, fmt.Sprintf("%v", c.GetSports()))
+	values = append(values, fmt.Sprintf("%v", c.GetSports2()))
+	values = append(values, fmt.Sprintf("%v", c.GetSportsNoDefault()))
+	sql += strings.Join(values, ",") + `)`
+	return corelib.Exec[User](sql)
 }
