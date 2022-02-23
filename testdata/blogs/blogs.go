@@ -3,10 +3,7 @@
 package blogs
 
 import (
-	"database/sql"
-	"fmt"
 	"github.com/olachat/gola/corelib"
-	"strings"
 )
 
 // Blog represents blogs table
@@ -375,20 +372,19 @@ func NewBlog() *Blog {
 	}
 }
 
-func (c *Blog) Insert() (sql.Result, error) {
-	tableName, columnNames := corelib.GetTableAndColumnsNames[Blog]()
-	sql := `INSERT INTO ` + tableName + ` (` + columnNames + `) value (`
-	values := make([]string, 0)
-	values = append(values, fmt.Sprintf("%v", c.GetId()))
-	values = append(values, fmt.Sprintf("%v", c.GetUserId()))
-	values = append(values, fmt.Sprintf("%v", c.GetSlug()))
-	values = append(values, fmt.Sprintf("%v", c.GetTitle()))
-	values = append(values, fmt.Sprintf("%v", c.GetCategoryId()))
-	values = append(values, fmt.Sprintf("%v", c.GetIsPinned()))
-	values = append(values, fmt.Sprintf("%v", c.GetIsVip()))
-	values = append(values, fmt.Sprintf("%v", c.GetCountry()))
-	values = append(values, fmt.Sprintf("%v", c.GetCreatedAt()))
-	values = append(values, fmt.Sprintf("%v", c.GetUpdatedAt()))
-	sql += strings.Join(values, ",") + `)`
-	return corelib.Exec[Blog](sql)
+func (c *Blog) Insert() error {
+	sql := `INSERT INTO blogs (user_id, slug, title, category_id, is_pinned, is_vip, country, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
+	result, err := corelib.Exec[Blog](sql, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	c.SetId(int(id))
+	return nil
 }
