@@ -124,3 +124,29 @@ func New{{.ClassName}}() *{{.ClassName}} {
 	{{- end }}
 	}
 }
+
+func (c *{{.ClassName}}) Insert() error {
+	sql := `INSERT INTO {{.Name}} (
+		{{- range $i, $c := .NonPrimaryColumns }}
+		{{- if $i}}, {{end}}
+		{{- $c.Name}}
+		{{- end }}) values (
+		{{- range $i, $c := .NonPrimaryColumns }}
+		{{- if $i}}, {{end}}?
+		{{- end }})`
+
+	result, err := corelib.Exec[{{.ClassName}}](sql, {{- range $i, $c := .NonPrimaryColumns }}
+	{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
+	{{- end }})
+
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	c.Set{{.GetPrimaryKey}}(int(id))
+	return nil
+}

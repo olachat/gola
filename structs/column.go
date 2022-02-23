@@ -334,24 +334,24 @@ func (c Column) GetSetConst() string {
 	return strings.Join(elements, "\n")
 }
 
-func (c Column) IsPrimaryKey() string {
+func (c Column) IsPrimaryKey() bool {
 	if c.Table.PKey == nil {
-		return "false"
+		return false
 	}
 
 	for _, pc := range c.Table.PKey.Columns {
 		if pc == c.Name {
-			return "true"
+			return true
 		}
 	}
 
-	return "false"
+	return false
 }
 
-func (c Column) IsAutoIncrement() string {
+func (c Column) IsAutoIncrement() bool {
 	if c.Default == "auto_increment" {
-		return "true"
+		return true
 	}
 
-	return "false"
+	return false
 }

@@ -35,6 +35,28 @@ func (t *Table) ClassName() string {
 	return name
 }
 
+func (t *Table) GetPrimaryKey() string {
+	for _, c := range t.Columns {
+		if c.IsPrimaryKey() {
+			return c.GoName()
+		}
+	}
+
+	return ""
+}
+
+func (t *Table) NonPrimaryColumns() []Column {
+	result := make([]Column, 0, len(t.Columns))
+
+	for _, c := range t.Columns {
+		if !c.IsPrimaryKey() {
+			result = append(result, c)
+		}
+	}
+
+	return result
+}
+
 func (t *Table) GetIndexRoot() *idxNode {
 	if t.idxRoot != nil {
 		return t.idxRoot

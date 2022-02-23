@@ -371,3 +371,20 @@ func NewBlog() *Blog {
 		UpdatedAt{val: uint(0)},
 	}
 }
+
+func (c *Blog) Insert() error {
+	sql := `INSERT INTO blogs (user_id, slug, title, category_id, is_pinned, is_vip, country, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
+	result, err := corelib.Exec[Blog](sql, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	c.SetId(int(id))
+	return nil
+}

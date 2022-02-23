@@ -50,6 +50,17 @@ func FetchByIds[T any](ids []int) []*T {
 	return Query[T](query)
 }
 
+func Exec[T any](query string, params ...interface{}) (sql.Result, error) {
+	db, err := sql.Open("mysql", _connstr)
+	defer db.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db.Exec(query, params...)
+}
+
 func FindOne[T any](where WhereQuery) *T {
 	db, err := sql.Open("mysql", _connstr)
 	if err != nil {

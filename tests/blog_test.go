@@ -1,38 +1,65 @@
 package tests
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/olachat/gola/testdata/blogs"
 )
 
 func TestBlogMethods(t *testing.T) {
-	data := blogs.Select[struct {
+	blog := blogs.NewBlog()
+	blog.SetTitle("foo")
+	e := blog.Insert()
+	if e != nil {
+		t.Error(e)
+	}
+
+	if blog.GetId() != 1 {
+		t.Error("Insert blog 1 failed")
+	}
+
+	blog = blogs.NewBlog()
+	blog.SetTitle("bar")
+	e = blog.Insert()
+	if e != nil {
+		t.Error(e)
+	}
+
+	if blog.GetId() != 2 {
+		t.Error("Insert blog 2 failed")
+	}
+
+	objs := blogs.Select[struct {
 		blogs.Id
 		blogs.Title
-	}]().WhereCountryEQ("SG").AndCategoryIdIN(1, 2).All()
+	}]().OrderBy(blogs.IdAsc).All()
 
-	fmt.Printf("data: %v", data)
+	if len(objs) != 2 {
+		t.Error("Read all blog failed")
+	}
 
-	data2 := blogs.Select[blogs.Blog]().WhereCountryEQ("SG").OrderBy(
-		blogs.CategoryIdAsc,
-		blogs.IdDesc).Limit(10, 0)
+	if objs[0].GetTitle() != "foo" {
+		t.Error("Read blog 1 failed")
+	}
 
-	fmt.Printf("data: %v", data2)
+	if objs[1].GetTitle() != "bar" {
+		t.Error("Read blog 2 failed")
+	}
+
+	objs = blogs.Select[struct {
+		blogs.Id
+		blogs.Title
+	}]().OrderBy(blogs.IdDesc).All()
+
+	if len(objs) != 2 {
+		t.Error("Read all blog failed")
+	}
+
+	if objs[0].GetTitle() != "bar" {
+		t.Error("Read blog 1 failed")
+	}
+
+	if objs[1].GetTitle() != "foo" {
+		t.Error("Read blog 2 failed")
+	}
 }
-
-// blogs.Query().CountryIN("SG", "CN").
-
-// blogs.Query().CountryEQ("SG").CategoryIdIn(1, 2).All[struct{
-// 	blogs.Id,
-// 	blogs.Title,
-// }]()
-// blogs.Select[blogs.Blog]().WhereCountryEQ("SG").AndCategoryIdIN(1, 2)
-
-// blogs.Query().CountryEqual("SG").CategoryIdIn(1, 2).OrderBy(
-// 	blogs.IdAsc,
-// ).Limit(limit, offset).Select[struct{
-// 	blogs.Id,
-// 	blogs.Title,
-// }]()
