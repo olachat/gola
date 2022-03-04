@@ -83,6 +83,22 @@ func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) {
 	}
 	c.val = strings.Join(strSlice, ",")
 }
+{{else if .IsBool}}
+type {{.GoName}} struct {
+	val int8
+}
+
+func (c *{{.GoName}}) Get{{.GoName}}() {{.GoType}} {
+	return c.val > 0
+}
+
+func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) {
+	if val {
+		c.val = 1
+		return
+	}
+	c.val = 0
+}
 {{else}}
 type {{.GoName}} struct {
 	val {{.GoType}}

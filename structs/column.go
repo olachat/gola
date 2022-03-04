@@ -164,6 +164,9 @@ func (c Column) SQLType() string {
 
 func (c Column) GoType() string {
 	if goType, ok := dbTypeToGoTypes[c.DBType]; ok {
+		if c.FullDBType == "tinyint(1)" {
+			return "bool"
+		}
 		return goType
 	}
 
@@ -282,7 +285,10 @@ func (c Column) GoDefaultValue() string {
 		if strings.HasPrefix(lowerCaseNoSpaceDefault, "(") && strings.HasSuffix(lowerCaseNoSpaceDefault, ")") {
 			return lowerCaseNoSpaceDefault[1 : len(lowerCaseNoSpaceDefault)-1]
 		}
-		return lowerCaseNoSpaceDefault
+		if strings.HasPrefix(lowerCaseNoSpaceDefault, "\"") && strings.HasSuffix(lowerCaseNoSpaceDefault, "\"") {
+			return lowerCaseNoSpaceDefault
+		}
+		return "\"" + lowerCaseNoSpaceDefault + "\""
 	}
 
 	if goType == "time.Time" {
@@ -294,6 +300,15 @@ func (c Column) GoDefaultValue() string {
 
 	if strings.Contains(goType, "int") || strings.Contains(goType, "float") {
 		return goType + "(" + strings.ReplaceAll(c.Default, `"`, "") + ")"
+	}
+
+	if goType == "bool" {
+		def := strings.ReplaceAll(c.Default, `"`, "")
+		if def == "0" {
+			return "int8(0)"
+		} else {
+			return "int8(1)"
+		}
 	}
 
 	return goType + "(" + c.Default + ")"
@@ -312,6 +327,9 @@ func (c Column) IsEnum() bool {
 }
 func (c Column) IsSet() bool {
 	return strings.HasPrefix(c.DBType, "set")
+}
+func (c Column) IsBool() bool {
+	return strings.HasPrefix(c.FullDBType, "tinyint(1)")
 }
 
 func (c Column) GetEnumConst() string {
