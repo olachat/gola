@@ -14,9 +14,9 @@ func GetParamPlaceHolder(count int) string {
 	return strings.Join(strs, ",")
 }
 
-// GetInterfaceSlice converts []T to []interface{}
-func GetInterfaceSlice[T any](data []T) []interface{} {
-	result := make([]interface{}, len(data))
+// GetAnySlice converts []T to []any
+func GetAnySlice[T any](data []T) []any {
+	result := make([]any, len(data))
 	for i, obj := range data {
 		result[i] = obj
 	}

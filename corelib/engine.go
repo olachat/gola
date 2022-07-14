@@ -50,10 +50,11 @@ func FetchByPK[T any](val interface{}, pkName string, db *sql.DB) *T {
 }
 
 // FetchByPKs returns rows of T type with given primary key values
-func FetchByPKs[T any](vals []interface{}, pkName string, db *sql.DB) []*T {
+func FetchByPKs[T any](vals []any, pkName string, db *sql.DB) []*T {
+	if len(vals) == 0 {
+		return make([]*T, 0)
+	}
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
-
-	// idstr := JoinInts(ids, ",")
 	query := fmt.Sprintf("SELECT %s from %s where %s in(%s)",
 		columnsNames, tableName, pkName, GetParamPlaceHolder(len(vals)))
 
@@ -61,7 +62,7 @@ func FetchByPKs[T any](vals []interface{}, pkName string, db *sql.DB) []*T {
 }
 
 // Exec given query with given db instances or default
-func Exec(query string, db *sql.DB, params ...interface{}) (sql.Result, error) {
+func Exec(query string, db *sql.DB, params ...any) (sql.Result, error) {
 	mydb := getDB(db)
 	return mydb.Exec(query, params...)
 }
@@ -99,7 +100,7 @@ func Find[T any](where WhereQuery, db *sql.DB) []*T {
 }
 
 // Query rows from given table type with where query & params
-func Query[T any](query string, db *sql.DB, params ...interface{}) []*T {
+func Query[T any](query string, db *sql.DB, params ...any) []*T {
 	var result []*T
 	var u *T
 

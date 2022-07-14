@@ -63,13 +63,13 @@ func FetchByPK[T any](val int) *T {
 
 // FetchUserByPKs returns rows with from users table with given primary key values
 func FetchUserByPKs(vals ...int) []*User {
-	pks := corelib.GetInterfaceSlice(vals)
+	pks := corelib.GetAnySlice(vals)
 	return corelib.FetchByPKs[User](pks, "id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from users table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
-	pks := corelib.GetInterfaceSlice(vals)
+	pks := corelib.GetAnySlice(vals)
 	return corelib.FetchByPKs[T](pks, "id", _db)
 }
 

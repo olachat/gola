@@ -59,13 +59,13 @@ func FetchByPK[T any](val int) *T {
 
 // FetchBlogByPKs returns rows with from blogs table with given primary key values
 func FetchBlogByPKs(vals ...int) []*Blog {
-	pks := corelib.GetInterfaceSlice(vals)
+	pks := corelib.GetAnySlice(vals)
 	return corelib.FetchByPKs[Blog](pks, "id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from blogs table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
-	pks := corelib.GetInterfaceSlice(vals)
+	pks := corelib.GetAnySlice(vals)
 	return corelib.FetchByPKs[T](pks, "id", _db)
 }
 
