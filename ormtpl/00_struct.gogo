@@ -155,7 +155,7 @@ func (c *{{.ClassName}}) Insert() error {
 		{{- if $i}}, {{end}}?
 		{{- end }})`
 
-	result, err := corelib.Exec[{{.ClassName}}](sql, _db, {{- range $i, $c := .NonPrimaryColumns }}
+	result, err := corelib.Exec(sql, _db, {{- range $i, $c := .NonPrimaryColumns }}
 	{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
 	{{- end }})
 

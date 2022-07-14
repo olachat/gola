@@ -56,7 +56,7 @@ func FetchByIds[T any](ids []int, db *sql.DB) []*T {
 	return Query[T](query, db)
 }
 
-func Exec[T any](query string, db *sql.DB, params ...interface{}) (sql.Result, error) {
+func Exec(query string, db *sql.DB, params ...interface{}) (sql.Result, error) {
 	mydb := getDB(db)
 	return mydb.Exec(query, params...)
 }
