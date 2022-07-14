@@ -68,19 +68,29 @@ func FetchByIds[T any](ids []int) []*T {
 // Id field
 //
 type Id struct {
-	val int
+	_updated bool
+	val      int
 }
 
 func (c *Id) GetId() int {
 	return c.val
 }
 
-func (c *Id) SetId(val int) {
+func (c *Id) SetId(val int) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *Id) GetColumnName() string {
 	return "id"
+}
+
+func (c *Id) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *Id) IsPrimaryKey() bool {
@@ -98,19 +108,29 @@ func (c *Id) GetTableType() corelib.TableType {
 // UserId field
 // User Id
 type UserId struct {
-	val int
+	_updated bool
+	val      int
 }
 
 func (c *UserId) GetUserId() int {
 	return c.val
 }
 
-func (c *UserId) SetUserId(val int) {
+func (c *UserId) SetUserId(val int) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *UserId) GetColumnName() string {
 	return "user_id"
+}
+
+func (c *UserId) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *UserId) IsPrimaryKey() bool {
@@ -128,19 +148,29 @@ func (c *UserId) GetTableType() corelib.TableType {
 // Slug field
 // Slug
 type Slug struct {
-	val string
+	_updated bool
+	val      string
 }
 
 func (c *Slug) GetSlug() string {
 	return c.val
 }
 
-func (c *Slug) SetSlug(val string) {
+func (c *Slug) SetSlug(val string) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *Slug) GetColumnName() string {
 	return "slug"
+}
+
+func (c *Slug) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *Slug) IsPrimaryKey() bool {
@@ -158,19 +188,29 @@ func (c *Slug) GetTableType() corelib.TableType {
 // Title field
 // Title
 type Title struct {
-	val string
+	_updated bool
+	val      string
 }
 
 func (c *Title) GetTitle() string {
 	return c.val
 }
 
-func (c *Title) SetTitle(val string) {
+func (c *Title) SetTitle(val string) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *Title) GetColumnName() string {
 	return "title"
+}
+
+func (c *Title) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *Title) IsPrimaryKey() bool {
@@ -188,19 +228,29 @@ func (c *Title) GetTableType() corelib.TableType {
 // CategoryId field
 // Category Id
 type CategoryId struct {
-	val int
+	_updated bool
+	val      int
 }
 
 func (c *CategoryId) GetCategoryId() int {
 	return c.val
 }
 
-func (c *CategoryId) SetCategoryId(val int) {
+func (c *CategoryId) SetCategoryId(val int) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *CategoryId) GetColumnName() string {
 	return "category_id"
+}
+
+func (c *CategoryId) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *CategoryId) IsPrimaryKey() bool {
@@ -218,19 +268,29 @@ func (c *CategoryId) GetTableType() corelib.TableType {
 // IsPinned field
 // Is pinned to top
 type IsPinned struct {
-	val int8
+	_updated bool
+	val      int8
 }
 
 func (c *IsPinned) GetIsPinned() int8 {
 	return c.val
 }
 
-func (c *IsPinned) SetIsPinned(val int8) {
+func (c *IsPinned) SetIsPinned(val int8) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *IsPinned) GetColumnName() string {
 	return "is_pinned"
+}
+
+func (c *IsPinned) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *IsPinned) IsPrimaryKey() bool {
@@ -248,19 +308,29 @@ func (c *IsPinned) GetTableType() corelib.TableType {
 // IsVip field
 // Is VIP reader only
 type IsVip struct {
-	val int8
+	_updated bool
+	val      int8
 }
 
 func (c *IsVip) GetIsVip() int8 {
 	return c.val
 }
 
-func (c *IsVip) SetIsVip(val int8) {
+func (c *IsVip) SetIsVip(val int8) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *IsVip) GetColumnName() string {
 	return "is_vip"
+}
+
+func (c *IsVip) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *IsVip) IsPrimaryKey() bool {
@@ -278,19 +348,29 @@ func (c *IsVip) GetTableType() corelib.TableType {
 // Country field
 // Country of the blog user
 type Country struct {
-	val string
+	_updated bool
+	val      string
 }
 
 func (c *Country) GetCountry() string {
 	return c.val
 }
 
-func (c *Country) SetCountry(val string) {
+func (c *Country) SetCountry(val string) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *Country) GetColumnName() string {
 	return "country"
+}
+
+func (c *Country) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *Country) IsPrimaryKey() bool {
@@ -308,19 +388,29 @@ func (c *Country) GetTableType() corelib.TableType {
 // CreatedAt field
 // Created Timestamp
 type CreatedAt struct {
-	val uint
+	_updated bool
+	val      uint
 }
 
 func (c *CreatedAt) GetCreatedAt() uint {
 	return c.val
 }
 
-func (c *CreatedAt) SetCreatedAt(val uint) {
+func (c *CreatedAt) SetCreatedAt(val uint) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *CreatedAt) GetColumnName() string {
 	return "created_at"
+}
+
+func (c *CreatedAt) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *CreatedAt) IsPrimaryKey() bool {
@@ -338,19 +428,29 @@ func (c *CreatedAt) GetTableType() corelib.TableType {
 // UpdatedAt field
 // Updated Timestamp
 type UpdatedAt struct {
-	val uint
+	_updated bool
+	val      uint
 }
 
 func (c *UpdatedAt) GetUpdatedAt() uint {
 	return c.val
 }
 
-func (c *UpdatedAt) SetUpdatedAt(val uint) {
+func (c *UpdatedAt) SetUpdatedAt(val uint) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *UpdatedAt) GetColumnName() string {
 	return "updated_at"
+}
+
+func (c *UpdatedAt) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *UpdatedAt) IsPrimaryKey() bool {

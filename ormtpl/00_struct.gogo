@@ -72,6 +72,7 @@ const (
 // {{.Comment}}
 {{- if .IsSet}}
 type {{.GoName}} struct {
+	_updated bool
 	val string
 }
 
@@ -84,15 +85,17 @@ func (c *{{.GoName}}) Get{{.GoName}}() []{{.GoType}} {
 	return valSlice
 }
 
-func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) {
+func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) bool {
 	strSlice := make([]string, 0, len(val))
 	for _, v := range val {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
+	return true
 }
 {{else}}
 type {{.GoName}} struct {
+	_updated bool
 	val {{.GoType}}
 }
 
@@ -100,12 +103,21 @@ func (c *{{.GoName}}) Get{{.GoName}}() {{.GoType}} {
 	return c.val
 }
 
-func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) {
+func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 {{end}}
 func (c *{{.GoName}}) GetColumnName() string {
 	return "{{.Name}}"
+}
+
+func (c *{{.GoName}}) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *{{.GoName}}) IsPrimaryKey() bool {
