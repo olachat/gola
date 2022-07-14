@@ -62,13 +62,15 @@ func FetchByPK[T any](val int) *T {
 }
 
 // FetchUserByPKs returns rows with from users table with given primary key values
-func FetchUserByPKs(vals []int) []*User {
-	return corelib.FetchByPKs[User](vals, _db)
+func FetchUserByPKs(vals ...int) []*User {
+	pks := corelib.GetInterfaceSlice(vals)
+	return corelib.FetchByPKs[User](pks, "id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from users table with given primary key values
-func FetchByPKs[T any](vals []int) []*T {
-	return corelib.FetchByPKs[T](vals, _db)
+func FetchByPKs[T any](vals ...int) []*T {
+	pks := corelib.GetInterfaceSlice(vals)
+	return corelib.FetchByPKs[T](pks, "id", _db)
 }
 
 // Column types

@@ -43,13 +43,15 @@ func FetchByPK[T any](val {{.GetPrimaryKeyType}}) *T {
 }
 
 // Fetch{{.ClassName}}ByPKs returns rows with from {{.Name}} table with given primary key values
-func Fetch{{.ClassName}}ByPKs(vals []{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
-	return corelib.FetchByPKs[{{.ClassName}}](vals, _db)
+func Fetch{{.ClassName}}ByPKs(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
+	pks := corelib.GetInterfaceSlice(vals)
+	return corelib.FetchByPKs[{{.ClassName}}](pks, "{{.GetPrimaryKeyName}}", _db)
 }
 
 // FetchByPKs returns rows with selected fields from {{.Name}} table with given primary key values
-func FetchByPKs[T any](vals []{{.GetPrimaryKeyType}}) []*T {
-	return corelib.FetchByPKs[T](vals, _db)
+func FetchByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
+	pks := corelib.GetInterfaceSlice(vals)
+	return corelib.FetchByPKs[T](pks, "{{.GetPrimaryKeyName}}", _db)
 }
 
 // Column types

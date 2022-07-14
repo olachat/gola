@@ -76,7 +76,7 @@ func TestBlogMethods(t *testing.T) {
 		t.Error("Read blog 2 failed")
 	}
 
-	data := blogs.FetchBlogByPKs([]int{2, 3})
+	data := blogs.FetchBlogByPKs(2, 3)
 	if len(data) != 2 {
 		t.Error("Read all blog failed")
 	}

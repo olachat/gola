@@ -50,13 +50,14 @@ func FetchByPK[T any](val interface{}, pkName string, db *sql.DB) *T {
 }
 
 // FetchByPKs returns rows of T type with given primary key values
-func FetchByPKs[T any](ids []int, db *sql.DB) []*T {
+func FetchByPKs[T any](vals []interface{}, pkName string, db *sql.DB) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
-	idstr := JoinInts(ids, ",")
-	query := fmt.Sprintf("SELECT %s from %s where id in(%s)", columnsNames, tableName, idstr)
+	// idstr := JoinInts(ids, ",")
+	query := fmt.Sprintf("SELECT %s from %s where %s in(%s)",
+		columnsNames, tableName, pkName, GetParamPlaceHolder(len(vals)))
 
-	return Query[T](query, db)
+	return Query[T](query, db, vals...)
 }
 
 // Exec given query with given db instances or default

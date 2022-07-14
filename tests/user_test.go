@@ -288,7 +288,7 @@ func TestUserMethods(t *testing.T) {
 		t.Error("FetchUserByPK must return nil for id 0")
 	}
 
-	objs := users.FetchByPKs[SimpleUser]([]int{1, 2})
+	objs := users.FetchByPKs[SimpleUser](1, 2)
 	if len(objs) != 2 {
 		t.Error("FetchByPKs[SimpleUser]([]int{1, 2}) failed")
 	}
@@ -296,7 +296,7 @@ func TestUserMethods(t *testing.T) {
 		t.Error("FetchByPK and FetchByPKs[SimpleUser] returns different result")
 	}
 
-	objs2 := users.FetchUserByPKs([]int{3, 4})
+	objs2 := users.FetchUserByPKs(3, 4)
 	if len(objs2) != 2 {
 		t.Error("FetchUserByPKs([]int{3, 4}) failed")
 	}
