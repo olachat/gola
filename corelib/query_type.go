@@ -2,7 +2,7 @@ package corelib
 
 // WhereQuery defines interface which support forming query query
 type WhereQuery interface {
-	GetWhere() (whereSQL string, params []interface{})
+	GetWhere() (whereSQL string, params []any)
 }
 
 // ReadQuery defines interface which support reading multiple objects

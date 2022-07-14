@@ -103,7 +103,7 @@ func (c *Id) IsPrimaryKey() bool {
 	return true
 }
 
-func (c *Id) GetValPointer() interface{} {
+func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
@@ -143,7 +143,7 @@ func (c *UserId) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *UserId) GetValPointer() interface{} {
+func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
@@ -183,7 +183,7 @@ func (c *Slug) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *Slug) GetValPointer() interface{} {
+func (c *Slug) GetValPointer() any {
 	return &c.val
 }
 
@@ -223,7 +223,7 @@ func (c *Title) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *Title) GetValPointer() interface{} {
+func (c *Title) GetValPointer() any {
 	return &c.val
 }
 
@@ -263,7 +263,7 @@ func (c *CategoryId) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *CategoryId) GetValPointer() interface{} {
+func (c *CategoryId) GetValPointer() any {
 	return &c.val
 }
 
@@ -303,7 +303,7 @@ func (c *IsPinned) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *IsPinned) GetValPointer() interface{} {
+func (c *IsPinned) GetValPointer() any {
 	return &c.val
 }
 
@@ -343,7 +343,7 @@ func (c *IsVip) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *IsVip) GetValPointer() interface{} {
+func (c *IsVip) GetValPointer() any {
 	return &c.val
 }
 
@@ -383,7 +383,7 @@ func (c *Country) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *Country) GetValPointer() interface{} {
+func (c *Country) GetValPointer() any {
 	return &c.val
 }
 
@@ -423,7 +423,7 @@ func (c *CreatedAt) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *CreatedAt) GetValPointer() interface{} {
+func (c *CreatedAt) GetValPointer() any {
 	return &c.val
 }
 
@@ -463,7 +463,7 @@ func (c *UpdatedAt) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *UpdatedAt) GetValPointer() interface{} {
+func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
 }
 
@@ -505,7 +505,7 @@ func (c *Blog) Insert() error {
 
 func (c *Blog) Update() (bool, error) {
 	var updatedFields []string
-	var params []interface{}
+	var params []any
 	if c.UserId.IsUpdated() {
 		updatedFields = append(updatedFields, "user_id = ?")
 		params = append(params, c.GetUserId())

@@ -129,7 +129,7 @@ func (c *{{.GoName}}) IsPrimaryKey() bool {
 	return {{.IsPrimaryKey}}
 }
 
-func (c *{{.GoName}}) GetValPointer() interface{} {
+func (c *{{.GoName}}) GetValPointer() any {
 	return &c.val
 }
 
@@ -178,7 +178,7 @@ func (c *{{.ClassName}}) Insert() error {
 
 func (c *{{.ClassName}}) Update() (bool, error) {
 	var updatedFields []string
-	var params []interface{}
+	var params []any
 	{{- range $i, $c := .NonPrimaryColumns }}
 	if c.{{ $c.GoName }}.IsUpdated() {
 		updatedFields = append(updatedFields, "{{ $c.Name }} = ?")

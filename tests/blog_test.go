@@ -41,7 +41,8 @@ func TestBlogMethods(t *testing.T) {
 	if blog.GetId() != 3 {
 		t.Error("Insert blog 2 failed")
 	}
-
+}
+func TestBlogSelect(t *testing.T) {
 	objs := blogs.Select[struct {
 		blogs.Id
 		blogs.Title

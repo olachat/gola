@@ -72,7 +72,7 @@ func init() {
 }
 
 func getDB() *structs.DBInfo {
-	var config mysqldriver.Config = map[string]interface{}{
+	var config mysqldriver.Config = map[string]any{
 		"dbname":    testDBName,
 		"whitelist": "blogs",
 		"host":      "localhost",
@@ -151,32 +151,32 @@ func TestIdx(t *testing.T) {
 		for idxName, data := range tb.Indexes {
 			switch idxName {
 			case "user":
-				if len(data) != 1 && data[0].Column_name != "user_id" {
+				if len(data) != 1 && data[0].ColumnName != "user_id" {
 					t.Error("Failed to parse blogs.user index")
 				}
 
-				if data[0].Non_unique != 1 {
+				if data[0].NonUnique != 1 {
 					t.Error("Failed to parse blogs.user index unique")
 				}
 			case "slug":
-				if len(data) != 1 && data[0].Column_name != "slug" {
+				if len(data) != 1 && data[0].ColumnName != "slug" {
 					t.Error("Failed to parse blogs.slug index")
 				}
 
-				if data[0].Non_unique != 0 {
+				if data[0].NonUnique != 0 {
 					t.Error("Failed to parse blogs.slug index unique")
 				}
 			case "user_pinned_cate":
 				if len(data) != 3 {
 					t.Error("Failed to parse blogs.user_pinned_cate index")
 				}
-				if data[0].Column_name != "user_id" {
+				if data[0].ColumnName != "user_id" {
 					t.Error("Failed to parse blogs.user_pinned_cate index user_id column")
 				}
-				if data[1].Column_name != "is_pinned" {
+				if data[1].ColumnName != "is_pinned" {
 					t.Error("Failed to parse blogs.user_pinned_cate index is_pinned column")
 				}
-				if data[2].Column_name != "category_id" {
+				if data[2].ColumnName != "category_id" {
 					t.Error("Failed to parse blogs.user_pinned_cate index category_id column")
 				}
 

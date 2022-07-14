@@ -15,7 +15,7 @@ type idxQuery[T any] struct {
 	whereSql    string
 	limitSql    string
 	orders      []string
-	whereParams []interface{}
+	whereParams []any
 }
 
 // order by enum & interface
@@ -357,7 +357,7 @@ func (q *idxQuery[T]) WhereUserIdIN(vals ...int) iQuery9[T] {
 	return &idxQuery9[T]{q}
 }
 
-func (q *idxQuery[T]) GetWhere() (whereSql string, params []interface{}) {
+func (q *idxQuery[T]) GetWhere() (whereSql string, params []any) {
 	var orderSql string
 	if len(q.orders) > 0 {
 		orderSql = " order by " + strings.Join(q.orders, ",")

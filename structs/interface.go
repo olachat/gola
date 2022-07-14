@@ -23,6 +23,7 @@ const (
 	ConfigSSLMode = "sslmode"
 )
 
+// DBInfo represents information about a database
 type DBInfo struct {
 	Schema string   `json:"schema"`
 	Tables []*Table `json:"tables"`
@@ -64,6 +65,7 @@ func (t *Table) GetColumn(name string) (col Column) {
 	panic(fmt.Sprintf("could not find column name: %s", name))
 }
 
+// Tables returns tables information of given schema
 func Tables(c Constructor, schema string, whitelist, blacklist []string) ([]*Table, error) {
 	var err error
 

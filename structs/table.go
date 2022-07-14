@@ -7,8 +7,7 @@ import (
 
 // Table struct represent table information read from mysql
 type Table struct {
-	dbinfo *DBInfo
-	Name   string `json:"name"`
+	Name string `json:"name"`
 	// For dbs with real schemas, like Postgres.
 	// Example value: "schema_name"."table_name"
 	SchemaName string   `json:"schema_name"`
@@ -107,7 +106,7 @@ func (t *Table) GetIndexRoot() *IdxNode {
 		items := t.Indexes[idxName]
 		node := root
 		for _, item := range items {
-			node = node.GetChildren(item.Column_name)
+			node = node.GetChildren(item.ColumnName)
 		}
 	}
 
