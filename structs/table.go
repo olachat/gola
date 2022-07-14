@@ -45,6 +45,16 @@ func (t *Table) GetPrimaryKey() string {
 	return ""
 }
 
+func (t *Table) GetPrimaryKeyName() string {
+	for _, c := range t.Columns {
+		if c.IsPrimaryKey() {
+			return c.Name
+		}
+	}
+
+	return ""
+}
+
 func (t *Table) NonPrimaryColumns() []Column {
 	result := make([]Column, 0, len(t.Columns))
 
