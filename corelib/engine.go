@@ -28,8 +28,8 @@ func getDB(db *sql.DB) *sql.DB {
 	panic("No db instance available")
 }
 
-// FetchByID returns a row from given table type with id
-func FetchByID[T any](id int, db *sql.DB) *T {
+// FetchByPK returns a row of T type with given primary key value
+func FetchByPK[T any](id int, db *sql.DB) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
@@ -49,8 +49,8 @@ func FetchByID[T any](id int, db *sql.DB) *T {
 	return u
 }
 
-// FetchByIDs returns rows from given table type with ids
-func FetchByIDs[T any](ids []int, db *sql.DB) []*T {
+// FetchByPKs returns rows of T type with given primary key values
+func FetchByPKs[T any](ids []int, db *sql.DB) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
 	idstr := JoinInts(ids, ",")

@@ -22,7 +22,7 @@ func TestBlogMethods(t *testing.T) {
 	if e != nil {
 		t.Error(e)
 	}
-	blog = blogs.FetchBlogByID(1)
+	blog = blogs.FetchBlogByPK(1)
 	if blog != nil {
 		t.Error("blog 1 delete failed")
 	}
