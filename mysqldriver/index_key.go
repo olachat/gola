@@ -6,6 +6,7 @@ import (
 	"github.com/olachat/gola/structs"
 )
 
+// SetIndexAndKey sets indexes & key information to given tables
 func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 	for _, t := range tables {
 		var tableDesc []*structs.RowDesc

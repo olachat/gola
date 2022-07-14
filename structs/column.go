@@ -80,6 +80,7 @@ var dbTypeToPHPTypes = map[string]string{
 	"double":            "float",
 }
 
+// SQLType returns data type in mysql of the column
 func (c Column) SQLType() string {
 	if sqlType, ok := dbTypeToSQLTypes[c.FullDBType]; ok {
 		return sqlType
@@ -162,6 +163,7 @@ func (c Column) SQLType() string {
 	return baseType
 }
 
+// GoType returns type in go of the column
 func (c Column) GoType() string {
 	if goType, ok := dbTypeToGoTypes[c.DBType]; ok {
 		return goType
@@ -207,6 +209,7 @@ func (c Column) GoType() string {
 	return baseType
 }
 
+// PHPType returns data type in PHP of the column
 func (c Column) PHPType() string {
 	if goType, ok := dbTypeToPHPTypes[c.DBType]; ok {
 		return goType
@@ -248,10 +251,12 @@ func (c Column) PHPType() string {
 	return baseType
 }
 
+// GoName returns the variable name for go of the column
 func (c Column) GoName() string {
 	return getGoName(c.Name)
 }
 
+// IsNullable returns if the column is nullable as string
 func (c Column) IsNullable() string {
 	if c.Nullable {
 		return "true"
@@ -260,6 +265,7 @@ func (c Column) IsNullable() string {
 	return "false"
 }
 
+// HasDefault returns if the column has default value
 func (c Column) HasDefault() bool {
 	if c.Default == "auto_increment" {
 		return false
@@ -268,6 +274,7 @@ func (c Column) HasDefault() bool {
 	return len(c.Default) > 0
 }
 
+// GoDefaultValue returns the go value of column's default value
 func (c Column) GoDefaultValue() string {
 	goType := c.GoType()
 	lowerCaseDefault := strings.ToLower(c.Default)
@@ -299,21 +306,17 @@ func (c Column) GoDefaultValue() string {
 	return goType + "(" + c.Default + ")"
 }
 
-func (c Column) GetColumnDefault() string {
-	if !c.HasDefault() {
-		return ""
-	}
-
-	return ", Default: default" + c.GoName()
-}
-
+// IsEnum returns if column type is enum
 func (c Column) IsEnum() bool {
 	return strings.HasPrefix(c.DBType, "enum")
 }
+
+// IsSet returns if column type is set
 func (c Column) IsSet() bool {
 	return strings.HasPrefix(c.DBType, "set")
 }
 
+// GetEnumConst returns enum const definitions in go
 func (c Column) GetEnumConst() string {
 	enums := strings.Split(strings.ReplaceAll(getValue(c.FullDBType), "'", ""), ",")
 	elements := make([]string, len(enums))
@@ -324,6 +327,7 @@ func (c Column) GetEnumConst() string {
 	return strings.Join(elements, "\n")
 }
 
+// GetSetConst returns set const definitions in go
 func (c Column) GetSetConst() string {
 	enums := strings.Split(strings.ReplaceAll(getValue(c.FullDBType), "'", ""), ",")
 	elements := make([]string, len(enums))
@@ -334,6 +338,7 @@ func (c Column) GetSetConst() string {
 	return strings.Join(elements, "\n")
 }
 
+// IsPrimaryKey returns if column is primary key
 func (c Column) IsPrimaryKey() bool {
 	if c.Table.PKey == nil {
 		return false
@@ -348,6 +353,7 @@ func (c Column) IsPrimaryKey() bool {
 	return false
 }
 
+// IsAutoIncrement returns if column value is auto incremented
 func (c Column) IsAutoIncrement() bool {
 	if c.Default == "auto_increment" {
 		return true

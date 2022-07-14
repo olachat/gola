@@ -13,6 +13,7 @@ desc users;
 +------------+--------------+------+------+---------+----------------+
 */
 
+// RowDesc defines a row in mysql's desc command
 type RowDesc struct {
 	Field, Type, Null, Key, Default, Extra string
 }
@@ -27,6 +28,7 @@ show index from users;
 +-------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
 */
 
+// IndexDesc defines a row in mysql's `show index from xxx` command
 type IndexDesc struct {
 	Table, Key_name, Column_name, Collation, Sub_part, Packed, Null, Index_type, Comment, Index_comment, Visible, Expression string
 	Non_unique, Seq_in_index, Cardinality                                                                                    int
