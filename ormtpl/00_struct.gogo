@@ -3,10 +3,19 @@
 package {{.Package}}
 {{$table := .}}
 import (
+	"database/sql"
+	"strings"
+
 	"github.com/olachat/gola/corelib"
 
 	{{.Imports}}
 )
+
+var _db *sql.DB
+
+func Setup(db *sql.DB) {
+	_db = db
+}
 
 // {{.ClassName}} represents {{.Name}} table
 type {{.ClassName}} struct {
@@ -25,20 +34,20 @@ func (*{{.ClassName}}Table) GetTableName() string {
 var table *{{.ClassName}}Table
 
 // Fetch methods
-func Fetch{{.ClassName}}ById(id int) *{{.ClassName}} {
-	return corelib.FetchById[{{.ClassName}}](id)
+func Fetch{{.ClassName}}ByID(id int) *{{.ClassName}} {
+	return corelib.FetchByID[{{.ClassName}}](id, _db)
 }
 
-func FetchById[T any](id int) *T {
-	return corelib.FetchById[T](id)
+func FetchByID[T any](id int) *T {
+	return corelib.FetchByID[T](id, _db)
 }
 
-func Fetch{{.ClassName}}ByIds(ids []int) []*{{.ClassName}} {
-	return corelib.FetchByIds[{{.ClassName}}](ids)
+func Fetch{{.ClassName}}ByIDs(ids []int) []*{{.ClassName}} {
+	return corelib.FetchByIDs[{{.ClassName}}](ids, _db)
 }
 
-func FetchByIds[T any](ids []int) []*T {
-	return corelib.FetchByIds[T](ids)
+func FetchByIDs[T any](ids []int) []*T {
+	return corelib.FetchByIDs[T](ids, _db)
 }
 
 // Column types
@@ -64,6 +73,7 @@ const (
 // {{.Comment}}
 {{- if .IsSet}}
 type {{.GoName}} struct {
+	_updated bool
 	val string
 }
 
@@ -76,15 +86,17 @@ func (c *{{.GoName}}) Get{{.GoName}}() []{{.GoType}} {
 	return valSlice
 }
 
-func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) {
+func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) bool {
 	strSlice := make([]string, 0, len(val))
 	for _, v := range val {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
+	return true
 }
 {{else}}
 type {{.GoName}} struct {
+	_updated bool
 	val {{.GoType}}
 }
 
@@ -92,12 +104,21 @@ func (c *{{.GoName}}) Get{{.GoName}}() {{.GoType}} {
 	return c.val
 }
 
-func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) {
+func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 {{end}}
 func (c *{{.GoName}}) GetColumnName() string {
 	return "{{.Name}}"
+}
+
+func (c *{{.GoName}}) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *{{.GoName}}) IsPrimaryKey() bool {
@@ -135,7 +156,7 @@ func (c *{{.ClassName}}) Insert() error {
 		{{- if $i}}, {{end}}?
 		{{- end }})`
 
-	result, err := corelib.Exec[{{.ClassName}}](sql, {{- range $i, $c := .NonPrimaryColumns }}
+	result, err := corelib.Exec(sql, _db, {{- range $i, $c := .NonPrimaryColumns }}
 	{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
 	{{- end }})
 
@@ -149,4 +170,35 @@ func (c *{{.ClassName}}) Insert() error {
 
 	c.Set{{.GetPrimaryKey}}(int(id))
 	return nil
+}
+
+func (c *{{.ClassName}}) Update() (bool, error) {
+	var updatedFields []string
+	var params []interface{}
+	{{- range $i, $c := .NonPrimaryColumns }}
+	if c.{{ $c.GoName }}.IsUpdated() {
+		updatedFields = append(updatedFields, "{{ $c.Name }} = ?")
+		params = append(params, c.Get{{ $c.GoName }}())
+	}
+	{{- end }}
+
+	sql := `update {{.Name}} set `
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql = sql + strings.Join(updatedFields, ",") + " where {{.GetPrimaryKeyName}} = ?"
+	params = append(params, c.Get{{.GetPrimaryKey}}())
+
+	_, err := corelib.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func Update[T any](obj *T) (bool, error) {
+	return corelib.Update(obj, _db)
 }

@@ -1,3 +1,5 @@
 package main
 
-const VERSION string = "0.0.1"
+// VERSION define gola's version
+// changes when ormtpl changes
+const VERSION string = "0.0.2"

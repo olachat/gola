@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Table struct represent table information read from mysql
 type Table struct {
 	dbinfo *DBInfo
 	Name   string `json:"name"`
@@ -19,13 +20,15 @@ type Table struct {
 	IsJoinTable bool `json:"is_join_table"`
 	Indexes     map[string][]*IndexDesc
 	VERSION     string
-	idxRoot     *idxNode
+	idxRoot     *IdxNode
 }
 
+// Package returns the package name for the table
 func (t *Table) Package() string {
 	return t.Name
 }
 
+// ClassName returns the go struct(class) name for the table
 func (t *Table) ClassName() string {
 	name := getGoName(t.Name)
 	if strings.HasSuffix(name, "s") {
@@ -35,6 +38,7 @@ func (t *Table) ClassName() string {
 	return name
 }
 
+// GetPrimaryKey returns the field name of the primary key
 func (t *Table) GetPrimaryKey() string {
 	for _, c := range t.Columns {
 		if c.IsPrimaryKey() {
@@ -45,6 +49,18 @@ func (t *Table) GetPrimaryKey() string {
 	return ""
 }
 
+// GetPrimaryKeyName returns the column name of the primary key
+func (t *Table) GetPrimaryKeyName() string {
+	for _, c := range t.Columns {
+		if c.IsPrimaryKey() {
+			return c.Name
+		}
+	}
+
+	return ""
+}
+
+// NonPrimaryColumns returns all columns except primary key
 func (t *Table) NonPrimaryColumns() []Column {
 	result := make([]Column, 0, len(t.Columns))
 
@@ -57,12 +73,13 @@ func (t *Table) NonPrimaryColumns() []Column {
 	return result
 }
 
-func (t *Table) GetIndexRoot() *idxNode {
+// GetIndexRoot returns the root index node
+func (t *Table) GetIndexRoot() *IdxNode {
 	if t.idxRoot != nil {
 		return t.idxRoot
 	}
 
-	root := &idxNode{
+	root := &IdxNode{
 		ColName: "",
 	}
 
@@ -89,9 +106,9 @@ func (t *Table) GetIndexRoot() *idxNode {
 
 // GetIndexNodes returns all index nodes need customized interface
 // i.e. has non-empty children nodes
-func (t *Table) GetIndexNodes() []*idxNode {
+func (t *Table) GetIndexNodes() []*IdxNode {
 	allNodes := t.GetIndexRoot().GetAllChildren()
-	nodes := make([]*idxNode, 0, len(allNodes))
+	nodes := make([]*IdxNode, 0, len(allNodes))
 	for _, n := range allNodes {
 		if len(n.Children) > 0 {
 			n.Column = t.GetColumn(n.ColName)
@@ -105,7 +122,8 @@ func (t *Table) GetIndexNodes() []*idxNode {
 	return nodes
 }
 
-func (t *Table) FirstIdxColumns() []*idxNode {
+// FirstIdxColumns returns first column of all indexes
+func (t *Table) FirstIdxColumns() []*IdxNode {
 	cols := t.GetIndexRoot().Children
 
 	for _, col := range cols {
@@ -115,14 +133,12 @@ func (t *Table) FirstIdxColumns() []*idxNode {
 	return cols
 }
 
+// Imports returns new packages needed to import
 func (t *Table) Imports() string {
 	packages := make(map[string]bool)
 	for _, c := range t.Columns {
 		if strings.Contains(c.SQLType(), "Time") {
 			packages[`"time"`] = true
-		}
-		if strings.Contains(strings.ToLower(c.SQLType()), "set") {
-			packages[`"strings"`] = true
 		}
 	}
 

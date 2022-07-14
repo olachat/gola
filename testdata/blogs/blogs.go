@@ -3,8 +3,17 @@
 package blogs
 
 import (
+	"database/sql"
+	"strings"
+
 	"github.com/olachat/gola/corelib"
 )
+
+var _db *sql.DB
+
+func Setup(db *sql.DB) {
+	_db = db
+}
 
 // Blog represents blogs table
 type Blog struct {
@@ -39,20 +48,20 @@ func (*BlogTable) GetTableName() string {
 var table *BlogTable
 
 // Fetch methods
-func FetchBlogById(id int) *Blog {
-	return corelib.FetchById[Blog](id)
+func FetchBlogByID(id int) *Blog {
+	return corelib.FetchByID[Blog](id, _db)
 }
 
-func FetchById[T any](id int) *T {
-	return corelib.FetchById[T](id)
+func FetchByID[T any](id int) *T {
+	return corelib.FetchByID[T](id, _db)
 }
 
-func FetchBlogByIds(ids []int) []*Blog {
-	return corelib.FetchByIds[Blog](ids)
+func FetchBlogByIDs(ids []int) []*Blog {
+	return corelib.FetchByIDs[Blog](ids, _db)
 }
 
-func FetchByIds[T any](ids []int) []*T {
-	return corelib.FetchByIds[T](ids)
+func FetchByIDs[T any](ids []int) []*T {
+	return corelib.FetchByIDs[T](ids, _db)
 }
 
 // Column types
@@ -60,19 +69,29 @@ func FetchByIds[T any](ids []int) []*T {
 // Id field
 //
 type Id struct {
-	val int
+	_updated bool
+	val      int
 }
 
 func (c *Id) GetId() int {
 	return c.val
 }
 
-func (c *Id) SetId(val int) {
+func (c *Id) SetId(val int) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *Id) GetColumnName() string {
 	return "id"
+}
+
+func (c *Id) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *Id) IsPrimaryKey() bool {
@@ -90,19 +109,29 @@ func (c *Id) GetTableType() corelib.TableType {
 // UserId field
 // User Id
 type UserId struct {
-	val int
+	_updated bool
+	val      int
 }
 
 func (c *UserId) GetUserId() int {
 	return c.val
 }
 
-func (c *UserId) SetUserId(val int) {
+func (c *UserId) SetUserId(val int) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *UserId) GetColumnName() string {
 	return "user_id"
+}
+
+func (c *UserId) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *UserId) IsPrimaryKey() bool {
@@ -120,19 +149,29 @@ func (c *UserId) GetTableType() corelib.TableType {
 // Slug field
 // Slug
 type Slug struct {
-	val string
+	_updated bool
+	val      string
 }
 
 func (c *Slug) GetSlug() string {
 	return c.val
 }
 
-func (c *Slug) SetSlug(val string) {
+func (c *Slug) SetSlug(val string) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *Slug) GetColumnName() string {
 	return "slug"
+}
+
+func (c *Slug) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *Slug) IsPrimaryKey() bool {
@@ -150,19 +189,29 @@ func (c *Slug) GetTableType() corelib.TableType {
 // Title field
 // Title
 type Title struct {
-	val string
+	_updated bool
+	val      string
 }
 
 func (c *Title) GetTitle() string {
 	return c.val
 }
 
-func (c *Title) SetTitle(val string) {
+func (c *Title) SetTitle(val string) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *Title) GetColumnName() string {
 	return "title"
+}
+
+func (c *Title) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *Title) IsPrimaryKey() bool {
@@ -180,19 +229,29 @@ func (c *Title) GetTableType() corelib.TableType {
 // CategoryId field
 // Category Id
 type CategoryId struct {
-	val int
+	_updated bool
+	val      int
 }
 
 func (c *CategoryId) GetCategoryId() int {
 	return c.val
 }
 
-func (c *CategoryId) SetCategoryId(val int) {
+func (c *CategoryId) SetCategoryId(val int) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *CategoryId) GetColumnName() string {
 	return "category_id"
+}
+
+func (c *CategoryId) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *CategoryId) IsPrimaryKey() bool {
@@ -210,19 +269,29 @@ func (c *CategoryId) GetTableType() corelib.TableType {
 // IsPinned field
 // Is pinned to top
 type IsPinned struct {
-	val int8
+	_updated bool
+	val      int8
 }
 
 func (c *IsPinned) GetIsPinned() int8 {
 	return c.val
 }
 
-func (c *IsPinned) SetIsPinned(val int8) {
+func (c *IsPinned) SetIsPinned(val int8) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *IsPinned) GetColumnName() string {
 	return "is_pinned"
+}
+
+func (c *IsPinned) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *IsPinned) IsPrimaryKey() bool {
@@ -240,19 +309,29 @@ func (c *IsPinned) GetTableType() corelib.TableType {
 // IsVip field
 // Is VIP reader only
 type IsVip struct {
-	val int8
+	_updated bool
+	val      int8
 }
 
 func (c *IsVip) GetIsVip() int8 {
 	return c.val
 }
 
-func (c *IsVip) SetIsVip(val int8) {
+func (c *IsVip) SetIsVip(val int8) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *IsVip) GetColumnName() string {
 	return "is_vip"
+}
+
+func (c *IsVip) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *IsVip) IsPrimaryKey() bool {
@@ -270,19 +349,29 @@ func (c *IsVip) GetTableType() corelib.TableType {
 // Country field
 // Country of the blog user
 type Country struct {
-	val string
+	_updated bool
+	val      string
 }
 
 func (c *Country) GetCountry() string {
 	return c.val
 }
 
-func (c *Country) SetCountry(val string) {
+func (c *Country) SetCountry(val string) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *Country) GetColumnName() string {
 	return "country"
+}
+
+func (c *Country) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *Country) IsPrimaryKey() bool {
@@ -300,19 +389,29 @@ func (c *Country) GetTableType() corelib.TableType {
 // CreatedAt field
 // Created Timestamp
 type CreatedAt struct {
-	val uint
+	_updated bool
+	val      uint
 }
 
 func (c *CreatedAt) GetCreatedAt() uint {
 	return c.val
 }
 
-func (c *CreatedAt) SetCreatedAt(val uint) {
+func (c *CreatedAt) SetCreatedAt(val uint) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *CreatedAt) GetColumnName() string {
 	return "created_at"
+}
+
+func (c *CreatedAt) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *CreatedAt) IsPrimaryKey() bool {
@@ -330,19 +429,29 @@ func (c *CreatedAt) GetTableType() corelib.TableType {
 // UpdatedAt field
 // Updated Timestamp
 type UpdatedAt struct {
-	val uint
+	_updated bool
+	val      uint
 }
 
 func (c *UpdatedAt) GetUpdatedAt() uint {
 	return c.val
 }
 
-func (c *UpdatedAt) SetUpdatedAt(val uint) {
+func (c *UpdatedAt) SetUpdatedAt(val uint) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
 	c.val = val
+	return true
 }
 
 func (c *UpdatedAt) GetColumnName() string {
 	return "updated_at"
+}
+
+func (c *UpdatedAt) IsUpdated() bool {
+	return c._updated
 }
 
 func (c *UpdatedAt) IsPrimaryKey() bool {
@@ -375,7 +484,7 @@ func NewBlog() *Blog {
 func (c *Blog) Insert() error {
 	sql := `INSERT INTO blogs (user_id, slug, title, category_id, is_pinned, is_vip, country, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	result, err := corelib.Exec[Blog](sql, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err := corelib.Exec(sql, _db, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
@@ -387,4 +496,65 @@ func (c *Blog) Insert() error {
 
 	c.SetId(int(id))
 	return nil
+}
+
+func (c *Blog) Update() (bool, error) {
+	var updatedFields []string
+	var params []interface{}
+	if c.UserId.IsUpdated() {
+		updatedFields = append(updatedFields, "user_id = ?")
+		params = append(params, c.GetUserId())
+	}
+	if c.Slug.IsUpdated() {
+		updatedFields = append(updatedFields, "slug = ?")
+		params = append(params, c.GetSlug())
+	}
+	if c.Title.IsUpdated() {
+		updatedFields = append(updatedFields, "title = ?")
+		params = append(params, c.GetTitle())
+	}
+	if c.CategoryId.IsUpdated() {
+		updatedFields = append(updatedFields, "category_id = ?")
+		params = append(params, c.GetCategoryId())
+	}
+	if c.IsPinned.IsUpdated() {
+		updatedFields = append(updatedFields, "is_pinned = ?")
+		params = append(params, c.GetIsPinned())
+	}
+	if c.IsVip.IsUpdated() {
+		updatedFields = append(updatedFields, "is_vip = ?")
+		params = append(params, c.GetIsVip())
+	}
+	if c.Country.IsUpdated() {
+		updatedFields = append(updatedFields, "country = ?")
+		params = append(params, c.GetCountry())
+	}
+	if c.CreatedAt.IsUpdated() {
+		updatedFields = append(updatedFields, "created_at = ?")
+		params = append(params, c.GetCreatedAt())
+	}
+	if c.UpdatedAt.IsUpdated() {
+		updatedFields = append(updatedFields, "updated_at = ?")
+		params = append(params, c.GetUpdatedAt())
+	}
+
+	sql := `update blogs set `
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql = sql + strings.Join(updatedFields, ",") + " where id = ?"
+	params = append(params, c.GetId())
+
+	_, err := corelib.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func Update[T any](obj *T) (bool, error) {
+	return corelib.Update(obj, _db)
 }
