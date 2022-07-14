@@ -33,15 +33,3 @@ type IndexDesc struct {
 	Table, KeyName, ColumnName, Collation, SubPart, Packed, Null, IndexType, Comment, IndexComment, Visible, Expression string
 	NonUnique, SeqInIndex, Cardinality                                                                                  int
 }
-
-func filterBy[T any](items []*T, isNeeded func(item *T) bool) []*T {
-	result := make([]*T, 0, len(items))
-
-	for _, item := range items {
-		if isNeeded(item) {
-			result = append(result, item)
-		}
-	}
-
-	return result
-}
