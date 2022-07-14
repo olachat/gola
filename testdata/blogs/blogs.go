@@ -4,6 +4,7 @@ package blogs
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/olachat/gola/corelib"
 )
@@ -495,4 +496,61 @@ func (c *Blog) Insert() error {
 
 	c.SetId(int(id))
 	return nil
+}
+
+func (c *Blog) Update() (bool, error) {
+	var updatedFields []string
+	var params []interface{}
+	if c.UserId.IsUpdated() {
+		updatedFields = append(updatedFields, "user_id = ?")
+		params = append(params, c.GetUserId())
+	}
+	if c.Slug.IsUpdated() {
+		updatedFields = append(updatedFields, "slug = ?")
+		params = append(params, c.GetSlug())
+	}
+	if c.Title.IsUpdated() {
+		updatedFields = append(updatedFields, "title = ?")
+		params = append(params, c.GetTitle())
+	}
+	if c.CategoryId.IsUpdated() {
+		updatedFields = append(updatedFields, "category_id = ?")
+		params = append(params, c.GetCategoryId())
+	}
+	if c.IsPinned.IsUpdated() {
+		updatedFields = append(updatedFields, "is_pinned = ?")
+		params = append(params, c.GetIsPinned())
+	}
+	if c.IsVip.IsUpdated() {
+		updatedFields = append(updatedFields, "is_vip = ?")
+		params = append(params, c.GetIsVip())
+	}
+	if c.Country.IsUpdated() {
+		updatedFields = append(updatedFields, "country = ?")
+		params = append(params, c.GetCountry())
+	}
+	if c.CreatedAt.IsUpdated() {
+		updatedFields = append(updatedFields, "created_at = ?")
+		params = append(params, c.GetCreatedAt())
+	}
+	if c.UpdatedAt.IsUpdated() {
+		updatedFields = append(updatedFields, "updated_at = ?")
+		params = append(params, c.GetUpdatedAt())
+	}
+
+	sql := `update blogs set `
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql = sql + strings.Join(updatedFields, ",") + " where id = ?"
+	params = append(params, c.GetId())
+
+	_, err := corelib.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

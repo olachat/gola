@@ -4,6 +4,7 @@ package {{.Package}}
 {{$table := .}}
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/olachat/gola/corelib"
 
@@ -169,4 +170,31 @@ func (c *{{.ClassName}}) Insert() error {
 
 	c.Set{{.GetPrimaryKey}}(int(id))
 	return nil
+}
+
+func (c *{{.ClassName}}) Update() (bool, error) {
+	var updatedFields []string
+	var params []interface{}
+	{{- range $i, $c := .NonPrimaryColumns }}
+	if c.{{ $c.GoName }}.IsUpdated() {
+		updatedFields = append(updatedFields, "{{ $c.Name }} = ?")
+		params = append(params, c.Get{{ $c.GoName }}())
+	}
+	{{- end }}
+
+	sql := `update {{.Name}} set `
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql = sql + strings.Join(updatedFields, ",") + " where id = ?"
+	params = append(params, c.GetId())
+
+	_, err := corelib.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

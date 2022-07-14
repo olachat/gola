@@ -121,9 +121,6 @@ func (t *Table) Imports() string {
 		if strings.Contains(c.SQLType(), "Time") {
 			packages[`"time"`] = true
 		}
-		if strings.Contains(strings.ToLower(c.SQLType()), "set") {
-			packages[`"strings"`] = true
-		}
 	}
 
 	imports := []string{}

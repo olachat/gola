@@ -4,10 +4,9 @@ package users
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/olachat/gola/corelib"
-
-	"strings"
 )
 
 var _db *sql.DB
@@ -646,4 +645,69 @@ func (c *User) Insert() error {
 
 	c.SetId(int(id))
 	return nil
+}
+
+func (c *User) Update() (bool, error) {
+	var updatedFields []string
+	var params []interface{}
+	if c.Name.IsUpdated() {
+		updatedFields = append(updatedFields, "name = ?")
+		params = append(params, c.GetName())
+	}
+	if c.Email.IsUpdated() {
+		updatedFields = append(updatedFields, "email = ?")
+		params = append(params, c.GetEmail())
+	}
+	if c.CreatedAt.IsUpdated() {
+		updatedFields = append(updatedFields, "created_at = ?")
+		params = append(params, c.GetCreatedAt())
+	}
+	if c.UpdatedAt.IsUpdated() {
+		updatedFields = append(updatedFields, "updated_at = ?")
+		params = append(params, c.GetUpdatedAt())
+	}
+	if c.FloatType.IsUpdated() {
+		updatedFields = append(updatedFields, "float_type = ?")
+		params = append(params, c.GetFloatType())
+	}
+	if c.DoubleType.IsUpdated() {
+		updatedFields = append(updatedFields, "double_type = ?")
+		params = append(params, c.GetDoubleType())
+	}
+	if c.Hobby.IsUpdated() {
+		updatedFields = append(updatedFields, "hobby = ?")
+		params = append(params, c.GetHobby())
+	}
+	if c.HobbyNoDefault.IsUpdated() {
+		updatedFields = append(updatedFields, "hobby_no_default = ?")
+		params = append(params, c.GetHobbyNoDefault())
+	}
+	if c.Sports.IsUpdated() {
+		updatedFields = append(updatedFields, "sports = ?")
+		params = append(params, c.GetSports())
+	}
+	if c.Sports2.IsUpdated() {
+		updatedFields = append(updatedFields, "sports2 = ?")
+		params = append(params, c.GetSports2())
+	}
+	if c.SportsNoDefault.IsUpdated() {
+		updatedFields = append(updatedFields, "sports_no_default = ?")
+		params = append(params, c.GetSportsNoDefault())
+	}
+
+	sql := `update users set `
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql = sql + strings.Join(updatedFields, ",") + " where id = ?"
+	params = append(params, c.GetId())
+
+	_, err := corelib.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
