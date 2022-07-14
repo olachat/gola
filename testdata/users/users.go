@@ -712,6 +712,13 @@ func (c *User) Update() (bool, error) {
 	return true, nil
 }
 
+func (c *User) Delete() error {
+	sql := `DELETE FROM users WHERE id = ?`
+
+	_, err := corelib.Exec(sql, _db, c.GetId())
+	return err
+}
+
 func Update[T any](obj *T) (bool, error) {
 	return corelib.Update(obj, _db)
 }

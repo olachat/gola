@@ -18,6 +18,19 @@ func TestBlogMethods(t *testing.T) {
 		t.Error("Insert blog 1 failed")
 	}
 
+	e = blog.Delete()
+	if e != nil {
+		t.Error(e)
+	}
+	blog = blogs.FetchBlogByID(1)
+	if blog != nil {
+		t.Error("blog 1 delete failed")
+	}
+
+	blog = blogs.NewBlog()
+	blog.SetTitle("foo")
+	blog.Insert()
+
 	blog = blogs.NewBlog()
 	blog.SetTitle("bar")
 	e = blog.Insert()
@@ -25,7 +38,7 @@ func TestBlogMethods(t *testing.T) {
 		t.Error(e)
 	}
 
-	if blog.GetId() != 2 {
+	if blog.GetId() != 3 {
 		t.Error("Insert blog 2 failed")
 	}
 
