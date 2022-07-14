@@ -26,14 +26,6 @@ const (
 var tableNames = []string{"users", "blogs"}
 
 func init() {
-	connstr := fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName)
-	db, err := sql.Open("mysql", connstr)
-	if err != nil {
-		panic(err)
-	}
-
-	corelib.Setup(db)
-
 	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
 		memory.NewDatabase(testDBName),
 		information_schema.NewInformationSchemaDatabase(),
@@ -52,11 +44,13 @@ func init() {
 
 	go s.Start()
 
-	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
-	db, err = sql.Open("mysql", connStr)
+	connstr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
+	db, err := sql.Open("mysql", connstr)
 	if err != nil {
 		panic(err)
 	}
+
+	corelib.Setup(db)
 
 	//create tables
 	for _, tableName := range tableNames {
