@@ -34,7 +34,7 @@ func FetchByPK[T any](val interface{}, pkName string, db *sql.DB) *T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 
-	query := fmt.Sprintf("SELECT %s from %s where %s=?", columnsNames, tableName, pkName)
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s=?", columnsNames, tableName, pkName)
 
 	mydb := getDB(db)
 	err2 := mydb.QueryRow(query, val).Scan(data...)
@@ -55,7 +55,7 @@ func FetchByPKs[T any](vals []any, pkName string, db *sql.DB) []*T {
 		return make([]*T, 0)
 	}
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
-	query := fmt.Sprintf("SELECT %s from %s where %s in(%s)",
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s in (%s)",
 		columnsNames, tableName, pkName, GetParamPlaceHolder(len(vals)))
 
 	return Query[T](query, db, vals...)
@@ -73,7 +73,7 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 	whereSQL, params := where.GetWhere()
-	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s", columnsNames,
 		tableName, whereSQL)
 
 	mydb := getDB(db)
@@ -93,7 +93,7 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 func Find[T any](where WhereQuery, db *sql.DB) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	whereSQL, params := where.GetWhere()
-	query := fmt.Sprintf("SELECT %s from %s %s", columnsNames,
+	query := fmt.Sprintf("SELECT %s FROM %s %s", columnsNames,
 		tableName, whereSQL)
 
 	return Query[T](query, db, params...)
