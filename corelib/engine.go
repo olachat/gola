@@ -29,15 +29,15 @@ func getDB(db *sql.DB) *sql.DB {
 }
 
 // FetchByPK returns a row of T type with given primary key value
-func FetchByPK[T any](id int, db *sql.DB) *T {
+func FetchByPK[T any](val interface{}, pkName string, db *sql.DB) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 
-	query := fmt.Sprintf("SELECT %s from %s where id=%d", columnsNames, tableName, id)
+	query := fmt.Sprintf("SELECT %s from %s where %s=?", columnsNames, tableName, pkName)
 
 	mydb := getDB(db)
-	err2 := mydb.QueryRow(query).Scan(data...)
+	err2 := mydb.QueryRow(query, val).Scan(data...)
 
 	if err2 != nil {
 		if err2 == sql.ErrNoRows {

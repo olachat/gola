@@ -49,6 +49,17 @@ func (t *Table) GetPrimaryKey() string {
 	return ""
 }
 
+// GetPrimaryKeyType returns the go type of the primary key
+func (t *Table) GetPrimaryKeyType() string {
+	for _, c := range t.Columns {
+		if c.IsPrimaryKey() {
+			return c.GoType()
+		}
+	}
+
+	return ""
+}
+
 // GetPrimaryKeyName returns the column name of the primary key
 func (t *Table) GetPrimaryKeyName() string {
 	for _, c := range t.Columns {

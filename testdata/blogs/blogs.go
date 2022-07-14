@@ -48,23 +48,23 @@ func (*BlogTable) GetTableName() string {
 var table *BlogTable
 
 // FetchBlogByPKs returns a row from blogs table with given primary key value
-func FetchBlogByPK(id int) *Blog {
-	return corelib.FetchByPK[Blog](id, _db)
+func FetchBlogByPK(val int) *Blog {
+	return corelib.FetchByPK[Blog](val, "id", _db)
 }
 
 // FetchByPKs returns a row with selected fields from blogs table with given primary key value
-func FetchByPK[T any](id int) *T {
-	return corelib.FetchByPK[T](id, _db)
+func FetchByPK[T any](val int) *T {
+	return corelib.FetchByPK[T](val, "id", _db)
 }
 
 // FetchBlogByPKs returns rows with from blogs table with given primary key values
-func FetchBlogByPKs(ids []int) []*Blog {
-	return corelib.FetchByPKs[Blog](ids, _db)
+func FetchBlogByPKs(vals []int) []*Blog {
+	return corelib.FetchByPKs[Blog](vals, _db)
 }
 
 // FetchByPKs returns rows with selected fields from blogs table with given primary key values
-func FetchByPKs[T any](ids []int) []*T {
-	return corelib.FetchByPKs[T](ids, _db)
+func FetchByPKs[T any](vals []int) []*T {
+	return corelib.FetchByPKs[T](vals, _db)
 }
 
 // Column types

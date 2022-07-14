@@ -34,22 +34,22 @@ func (*{{.ClassName}}Table) GetTableName() string {
 var table *{{.ClassName}}Table
 
 // Fetch{{.ClassName}}ByPKs returns a row from {{.Name}} table with given primary key value
-func Fetch{{.ClassName}}ByPK(id int) *{{.ClassName}} {
-	return corelib.FetchByPK[{{.ClassName}}](id, _db)
+func Fetch{{.ClassName}}ByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
+	return corelib.FetchByPK[{{.ClassName}}](val, "{{.GetPrimaryKeyName}}", _db)
 }
 // FetchByPKs returns a row with selected fields from {{.Name}} table with given primary key value
-func FetchByPK[T any](id int) *T {
-	return corelib.FetchByPK[T](id, _db)
+func FetchByPK[T any](val {{.GetPrimaryKeyType}}) *T {
+	return corelib.FetchByPK[T](val, "{{.GetPrimaryKeyName}}", _db)
 }
 
 // Fetch{{.ClassName}}ByPKs returns rows with from {{.Name}} table with given primary key values
-func Fetch{{.ClassName}}ByPKs(ids []int) []*{{.ClassName}} {
-	return corelib.FetchByPKs[{{.ClassName}}](ids, _db)
+func Fetch{{.ClassName}}ByPKs(vals []{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
+	return corelib.FetchByPKs[{{.ClassName}}](vals, _db)
 }
 
 // FetchByPKs returns rows with selected fields from {{.Name}} table with given primary key values
-func FetchByPKs[T any](ids []int) []*T {
-	return corelib.FetchByPKs[T](ids, _db)
+func FetchByPKs[T any](vals []{{.GetPrimaryKeyType}}) []*T {
+	return corelib.FetchByPKs[T](vals, _db)
 }
 
 // Column types
