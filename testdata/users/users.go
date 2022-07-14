@@ -700,13 +700,13 @@ func (c *User) Update() (bool, error) {
 		params = append(params, c.GetSportsNoDefault())
 	}
 
-	sql := `update users set `
+	sql := `UPDATE users SET `
 
 	if len(updatedFields) == 0 {
 		return false, nil
 	}
 
-	sql = sql + strings.Join(updatedFields, ",") + " where id = ?"
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
 	params = append(params, c.GetId())
 
 	_, err := corelib.Exec(sql, _db, params...)

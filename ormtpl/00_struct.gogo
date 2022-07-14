@@ -186,13 +186,13 @@ func (c *{{.ClassName}}) Update() (bool, error) {
 	}
 	{{- end }}
 
-	sql := `update {{.Name}} set `
+	sql := `UPDATE {{.Name}} SET `
 
 	if len(updatedFields) == 0 {
 		return false, nil
 	}
 
-	sql = sql + strings.Join(updatedFields, ",") + " where {{.GetPrimaryKeyName}} = ?"
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeyName}} = ?"
 	params = append(params, c.Get{{.GetPrimaryKey}}())
 
 	_, err := corelib.Exec(sql, _db, params...)
