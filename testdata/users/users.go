@@ -51,21 +51,26 @@ func (*UserTable) GetTableName() string {
 
 var table *UserTable
 
-// Fetch methods
-func FetchUserByID(id int) *User {
-	return corelib.FetchByID[User](id, _db)
+// FetchUserByPKs returns a row from users table with given primary key value
+func FetchUserByPK(val int) *User {
+	return corelib.FetchByPK[User](val, "id", _db)
 }
 
-func FetchByID[T any](id int) *T {
-	return corelib.FetchByID[T](id, _db)
+// FetchByPKs returns a row with selected fields from users table with given primary key value
+func FetchByPK[T any](val int) *T {
+	return corelib.FetchByPK[T](val, "id", _db)
 }
 
-func FetchUserByIDs(ids []int) []*User {
-	return corelib.FetchByIDs[User](ids, _db)
+// FetchUserByPKs returns rows with from users table with given primary key values
+func FetchUserByPKs(vals ...int) []*User {
+	pks := corelib.GetAnySlice(vals)
+	return corelib.FetchByPKs[User](pks, "id", _db)
 }
 
-func FetchByIDs[T any](ids []int) []*T {
-	return corelib.FetchByIDs[T](ids, _db)
+// FetchByPKs returns rows with selected fields from users table with given primary key values
+func FetchByPKs[T any](vals ...int) []*T {
+	pks := corelib.GetAnySlice(vals)
+	return corelib.FetchByPKs[T](pks, "id", _db)
 }
 
 // Column types

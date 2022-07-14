@@ -35,7 +35,7 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
 - [x] Default & per struct connstr
 - [ ] Safety
   - [ ] SQL escape
-  - [ ] parameterize
+  - [x] parameterize
 - [x] code gen template
   - [x] struct
   - [ ] index query methods
