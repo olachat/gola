@@ -204,7 +204,9 @@ func TestUserSports(t *testing.T) {
 	if !contains(u2.GetSportsNoDefault(), users.UserSportsNoDefaultBasketball) {
 		t.Errorf("FetchUserByPK GetSportsNoDefault should contain basketball. Actual: %v", u2.GetSportsNoDefault())
 	}
+}
 
+func TestUserSports2(t *testing.T) {
 	u3 := users.FetchUserByPK(3)
 	if len(u3.GetSports()) != 2 {
 		t.Errorf("FetchUserByPK GetSports returns unexpected value: %v", u3.GetSports())
