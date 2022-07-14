@@ -72,7 +72,7 @@ func init() {
 }
 
 func getDB() *structs.DBInfo {
-	var config mysqldriver.Config = map[string]interface{}{
+	var config mysqldriver.Config = map[string]any{
 		"dbname":    testDBName,
 		"whitelist": "blogs",
 		"host":      "localhost",

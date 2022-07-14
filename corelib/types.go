@@ -3,7 +3,7 @@ package corelib
 // RowStruct defines interface of an ORM row struct
 type RowStruct interface {
 	GetColumnNames() string
-	GetPointers() []interface{}
+	GetPointers() []any
 }
 
 // Ops defines operation in a where query

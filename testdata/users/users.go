@@ -155,7 +155,7 @@ func (c *Id) IsPrimaryKey() bool {
 	return true
 }
 
-func (c *Id) GetValPointer() interface{} {
+func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
@@ -195,7 +195,7 @@ func (c *Name) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *Name) GetValPointer() interface{} {
+func (c *Name) GetValPointer() any {
 	return &c.val
 }
 
@@ -235,7 +235,7 @@ func (c *Email) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *Email) GetValPointer() interface{} {
+func (c *Email) GetValPointer() any {
 	return &c.val
 }
 
@@ -275,7 +275,7 @@ func (c *CreatedAt) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *CreatedAt) GetValPointer() interface{} {
+func (c *CreatedAt) GetValPointer() any {
 	return &c.val
 }
 
@@ -315,7 +315,7 @@ func (c *UpdatedAt) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *UpdatedAt) GetValPointer() interface{} {
+func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
 }
 
@@ -355,7 +355,7 @@ func (c *FloatType) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *FloatType) GetValPointer() interface{} {
+func (c *FloatType) GetValPointer() any {
 	return &c.val
 }
 
@@ -395,7 +395,7 @@ func (c *DoubleType) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *DoubleType) GetValPointer() interface{} {
+func (c *DoubleType) GetValPointer() any {
 	return &c.val
 }
 
@@ -435,7 +435,7 @@ func (c *Hobby) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *Hobby) GetValPointer() interface{} {
+func (c *Hobby) GetValPointer() any {
 	return &c.val
 }
 
@@ -475,7 +475,7 @@ func (c *HobbyNoDefault) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *HobbyNoDefault) GetValPointer() interface{} {
+func (c *HobbyNoDefault) GetValPointer() any {
 	return &c.val
 }
 
@@ -520,7 +520,7 @@ func (c *Sports) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *Sports) GetValPointer() interface{} {
+func (c *Sports) GetValPointer() any {
 	return &c.val
 }
 
@@ -565,7 +565,7 @@ func (c *Sports2) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *Sports2) GetValPointer() interface{} {
+func (c *Sports2) GetValPointer() any {
 	return &c.val
 }
 
@@ -610,7 +610,7 @@ func (c *SportsNoDefault) IsPrimaryKey() bool {
 	return false
 }
 
-func (c *SportsNoDefault) GetValPointer() interface{} {
+func (c *SportsNoDefault) GetValPointer() any {
 	return &c.val
 }
 
@@ -654,7 +654,7 @@ func (c *User) Insert() error {
 
 func (c *User) Update() (bool, error) {
 	var updatedFields []string
-	var params []interface{}
+	var params []any
 	if c.Name.IsUpdated() {
 		updatedFields = append(updatedFields, "name = ?")
 		params = append(params, c.GetName())

@@ -29,7 +29,7 @@ func getDB(db *sql.DB) *sql.DB {
 }
 
 // FetchByPK returns a row of T type with given primary key value
-func FetchByPK[T any](val interface{}, pkName string, db *sql.DB) *T {
+func FetchByPK[T any](val any, pkName string, db *sql.DB) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
@@ -157,9 +157,9 @@ func GetTableAndColumnsNames[T any]() (tableName string, joinedColumnNames strin
 }
 
 // StrutForScan returns value pointers of given obj
-func StrutForScan[T any](u *T) (pointers []interface{}) {
+func StrutForScan[T any](u *T) (pointers []any) {
 	val := reflect.ValueOf(u).Elem()
-	pointers = make([]interface{}, 0, val.NumField())
+	pointers = make([]any, 0, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
 		if f, ok := valueField.Addr().Interface().(ColumnType); ok {

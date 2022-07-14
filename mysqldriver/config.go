@@ -8,7 +8,7 @@ import (
 )
 
 // Config is a map with helper functions
-type Config map[string]interface{}
+type Config map[string]any
 
 // MustString retrieves a string that must exist and must be a string, it must also not be the empty string
 func (c Config) MustString(key string) string {
