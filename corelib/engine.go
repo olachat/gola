@@ -10,6 +10,7 @@ import (
 
 var _db *sql.DB
 
+// Setup the default db instance
 func Setup(db *sql.DB) {
 	_db = db
 }
@@ -27,6 +28,7 @@ func getDB(db *sql.DB) *sql.DB {
 	panic("No db instance available")
 }
 
+// FetchById returns a row from given table type with id
 func FetchById[T any](id int, db *sql.DB) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
@@ -47,6 +49,7 @@ func FetchById[T any](id int, db *sql.DB) *T {
 	return u
 }
 
+// FetchByIds returns rows from given table type with ids
 func FetchByIds[T any](ids []int, db *sql.DB) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
@@ -56,11 +59,13 @@ func FetchByIds[T any](ids []int, db *sql.DB) []*T {
 	return Query[T](query, db)
 }
 
+// Exec given query with given db instances or default
 func Exec(query string, db *sql.DB, params ...interface{}) (sql.Result, error) {
 	mydb := getDB(db)
 	return mydb.Exec(query, params...)
 }
 
+// FindOne returns a row from given table type with where query
 func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
@@ -82,6 +87,7 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	return u
 }
 
+// Find returns rows from given table type with where query
 func Find[T any](where WhereQuery, db *sql.DB) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	whereSql, params := where.GetWhere()
@@ -91,6 +97,7 @@ func Find[T any](where WhereQuery, db *sql.DB) []*T {
 	return Query[T](query, db, params...)
 }
 
+// Query rows from given table type with where query & params
 func Query[T any](query string, db *sql.DB, params ...interface{}) []*T {
 	var result []*T
 	var u *T
@@ -112,10 +119,12 @@ func Query[T any](query string, db *sql.DB, params ...interface{}) []*T {
 	return result
 }
 
+// Update given obj changes with given db instances or default
 func Update[T any](obj *T, db *sql.DB) (bool, error) {
 	return true, nil
 }
 
+// GetTableAndColumnsNames returns tablesName & column names joined by , of given type
 func GetTableAndColumnsNames[T any]() (tableName string, joinedColumnNames string) {
 	var o *T
 	t := reflect.TypeOf(o)
@@ -145,6 +154,7 @@ func GetTableAndColumnsNames[T any]() (tableName string, joinedColumnNames strin
 	return
 }
 
+// StrutForScan returns value pointers of given obj
 func StrutForScan[T any](u *T) (pointers []interface{}) {
 	val := reflect.ValueOf(u).Elem()
 	pointers = make([]interface{}, 0, val.NumField())
