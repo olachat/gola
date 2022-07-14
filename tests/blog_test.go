@@ -75,4 +75,24 @@ func TestBlogMethods(t *testing.T) {
 	if objs[1].GetTitle() != "foo" {
 		t.Error("Read blog 2 failed")
 	}
+
+	data := blogs.FetchBlogByPKs([]int{2, 3})
+	if len(data) != 2 {
+		t.Error("Read all blog failed")
+	}
+
+	for _, obj := range data {
+		switch obj.GetId() {
+		case 2:
+			if obj.GetTitle() != "foo" {
+				t.Error("Read blog 2 failed")
+			}
+		case 3:
+			if obj.GetTitle() != "bar" {
+				t.Error("Read blog 3 failed")
+			}
+		default:
+			t.Error("blogs.FetchBlogByPKs load wrong id")
+		}
+	}
 }
