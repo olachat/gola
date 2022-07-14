@@ -48,20 +48,20 @@ func (*BlogTable) GetTableName() string {
 var table *BlogTable
 
 // Fetch methods
-func FetchBlogById(id int) *Blog {
-	return corelib.FetchById[Blog](id, _db)
+func FetchBlogByID(id int) *Blog {
+	return corelib.FetchByID[Blog](id, _db)
 }
 
-func FetchById[T any](id int) *T {
-	return corelib.FetchById[T](id, _db)
+func FetchByID[T any](id int) *T {
+	return corelib.FetchByID[T](id, _db)
 }
 
-func FetchBlogByIds(ids []int) []*Blog {
-	return corelib.FetchByIds[Blog](ids, _db)
+func FetchBlogByIDs(ids []int) []*Blog {
+	return corelib.FetchByIDs[Blog](ids, _db)
 }
 
-func FetchByIds[T any](ids []int) []*T {
-	return corelib.FetchByIds[T](ids, _db)
+func FetchByIDs[T any](ids []int) []*T {
+	return corelib.FetchByIDs[T](ids, _db)
 }
 
 // Column types

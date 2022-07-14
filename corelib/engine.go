@@ -28,8 +28,8 @@ func getDB(db *sql.DB) *sql.DB {
 	panic("No db instance available")
 }
 
-// FetchById returns a row from given table type with id
-func FetchById[T any](id int, db *sql.DB) *T {
+// FetchByID returns a row from given table type with id
+func FetchByID[T any](id int, db *sql.DB) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
@@ -49,8 +49,8 @@ func FetchById[T any](id int, db *sql.DB) *T {
 	return u
 }
 
-// FetchByIds returns rows from given table type with ids
-func FetchByIds[T any](ids []int, db *sql.DB) []*T {
+// FetchByIDs returns rows from given table type with ids
+func FetchByIDs[T any](ids []int, db *sql.DB) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
 	idstr := JoinInts(ids, ",")
@@ -70,9 +70,9 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
-	whereSql, params := where.GetWhere()
+	whereSQL, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
-		tableName, whereSql)
+		tableName, whereSQL)
 
 	mydb := getDB(db)
 	err2 := mydb.QueryRow(query, params...).Scan(data...)
@@ -90,9 +90,9 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 // Find returns rows from given table type with where query
 func Find[T any](where WhereQuery, db *sql.DB) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
-	whereSql, params := where.GetWhere()
+	whereSQL, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s from %s %s", columnsNames,
-		tableName, whereSql)
+		tableName, whereSQL)
 
 	return Query[T](query, db, params...)
 }

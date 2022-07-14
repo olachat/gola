@@ -52,20 +52,20 @@ func (*UserTable) GetTableName() string {
 var table *UserTable
 
 // Fetch methods
-func FetchUserById(id int) *User {
-	return corelib.FetchById[User](id, _db)
+func FetchUserByID(id int) *User {
+	return corelib.FetchByID[User](id, _db)
 }
 
-func FetchById[T any](id int) *T {
-	return corelib.FetchById[T](id, _db)
+func FetchByID[T any](id int) *T {
+	return corelib.FetchByID[T](id, _db)
 }
 
-func FetchUserByIds(ids []int) []*User {
-	return corelib.FetchByIds[User](ids, _db)
+func FetchUserByIDs(ids []int) []*User {
+	return corelib.FetchByIDs[User](ids, _db)
 }
 
-func FetchByIds[T any](ids []int) []*T {
-	return corelib.FetchByIds[T](ids, _db)
+func FetchByIDs[T any](ids []int) []*T {
+	return corelib.FetchByIDs[T](ids, _db)
 }
 
 // Column types

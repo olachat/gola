@@ -34,20 +34,20 @@ func (*{{.ClassName}}Table) GetTableName() string {
 var table *{{.ClassName}}Table
 
 // Fetch methods
-func Fetch{{.ClassName}}ById(id int) *{{.ClassName}} {
-	return corelib.FetchById[{{.ClassName}}](id, _db)
+func Fetch{{.ClassName}}ByID(id int) *{{.ClassName}} {
+	return corelib.FetchByID[{{.ClassName}}](id, _db)
 }
 
-func FetchById[T any](id int) *T {
-	return corelib.FetchById[T](id, _db)
+func FetchByID[T any](id int) *T {
+	return corelib.FetchByID[T](id, _db)
 }
 
-func Fetch{{.ClassName}}ByIds(ids []int) []*{{.ClassName}} {
-	return corelib.FetchByIds[{{.ClassName}}](ids, _db)
+func Fetch{{.ClassName}}ByIDs(ids []int) []*{{.ClassName}} {
+	return corelib.FetchByIDs[{{.ClassName}}](ids, _db)
 }
 
-func FetchByIds[T any](ids []int) []*T {
-	return corelib.FetchByIds[T](ids, _db)
+func FetchByIDs[T any](ids []int) []*T {
+	return corelib.FetchByIDs[T](ids, _db)
 }
 
 // Column types
