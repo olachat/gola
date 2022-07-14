@@ -25,13 +25,14 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
 # Todo
 
 * [ ] CURD
-  * [ ] Insert
-    * [ ] Default Value
-    * [ ] LAST_INSERT_ID()
-  * [ ] Update
+  * [X] Insert
+    * [X] Default Value
+    * [X] LAST_INSERT_ID()
+  * [X] Update
+    * [ ] Partial Update
+    * [ ] Auto updatedt field value
   * [ ] Delete
-* [ ] Connection Pool
-  * [ ] Default & per struct connstr
+* [X] Default & per struct connstr
 * [ ] Safety
   * [ ] SQL escape
   * [ ] parameterize
@@ -43,12 +44,12 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
     * [X] paging & order
       * [ ] paging using cursor
 * [ ] better primary key support
-  * [ ] Single Key types / names
+  * [X] Single Key types / names
   * [ ] Composite key
 * [ ] db types
   * [ ] timestamp
-  * [ ] boolean
-  * [ ] float
+  * [X] boolean
+  * [X] float
   * [X] enum
   * [X] set
 * [X] Remove sqlboiler dependency in code gen
@@ -58,7 +59,6 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
   * [ ] Performance test
 * [ ] context support
 * [ ] transaction support
-* [ ] Non-generice version?
 * [ ] zero reflect verison?
 * [ ] Embed groupcache
 * [ ] docs & docs & docs...
