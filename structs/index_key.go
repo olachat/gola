@@ -30,8 +30,8 @@ show index from users;
 
 // IndexDesc defines a row in mysql's `show index from xxx` command
 type IndexDesc struct {
-	Table, Key_name, Column_name, Collation, Sub_part, Packed, Null, Index_type, Comment, Index_comment, Visible, Expression string
-	Non_unique, Seq_in_index, Cardinality                                                                                    int
+	Table, KeyName, ColumnName, Collation, SubPart, Packed, Null, IndexType, Comment, IndexComment, Visible, Expression string
+	NonUnique, SeqInIndex, Cardinality                                                                                  int
 }
 
 func filterBy[T any](items []*T, isNeeded func(item *T) bool) []*T {

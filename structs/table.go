@@ -107,7 +107,7 @@ func (t *Table) GetIndexRoot() *IdxNode {
 		items := t.Indexes[idxName]
 		node := root
 		for _, item := range items {
-			node = node.GetChildren(item.Column_name)
+			node = node.GetChildren(item.ColumnName)
 		}
 	}
 

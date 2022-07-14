@@ -36,8 +36,8 @@ func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 		}
 		for rows.Next() {
 			id := new(structs.IndexDesc)
-			rows.Scan(&id.Table, &id.Non_unique, &id.Key_name, &id.Seq_in_index, &id.Column_name, &id.Collation, &id.Cardinality,
-				&id.Sub_part, &id.Packed, &id.Null, &id.Index_type, &id.Comment, &id.Index_comment, &id.Visible, &id.Expression)
+			rows.Scan(&id.Table, &id.NonUnique, &id.KeyName, &id.SeqInIndex, &id.ColumnName, &id.Collation, &id.Cardinality,
+				&id.SubPart, &id.Packed, &id.Null, &id.IndexType, &id.Comment, &id.IndexComment, &id.Visible, &id.Expression)
 			indexDesc = append(indexDesc, id)
 		}
 		t.Indexes = groupIndex(indexDesc)
@@ -62,7 +62,7 @@ func groupIndex(indexDesc []*structs.IndexDesc) map[string][]*structs.IndexDesc 
 	data := make(map[string][]*structs.IndexDesc, 0)
 
 	for _, idx := range indexDesc {
-		key := idx.Key_name
+		key := idx.KeyName
 		if _, ok := data[key]; !ok {
 			data[key] = []*structs.IndexDesc{}
 		}
@@ -70,11 +70,11 @@ func groupIndex(indexDesc []*structs.IndexDesc) map[string][]*structs.IndexDesc 
 
 	for name := range data {
 		items := filterBy(indexDesc, func(item *structs.IndexDesc) bool {
-			return item.Key_name == name
+			return item.KeyName == name
 		})
 
 		sort.Slice(items, func(i, j int) bool {
-			return items[i].Seq_in_index < items[j].Seq_in_index
+			return items[i].SeqInIndex < items[j].SeqInIndex
 		})
 
 		data[name] = items
