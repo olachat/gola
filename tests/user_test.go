@@ -26,7 +26,13 @@ const (
 var tableNames = []string{"users", "blogs"}
 
 func init() {
-	corelib.Setup(fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName))
+	connstr := fmt.Sprintf("root:@tcp(127.0.0.1:%d)/%s", testDBPort, testDBName)
+	db, err := sql.Open("mysql", connstr)
+	if err != nil {
+		panic(err)
+	}
+
+	corelib.Setup(db)
 
 	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
 		memory.NewDatabase(testDBName),
@@ -38,7 +44,6 @@ func init() {
 		Address:  fmt.Sprintf("localhost:%d", testDBPort),
 		Auth:     auth.NewNativeSingle("root", "", auth.AllPermissions),
 	}
-	var err error
 
 	s, err := server.NewDefaultServer(config, engine)
 	if err != nil {
@@ -48,7 +53,7 @@ func init() {
 	go s.Start()
 
 	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
-	db, err := sql.Open("mysql", connStr)
+	db, err = sql.Open("mysql", connStr)
 	if err != nil {
 		panic(err)
 	}

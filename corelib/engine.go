@@ -8,28 +8,22 @@ import (
 	"strings"
 )
 
-var _connstr string
+var _db *sql.DB
 
-func Setup(connstr string) {
-	_connstr = connstr
+func Setup(db *sql.DB) {
+	_db = db
 }
 
 var typeColumnNames = make(map[reflect.Type]string)
 var typeTableNames = make(map[reflect.Type]string)
 
 func FetchById[T any](id int) *T {
-	db, err := sql.Open("mysql", _connstr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 
 	query := fmt.Sprintf("SELECT %s from %s where id=%d", columnsNames, tableName, id)
-	err2 := db.QueryRow(query).Scan(data...)
+	err2 := _db.QueryRow(query).Scan(data...)
 
 	if err2 != nil {
 		if err2 == sql.ErrNoRows {
@@ -51,30 +45,17 @@ func FetchByIds[T any](ids []int) []*T {
 }
 
 func Exec[T any](query string, params ...interface{}) (sql.Result, error) {
-	db, err := sql.Open("mysql", _connstr)
-	defer db.Close()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return db.Exec(query, params...)
+	return _db.Exec(query, params...)
 }
 
 func FindOne[T any](where WhereQuery) *T {
-	db, err := sql.Open("mysql", _connstr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 	whereSql, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
 		tableName, whereSql)
-	err2 := db.QueryRow(query, params...).Scan(data...)
+	err2 := _db.QueryRow(query, params...).Scan(data...)
 
 	if err2 != nil {
 		if err2 == sql.ErrNoRows {
@@ -96,16 +77,10 @@ func Find[T any](where WhereQuery) []*T {
 }
 
 func Query[T any](query string, params ...interface{}) []*T {
-	db, err := sql.Open("mysql", _connstr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	var result []*T
 	var u *T
 
-	rows, err2 := db.Query(query, params...)
+	rows, err2 := _db.Query(query, params...)
 
 	if err2 != nil {
 		log.Fatal(err2)
