@@ -112,6 +112,10 @@ func Query[T any](query string, db *sql.DB, params ...interface{}) []*T {
 	return result
 }
 
+func Update[T any](obj *T, db *sql.DB) (bool, error) {
+	return true, nil
+}
+
 func GetTableAndColumnsNames[T any]() (tableName string, joinedColumnNames string) {
 	var o *T
 	t := reflect.TypeOf(o)

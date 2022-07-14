@@ -711,3 +711,7 @@ func (c *User) Update() (bool, error) {
 
 	return true, nil
 }
+
+func Update[T any](obj *T) (bool, error) {
+	return corelib.Update(obj, _db)
+}
