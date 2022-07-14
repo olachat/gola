@@ -116,6 +116,18 @@ func TestUserDouble(t *testing.T) {
 	if u4.GetFloatType() != 4.5 {
 		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u4.GetFloatType())
 	}
+
+	u4.SetDoubleType(5.1)
+	u4.SetFloatType(4.0)
+	u4.Update()
+
+	u5 := users.FetchUserById(4)
+	if u5.GetDoubleType() != 5.1 {
+		t.Errorf("FetchUserById GetDoubleType returns unexpected value: %f", u4.GetDoubleType())
+	}
+	if u5.GetFloatType() != 4.0 {
+		t.Errorf("FetchUserById GetFloatType returns unexpected value: %f", u4.GetFloatType())
+	}
 }
 
 func TestUserHobby(t *testing.T) {
@@ -125,6 +137,13 @@ func TestUserHobby(t *testing.T) {
 	}
 	if u1.GetHobbyNoDefault() != users.UserHobbyNoDefaultSwimming {
 		t.Errorf("FetchUserById GetHobbyNoDefault returns unexpected value: %v", u1.GetHobbyNoDefault())
+	}
+
+	u1.SetHobby(users.UserHobbySinging)
+	u1.Update()
+	u1 = users.FetchUserById(1)
+	if u1.GetHobby() != users.UserHobbySinging {
+		t.Errorf("FetchUserById GetHobby returns unexpected value: %v", u1.GetHobby())
 	}
 
 	u2 := users.FetchUserById(2)
@@ -247,6 +266,17 @@ func TestUserMethods(t *testing.T) {
 	if u2.GetEmail() != "john@doe.com" && u2.GetName() != "John Doe" {
 		t.Error("Failed to FetchById with User using id 1")
 	}
+	u2.SetEmail("joe@doe.com")
+	u2.SetName("Joe Doe")
+	u2.Update()
+
+	u2 = users.FetchById[users.User](1)
+	if u2.GetEmail() != "joe@doe.com" && u2.GetName() != "JOe Doe" {
+		t.Error("Failed to FetchById with User using id 1 after update")
+	}
+	u2.SetEmail("john@doe.com")
+	u2.SetName("John Doe")
+	u2.Update()
 
 	u3 := users.FetchUserById(1)
 	if u2.GetEmail() != u3.GetEmail() && u2.GetName() != u3.GetName() {
