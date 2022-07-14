@@ -17,13 +17,25 @@ func Setup(db *sql.DB) {
 var typeColumnNames = make(map[reflect.Type]string)
 var typeTableNames = make(map[reflect.Type]string)
 
-func FetchById[T any](id int) *T {
+func getDB(db *sql.DB) *sql.DB {
+	if db != nil {
+		return db
+	}
+	if _db != nil {
+		return _db
+	}
+	panic("No db instance available")
+}
+
+func FetchById[T any](id int, db *sql.DB) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 
 	query := fmt.Sprintf("SELECT %s from %s where id=%d", columnsNames, tableName, id)
-	err2 := _db.QueryRow(query).Scan(data...)
+
+	mydb := getDB(db)
+	err2 := mydb.QueryRow(query).Scan(data...)
 
 	if err2 != nil {
 		if err2 == sql.ErrNoRows {
@@ -35,27 +47,30 @@ func FetchById[T any](id int) *T {
 	return u
 }
 
-func FetchByIds[T any](ids []int) []*T {
+func FetchByIds[T any](ids []int, db *sql.DB) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 
 	idstr := JoinInts(ids, ",")
 	query := fmt.Sprintf("SELECT %s from %s where id in(%s)", columnsNames, tableName, idstr)
 
-	return Query[T](query)
+	return Query[T](query, db)
 }
 
-func Exec[T any](query string, params ...interface{}) (sql.Result, error) {
-	return _db.Exec(query, params...)
+func Exec[T any](query string, db *sql.DB, params ...interface{}) (sql.Result, error) {
+	mydb := getDB(db)
+	return mydb.Exec(query, params...)
 }
 
-func FindOne[T any](where WhereQuery) *T {
+func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 	whereSql, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s from %s where %s", columnsNames,
 		tableName, whereSql)
-	err2 := _db.QueryRow(query, params...).Scan(data...)
+
+	mydb := getDB(db)
+	err2 := mydb.QueryRow(query, params...).Scan(data...)
 
 	if err2 != nil {
 		if err2 == sql.ErrNoRows {
@@ -67,20 +82,21 @@ func FindOne[T any](where WhereQuery) *T {
 	return u
 }
 
-func Find[T any](where WhereQuery) []*T {
+func Find[T any](where WhereQuery, db *sql.DB) []*T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	whereSql, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s from %s %s", columnsNames,
 		tableName, whereSql)
 
-	return Query[T](query, params...)
+	return Query[T](query, db, params...)
 }
 
-func Query[T any](query string, params ...interface{}) []*T {
+func Query[T any](query string, db *sql.DB, params ...interface{}) []*T {
 	var result []*T
 	var u *T
 
-	rows, err2 := _db.Query(query, params...)
+	mydb := getDB(db)
+	rows, err2 := mydb.Query(query, params...)
 
 	if err2 != nil {
 		log.Fatal(err2)

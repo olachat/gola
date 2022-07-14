@@ -3,8 +3,16 @@
 package blogs
 
 import (
+	"database/sql"
+
 	"github.com/olachat/gola/corelib"
 )
+
+var _db *sql.DB
+
+func Setup(db *sql.DB) {
+	_db = db
+}
 
 // Blog represents blogs table
 type Blog struct {
@@ -40,19 +48,19 @@ var table *BlogTable
 
 // Fetch methods
 func FetchBlogById(id int) *Blog {
-	return corelib.FetchById[Blog](id)
+	return corelib.FetchById[Blog](id, _db)
 }
 
 func FetchById[T any](id int) *T {
-	return corelib.FetchById[T](id)
+	return corelib.FetchById[T](id, _db)
 }
 
 func FetchBlogByIds(ids []int) []*Blog {
-	return corelib.FetchByIds[Blog](ids)
+	return corelib.FetchByIds[Blog](ids, _db)
 }
 
 func FetchByIds[T any](ids []int) []*T {
-	return corelib.FetchByIds[T](ids)
+	return corelib.FetchByIds[T](ids, _db)
 }
 
 // Column types
@@ -375,7 +383,7 @@ func NewBlog() *Blog {
 func (c *Blog) Insert() error {
 	sql := `INSERT INTO blogs (user_id, slug, title, category_id, is_pinned, is_vip, country, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	result, err := corelib.Exec[Blog](sql, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err := corelib.Exec[Blog](sql, _db, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err

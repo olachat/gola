@@ -3,10 +3,18 @@
 package {{.Package}}
 {{$table := .}}
 import (
+	"database/sql"
+
 	"github.com/olachat/gola/corelib"
 
 	{{.Imports}}
 )
+
+var _db *sql.DB
+
+func Setup(db *sql.DB) {
+	_db = db
+}
 
 // {{.ClassName}} represents {{.Name}} table
 type {{.ClassName}} struct {
@@ -26,19 +34,19 @@ var table *{{.ClassName}}Table
 
 // Fetch methods
 func Fetch{{.ClassName}}ById(id int) *{{.ClassName}} {
-	return corelib.FetchById[{{.ClassName}}](id)
+	return corelib.FetchById[{{.ClassName}}](id, _db)
 }
 
 func FetchById[T any](id int) *T {
-	return corelib.FetchById[T](id)
+	return corelib.FetchById[T](id, _db)
 }
 
 func Fetch{{.ClassName}}ByIds(ids []int) []*{{.ClassName}} {
-	return corelib.FetchByIds[{{.ClassName}}](ids)
+	return corelib.FetchByIds[{{.ClassName}}](ids, _db)
 }
 
 func FetchByIds[T any](ids []int) []*T {
-	return corelib.FetchByIds[T](ids)
+	return corelib.FetchByIds[T](ids, _db)
 }
 
 // Column types
@@ -135,7 +143,7 @@ func (c *{{.ClassName}}) Insert() error {
 		{{- if $i}}, {{end}}?
 		{{- end }})`
 
-	result, err := corelib.Exec[{{.ClassName}}](sql, {{- range $i, $c := .NonPrimaryColumns }}
+	result, err := corelib.Exec[{{.ClassName}}](sql, _db, {{- range $i, $c := .NonPrimaryColumns }}
 	{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
 	{{- end }})
 

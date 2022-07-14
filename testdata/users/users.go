@@ -3,10 +3,18 @@
 package users
 
 import (
+	"database/sql"
+
 	"github.com/olachat/gola/corelib"
 
 	"strings"
 )
+
+var _db *sql.DB
+
+func Setup(db *sql.DB) {
+	_db = db
+}
 
 // User represents users table
 type User struct {
@@ -46,19 +54,19 @@ var table *UserTable
 
 // Fetch methods
 func FetchUserById(id int) *User {
-	return corelib.FetchById[User](id)
+	return corelib.FetchById[User](id, _db)
 }
 
 func FetchById[T any](id int) *T {
-	return corelib.FetchById[T](id)
+	return corelib.FetchById[T](id, _db)
 }
 
 func FetchUserByIds(ids []int) []*User {
-	return corelib.FetchByIds[User](ids)
+	return corelib.FetchByIds[User](ids, _db)
 }
 
 func FetchByIds[T any](ids []int) []*T {
-	return corelib.FetchByIds[T](ids)
+	return corelib.FetchByIds[T](ids, _db)
 }
 
 // Column types
@@ -518,7 +526,7 @@ func NewUser() *User {
 func (c *User) Insert() error {
 	sql := `INSERT INTO users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports, sports2, sports_no_default) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	result, err := corelib.Exec[User](sql, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+	result, err := corelib.Exec[User](sql, _db, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 
 	if err != nil {
 		return err
