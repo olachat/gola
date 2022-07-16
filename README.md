@@ -32,6 +32,8 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
     - [ ] Partial Update
     - [ ] Auto updatedt field value
   - [x] Delete
+  - [x] Count
+  - [ ] Count with IAQ
 - [x] Default & per struct connstr
 - [ ] Safety
   - [ ] SQL escape
@@ -66,3 +68,4 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
 - [ ] zero reflect verison?
 - [ ] Embed groupcache
 - [ ] docs & docs & docs...
+ - [ ] IAQ: Index Aware Query doc
