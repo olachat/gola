@@ -73,6 +73,34 @@ func FetchByPKs[T any](vals ...int) []*T {
 	return corelib.FetchByPKs[T](pks, "id", _db)
 }
 
+// FindOneUser returns a row from users table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneUser(whereSQL string, params ...any) *User {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.FindOne[User](w, _db)
+}
+
+// FindOne returns a row with selected fields from users table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOne[T any](whereSQL string, params ...any) *T {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.FindOne[T](w, _db)
+}
+
+// FindUser returns rows from users table with arbitary where query
+// whereSQL must start with "where ..."
+func FindUser(whereSQL string, params ...any) ([]*User, error) {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.Find[User](w, _db)
+}
+
+// Find returns rows with selected fields from users table with arbitary where query
+// whereSQL must start with "where ..."
+func Find[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.Find[T](w, _db)
+}
+
 // Column types
 type UserHobby string
 

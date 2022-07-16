@@ -75,7 +75,7 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 	whereSQL, params := where.GetWhere()
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s", columnsNames,
+	query := fmt.Sprintf("SELECT %s FROM %s %s", columnsNames,
 		tableName, whereSQL)
 
 	mydb := getDB(db)

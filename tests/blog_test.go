@@ -42,6 +42,53 @@ func TestBlogMethods(t *testing.T) {
 		t.Error("Insert blog 2 failed")
 	}
 }
+
+func TestBlogFind(t *testing.T) {
+	obj := blogs.FindOneBlog("where title = ?", "bar")
+	if obj.GetId() != 3 {
+		t.Error("Find blog with title bar failed")
+	}
+
+	objs, err := blogs.FindBlog("where title = ?", "bar")
+	if err != nil || len(objs) != 1 {
+		t.Error("Find blogs with title bar failed: ")
+	}
+	if objs[0].GetId() != 3 {
+		t.Error("Find blogs with title bar failed")
+	}
+
+	objs, err = blogs.FindBlog("where title = ?", "barbar")
+	if err != nil || len(objs) != 0 {
+		t.Error("Find blogs with non-exist title bar failed: ")
+	}
+}
+
+func TestBlogFindT(t *testing.T) {
+	obj := blogs.FindOne[struct {
+		blogs.Id
+	}]("where title = ?", "bar")
+	if obj.GetId() != 3 {
+		t.Error("Find blog with title bar failed")
+	}
+
+	objs, err := blogs.Find[struct {
+		blogs.Id
+	}]("where title = ?", "bar")
+	if err != nil || len(objs) != 1 {
+		t.Error("Find blogs with title bar failed: ")
+	}
+	if objs[0].GetId() != 3 {
+		t.Error("Find blogs with title bar failed")
+	}
+
+	data, err := blogs.Find[struct {
+		blogs.Title
+	}]("where title = ?", "barbar")
+	if err != nil || len(data) != 0 {
+		t.Error("Find blogs with non-exist title bar failed: ")
+	}
+}
+
 func TestBlogSelect(t *testing.T) {
 	objs := blogs.Select[struct {
 		blogs.Id
