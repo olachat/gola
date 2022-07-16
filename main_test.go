@@ -130,6 +130,16 @@ func TestCodeGen(t *testing.T) {
 	}
 }
 
+func getOne[T any](objs []T, filter func(obj T) bool) T {
+	for _, obj := range objs {
+		if filter(obj) {
+			return obj
+		}
+	}
+
+	return *new(T)
+}
+
 func TestIdx(t *testing.T) {
 	db := getDB()
 
@@ -139,49 +149,35 @@ func TestIdx(t *testing.T) {
 	// KEY `user_pinned_cate` (`user_id`, `is_pinned`, `category_id`),
 	// UNIQUE KEY `slug` (`slug`)
 
-	for _, tb := range db.Tables {
-		if tb.Name != "blogs" {
-			continue
-		}
+	tb := getOne(db.Tables, func(tb *structs.Table) bool {
+		return tb.Name == "blogs"
+	})
+	if len(tb.Indexes) != 7 {
+		t.Error("Failed to parse blogs table's 7 indexes")
+	}
 
-		if len(tb.Indexes) != 7 {
-			t.Error("Failed to parse blogs table's 7 indexes")
-		}
+	data := tb.Indexes["user"]
+	if len(data) != 1 && data[0].ColumnName != "user_id" {
+		t.Error("Failed to parse blogs.user index")
+	}
+	if data[0].NonUnique != 1 {
+		t.Error("Failed to parse blogs.user index unique")
+	}
 
-		for idxName, data := range tb.Indexes {
-			switch idxName {
-			case "user":
-				if len(data) != 1 && data[0].ColumnName != "user_id" {
-					t.Error("Failed to parse blogs.user index")
-				}
+	data = tb.Indexes["slug"]
+	if len(data) != 1 && data[0].ColumnName != "slug" {
+		t.Error("Failed to parse blogs.slug index")
+	}
+	if data[0].NonUnique != 0 {
+		t.Error("Failed to parse blogs.slug index unique")
+	}
 
-				if data[0].NonUnique != 1 {
-					t.Error("Failed to parse blogs.user index unique")
-				}
-			case "slug":
-				if len(data) != 1 && data[0].ColumnName != "slug" {
-					t.Error("Failed to parse blogs.slug index")
-				}
-
-				if data[0].NonUnique != 0 {
-					t.Error("Failed to parse blogs.slug index unique")
-				}
-			case "user_pinned_cate":
-				if len(data) != 3 {
-					t.Error("Failed to parse blogs.user_pinned_cate index")
-				}
-				if data[0].ColumnName != "user_id" {
-					t.Error("Failed to parse blogs.user_pinned_cate index user_id column")
-				}
-				if data[1].ColumnName != "is_pinned" {
-					t.Error("Failed to parse blogs.user_pinned_cate index is_pinned column")
-				}
-				if data[2].ColumnName != "category_id" {
-					t.Error("Failed to parse blogs.user_pinned_cate index category_id column")
-				}
-
-			}
-		}
+	data = tb.Indexes["user_pinned_cate"]
+	if len(data) != 3 {
+		t.Error("Failed to parse blogs.user_pinned_cate index")
+	}
+	if data[0].ColumnName != "user_id" || data[1].ColumnName != "is_pinned" || data[2].ColumnName != "category_id" {
+		t.Error("Failed to parse blogs index column names")
 	}
 }
 
