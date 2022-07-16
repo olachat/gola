@@ -85,25 +85,18 @@ func (c Column) SQLType() string {
 	if sqlType, ok := dbTypeToSQLTypes[c.FullDBType]; ok {
 		return sqlType
 	}
+
 	unsignedString := ""
 	if strings.HasSuffix(c.FullDBType, "unsigned") {
 		unsignedString = " unsigned"
 	}
-	if strings.HasPrefix(c.DBType, "tinyint") {
-		if sqlType, ok := dbTypeToSQLTypes["tinyint"+unsignedString]; ok {
-			return sqlType
-		}
-	} else if strings.HasPrefix(c.DBType, "smallint") {
-		if sqlType, ok := dbTypeToSQLTypes["smallint"+unsignedString]; ok {
-			return sqlType
-		}
-	} else if strings.HasPrefix(c.DBType, "bigint") {
-		if sqlType, ok := dbTypeToSQLTypes["bigint"+unsignedString]; ok {
-			return sqlType
-		}
-	} else if strings.HasPrefix(c.DBType, "int") {
-		if sqlType, ok := dbTypeToSQLTypes["int"+unsignedString]; ok {
-			return sqlType
+
+	intTypes := []string{"tinyint", "smallint", "bigint", "int"}
+	for _, intType := range intTypes {
+		if strings.HasPrefix(c.DBType, intType) {
+			if sqlType, ok := dbTypeToSQLTypes[intType+unsignedString]; ok {
+				return sqlType
+			}
 		}
 	}
 
@@ -113,12 +106,17 @@ func (c Column) SQLType() string {
 		return fmt.Sprintf("sql.MustCreateStringWithDefaults(sqltypes.VarChar, %s)", size)
 	}
 
-	if strings.HasPrefix(c.DBType, "decimal") || strings.HasPrefix(c.DBType, "float") {
-		return "sql.Float32"
+	simpleTypes := map[string]string{
+		"decimal":   "sql.Float32",
+		"float":     "sql.Float32",
+		"double":    "sql.Float64",
+		"timestamp": "sql.Timestamp",
 	}
 
-	if strings.HasPrefix(c.DBType, "double") {
-		return "sql.Float64"
+	for sqlType, goSqlType := range simpleTypes {
+		if strings.HasPrefix(c.DBType, sqlType) {
+			return goSqlType
+		}
 	}
 
 	if strings.HasPrefix(c.DBType, "enum") {
@@ -137,10 +135,6 @@ func (c Column) SQLType() string {
 		size := getValue(c.FullDBType)
 
 		return fmt.Sprintf("sql.MustCreateStringWithDefaults(sqltypes.Char, %s)", size)
-	}
-
-	if strings.HasPrefix(c.DBType, "timestamp") {
-		return "sql.Timestamp"
 	}
 
 	if strings.Contains(c.DBType, "text") {
