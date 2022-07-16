@@ -54,6 +54,40 @@ func FetchByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 	return corelib.FetchByPKs[T](pks, "{{.GetPrimaryKeyName}}", _db)
 }
 
+// FindOne{{.ClassName}} returns a row from {{.Name}} table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOne{{.ClassName}}(whereSQL string, params ...any) *{{.ClassName}} {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.FindOne[{{.ClassName}}](w, _db)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func Count(whereSQL string, params ...any) (int, error) {
+	return corelib.QueryInt("SELECT COUNT(*) FROM {{.Name}} " + whereSQL, _db, params...)
+}
+
+// FindOne returns a row with selected fields from {{.Name}} table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOne[T any](whereSQL string, params ...any) *T {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.FindOne[T](w, _db)
+}
+
+// Find{{.ClassName}} returns rows from {{.Name}} table with arbitary where query
+// whereSQL must start with "where ..."
+func Find{{.ClassName}}(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.Find[{{.ClassName}}](w, _db)
+}
+
+// Find returns rows with selected fields from {{.Name}} table with arbitary where query
+// whereSQL must start with "where ..."
+func Find[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.Find[T](w, _db)
+}
+
 // Column types
 
 {{- range .Columns }}

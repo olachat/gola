@@ -69,6 +69,40 @@ func FetchByPKs[T any](vals ...int) []*T {
 	return corelib.FetchByPKs[T](pks, "id", _db)
 }
 
+// FindOneBlog returns a row from blogs table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneBlog(whereSQL string, params ...any) *Blog {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.FindOne[Blog](w, _db)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func Count(whereSQL string, params ...any) (int, error) {
+	return corelib.QueryInt("SELECT COUNT(*) FROM blogs "+whereSQL, _db, params...)
+}
+
+// FindOne returns a row with selected fields from blogs table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOne[T any](whereSQL string, params ...any) *T {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.FindOne[T](w, _db)
+}
+
+// FindBlog returns rows from blogs table with arbitary where query
+// whereSQL must start with "where ..."
+func FindBlog(whereSQL string, params ...any) ([]*Blog, error) {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.Find[Blog](w, _db)
+}
+
+// Find returns rows with selected fields from blogs table with arbitary where query
+// whereSQL must start with "where ..."
+func Find[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := corelib.NewWhere(whereSQL, params...)
+	return corelib.Find[T](w, _db)
+}
+
 // Column types
 
 // Id field

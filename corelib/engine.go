@@ -30,23 +30,8 @@ func getDB(db *sql.DB) *sql.DB {
 
 // FetchByPK returns a row of T type with given primary key value
 func FetchByPK[T any](val any, pkName string, db *sql.DB) *T {
-	u := new(T)
-	tableName, columnsNames := GetTableAndColumnsNames[T]()
-	data := StrutForScan(u)
-
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s=?", columnsNames, tableName, pkName)
-
-	mydb := getDB(db)
-	err2 := mydb.QueryRow(query, val).Scan(data...)
-
-	if err2 != nil {
-		if err2 == sql.ErrNoRows {
-			return nil
-		}
-		log.Fatal(err2)
-	}
-
-	return u
+	w := NewWhere("WHERE "+pkName+"=?", val)
+	return FindOne[T](w, db)
 }
 
 // FetchByPKs returns rows of T type with given primary key values
@@ -54,11 +39,12 @@ func FetchByPKs[T any](vals []any, pkName string, db *sql.DB) []*T {
 	if len(vals) == 0 {
 		return make([]*T, 0)
 	}
-	tableName, columnsNames := GetTableAndColumnsNames[T]()
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s in (%s)",
-		columnsNames, tableName, pkName, GetParamPlaceHolder(len(vals)))
 
-	return Query[T](query, db, vals...)
+	query := fmt.Sprintf("WHERE %s in (%s)", pkName, GetParamPlaceHolder(len(vals)))
+	w := NewWhere(query, vals...)
+
+	result, _ := Find[T](w, db)
+	return result
 }
 
 // Exec given query with given db instances or default
@@ -73,7 +59,7 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 	whereSQL, params := where.GetWhere()
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s", columnsNames,
+	query := fmt.Sprintf("SELECT %s FROM %s %s", columnsNames,
 		tableName, whereSQL)
 
 	mydb := getDB(db)
@@ -90,7 +76,7 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 }
 
 // Find returns rows from given table type with where query
-func Find[T any](where WhereQuery, db *sql.DB) []*T {
+func Find[T any](where WhereQuery, db *sql.DB) ([]*T, error) {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	whereSQL, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s FROM %s %s", columnsNames,
@@ -99,26 +85,33 @@ func Find[T any](where WhereQuery, db *sql.DB) []*T {
 	return Query[T](query, db, params...)
 }
 
-// Query rows from given table type with where query & params
-func Query[T any](query string, db *sql.DB, params ...any) []*T {
-	var result []*T
-	var u *T
-
+// QueryInt single int result by query, handy for count(*) querys
+func QueryInt(query string, db *sql.DB, params ...any) (result int, err error) {
 	mydb := getDB(db)
-	rows, err2 := mydb.Query(query, params...)
+	mydb.QueryRow(query, params...).Scan(&result)
+	return
+}
 
-	if err2 != nil {
-		log.Fatal(err2)
+// Query rows from given table type with where query & params
+func Query[T any](query string, db *sql.DB, params ...any) (result []*T, err error) {
+	mydb := getDB(db)
+	rows, err := mydb.Query(query, params...)
+	if err != nil {
+		return
 	}
 
+	var u *T
 	for rows.Next() {
 		u = new(T)
 		data := StrutForScan(u)
-		rows.Scan(data...)
+		err = rows.Scan(data...)
+		if err != nil {
+			return
+		}
 		result = append(result, u)
 	}
 
-	return result
+	return
 }
 
 // Update given obj changes with given db instances or default
