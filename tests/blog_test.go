@@ -41,6 +41,21 @@ func TestBlogMethods(t *testing.T) {
 	if blog.GetId() != 3 {
 		t.Error("Insert blog 2 failed")
 	}
+
+	count, err := blogs.Count("")
+	if err != nil || count != 2 {
+		t.Error("Count all blogs failed")
+	}
+
+	count, err = blogs.Count("where title=?", "bar")
+	if err != nil || count != 1 {
+		t.Error("Count bar blog failed")
+	}
+
+	count, err = blogs.Count("where title=?", "barbar")
+	if err != nil || count != 0 {
+		t.Error("Count not-exist blog failed")
+	}
 }
 
 func TestBlogFind(t *testing.T) {

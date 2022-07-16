@@ -76,6 +76,12 @@ func FindOneBlog(whereSQL string, params ...any) *Blog {
 	return corelib.FindOne[Blog](w, _db)
 }
 
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func Count(whereSQL string, params ...any) (int, error) {
+	return corelib.QueryInt("SELECT COUNT(*) FROM blogs "+whereSQL, _db, params...)
+}
+
 // FindOne returns a row with selected fields from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {

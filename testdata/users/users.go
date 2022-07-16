@@ -80,6 +80,12 @@ func FindOneUser(whereSQL string, params ...any) *User {
 	return corelib.FindOne[User](w, _db)
 }
 
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func Count(whereSQL string, params ...any) (int, error) {
+	return corelib.QueryInt("SELECT COUNT(*) FROM users "+whereSQL, _db, params...)
+}
+
 // FindOne returns a row with selected fields from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {

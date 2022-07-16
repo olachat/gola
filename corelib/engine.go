@@ -85,6 +85,13 @@ func Find[T any](where WhereQuery, db *sql.DB) ([]*T, error) {
 	return Query[T](query, db, params...)
 }
 
+// QueryInt single int result by query, handy for count(*) querys
+func QueryInt(query string, db *sql.DB, params ...any) (result int, err error) {
+	mydb := getDB(db)
+	mydb.QueryRow(query, params...).Scan(&result)
+	return
+}
+
 // Query rows from given table type with where query & params
 func Query[T any](query string, db *sql.DB, params ...any) (result []*T, err error) {
 	mydb := getDB(db)
