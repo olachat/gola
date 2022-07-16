@@ -113,6 +113,10 @@ func (q *{{$col.StructName}}[T]) And{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .I
 {{ end }}
 
 // Find methods
+func Select{{.ClassName}}() iQuery[{{.ClassName}}] {
+	return new(idxQuery[{{.ClassName}}])
+}
+
 func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }

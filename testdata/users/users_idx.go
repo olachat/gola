@@ -130,6 +130,10 @@ type iQuery[T any] interface {
 }
 
 // Find methods
+func SelectUser() iQuery[User] {
+	return new(idxQuery[User])
+}
+
 func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }

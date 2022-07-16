@@ -297,6 +297,10 @@ func (q *idxQuery10[T]) AndCategoryIdIN(vals ...int) orderReadQuery[T] {
 }
 
 // Find methods
+func SelectBlog() iQuery[Blog] {
+	return new(idxQuery[Blog])
+}
+
 func Select[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
