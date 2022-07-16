@@ -30,23 +30,8 @@ func getDB(db *sql.DB) *sql.DB {
 
 // FetchByPK returns a row of T type with given primary key value
 func FetchByPK[T any](val any, pkName string, db *sql.DB) *T {
-	u := new(T)
-	tableName, columnsNames := GetTableAndColumnsNames[T]()
-	data := StrutForScan(u)
-
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s=?", columnsNames, tableName, pkName)
-
-	mydb := getDB(db)
-	err2 := mydb.QueryRow(query, val).Scan(data...)
-
-	if err2 != nil {
-		if err2 == sql.ErrNoRows {
-			return nil
-		}
-		log.Fatal(err2)
-	}
-
-	return u
+	w := NewWhere("WHERE "+pkName+"=?", val)
+	return FindOne[T](w, db)
 }
 
 // FetchByPKs returns rows of T type with given primary key values
@@ -54,12 +39,11 @@ func FetchByPKs[T any](vals []any, pkName string, db *sql.DB) []*T {
 	if len(vals) == 0 {
 		return make([]*T, 0)
 	}
-	tableName, columnsNames := GetTableAndColumnsNames[T]()
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s in (%s)",
-		columnsNames, tableName, pkName, GetParamPlaceHolder(len(vals)))
 
-	result, _ := Query[T](query, db, vals...)
+	query := fmt.Sprintf("WHERE %s in (%s)", pkName, GetParamPlaceHolder(len(vals)))
+	w := NewWhere(query, vals...)
 
+	result, _ := Find[T](w, db)
 	return result
 }
 
