@@ -408,45 +408,23 @@ var uintTypes = map[string]string{
 // as a Column object.
 func (m *MySQLDriver) TranslateColumnType(c structs.Column) structs.Column {
 	unsigned := strings.Contains(c.FullDBType, "unsigned")
+
+	boolType, strType, intTypeMap, uintTypeMap, simpleTypeMap := "bool", "string", intTypes, uintTypes, simpleTypes
 	if c.Nullable {
-		if c.DBType == "tinyint" {
-			// map tinyint(1) to bool if TinyintAsBool is true
-			if !m.tinyIntAsInt && c.FullDBType == "tinyint(1)" {
-				c.Type = "null.Bool"
-				return c
-			}
-		}
-
-		if columnType, ok := nullIntTypes[c.DBType]; ok {
-			if unsigned {
-				c.Type = nullUintTypes[c.DBType]
-			} else {
-				c.Type = columnType
-			}
-
-			return c
-		}
-
-		if columnType, ok := nullSimpleTypes[c.DBType]; ok {
-			c.Type = columnType
-			return c
-		}
-
-		c.Type = "null.String"
-		return c
+		boolType, strType, intTypeMap, uintTypeMap, simpleTypeMap = "null.Bool", "null.String", nullIntTypes, nullUintTypes, nullSimpleTypes
 	}
 
 	if c.DBType == "tinyint" {
 		// map tinyint(1) to bool if TinyintAsBool is true
 		if !m.tinyIntAsInt && c.FullDBType == "tinyint(1)" {
-			c.Type = "bool"
+			c.Type = boolType
 			return c
 		}
 	}
 
-	if columnType, ok := intTypes[c.DBType]; ok {
+	if columnType, ok := intTypeMap[c.DBType]; ok {
 		if unsigned {
-			c.Type = uintTypes[c.DBType]
+			c.Type = uintTypeMap[c.DBType]
 		} else {
 			c.Type = columnType
 		}
@@ -454,11 +432,11 @@ func (m *MySQLDriver) TranslateColumnType(c structs.Column) structs.Column {
 		return c
 	}
 
-	if columnType, ok := simpleTypes[c.DBType]; ok {
+	if columnType, ok := simpleTypeMap[c.DBType]; ok {
 		c.Type = columnType
 		return c
 	}
 
-	c.Type = "string"
+	c.Type = strType
 	return c
 }
