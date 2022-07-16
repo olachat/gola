@@ -104,12 +104,14 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
 }
 
 func (q *idxQuery[T]) All() []*T {
-	return corelib.Find[T](q, _db)
+	result, _ := corelib.Find[T](q, _db)
+	return result
 }
 
 func (q *idxQuery[T]) Limit(offset, count int) []*T {
 	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, count)
-	return corelib.Find[T](q, _db)
+	result, _ := corelib.Find[T](q, _db)
+	return result
 }
 
 type order[T any] interface {
