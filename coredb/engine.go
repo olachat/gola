@@ -66,10 +66,13 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	err2 := mydb.QueryRow(query, params...).Scan(data...)
 
 	if err2 != nil {
-		if err2 == sql.ErrNoRows {
-			return nil
+		// It's on purpose the hide the error
+		// But should re-consider later
+		if err2 != sql.ErrNoRows {
+			log.Fatal(err2)
 		}
-		log.Fatal(err2)
+
+		return nil
 	}
 
 	return u
