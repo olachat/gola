@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/olachat/gola/corelib"
+	"github.com/olachat/gola/coredb"
 )
 
 type orderBy int
@@ -46,7 +46,7 @@ const (
 	SportsNoDefaultDesc
 )
 
-func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
+func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 	q.orders = make([]string, len(args))
 	for i, arg := range args {
 		switch arg {
@@ -104,23 +104,23 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) corelib.ReadQuery[T] {
 }
 
 func (q *idxQuery[T]) All() []*T {
-	result, _ := corelib.Find[T](q, _db)
+	result, _ := coredb.Find[T](q, _db)
 	return result
 }
 
 func (q *idxQuery[T]) Limit(offset, count int) []*T {
 	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, count)
-	result, _ := corelib.Find[T](q, _db)
+	result, _ := coredb.Find[T](q, _db)
 	return result
 }
 
 type order[T any] interface {
-	OrderBy(args ...orderBy) corelib.ReadQuery[T]
+	OrderBy(args ...orderBy) coredb.ReadQuery[T]
 }
 
 type orderReadQuery[T any] interface {
 	order[T]
-	corelib.ReadQuery[T]
+	coredb.ReadQuery[T]
 }
 
 type iQuery[T any] interface {
@@ -147,7 +147,7 @@ func (q *idxQuery[T]) WhereEmailEQ(val string) orderReadQuery[T] {
 }
 
 func (q *idxQuery[T]) WhereEmailIN(vals ...string) orderReadQuery[T] {
-	q.whereSql = " where email in (" + corelib.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql = " where email in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -161,7 +161,7 @@ func (q *idxQuery[T]) WhereNameEQ(val string) orderReadQuery[T] {
 }
 
 func (q *idxQuery[T]) WhereNameIN(vals ...string) orderReadQuery[T] {
-	q.whereSql = " where name in (" + corelib.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql = " where name in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}

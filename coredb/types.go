@@ -1,4 +1,4 @@
-package corelib
+package coredb
 
 // RowStruct defines interface of an ORM row struct
 type RowStruct interface {

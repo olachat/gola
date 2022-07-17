@@ -1,4 +1,4 @@
-package corelib
+package coredb
 
 // WhereQuery defines interface which support forming query query
 type WhereQuery interface {

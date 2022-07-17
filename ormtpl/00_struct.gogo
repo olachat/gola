@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"strings"
 
-	"github.com/olachat/gola/corelib"
+	"github.com/olachat/gola/coredb"
 
 	{{.Imports}}
 )
@@ -35,57 +35,57 @@ var table *{{.ClassName}}Table
 
 // Fetch{{.ClassName}}ByPKs returns a row from {{.Name}} table with given primary key value
 func Fetch{{.ClassName}}ByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
-	return corelib.FetchByPK[{{.ClassName}}](val, "{{.GetPrimaryKeyName}}", _db)
+	return coredb.FetchByPK[{{.ClassName}}](val, "{{.GetPrimaryKeyName}}", _db)
 }
 // FetchByPKs returns a row with selected fields from {{.Name}} table with given primary key value
 func FetchByPK[T any](val {{.GetPrimaryKeyType}}) *T {
-	return corelib.FetchByPK[T](val, "{{.GetPrimaryKeyName}}", _db)
+	return coredb.FetchByPK[T](val, "{{.GetPrimaryKeyName}}", _db)
 }
 
 // Fetch{{.ClassName}}ByPKs returns rows with from {{.Name}} table with given primary key values
 func Fetch{{.ClassName}}ByPKs(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
-	pks := corelib.GetAnySlice(vals)
-	return corelib.FetchByPKs[{{.ClassName}}](pks, "{{.GetPrimaryKeyName}}", _db)
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKs[{{.ClassName}}](pks, "{{.GetPrimaryKeyName}}", _db)
 }
 
 // FetchByPKs returns rows with selected fields from {{.Name}} table with given primary key values
 func FetchByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
-	pks := corelib.GetAnySlice(vals)
-	return corelib.FetchByPKs[T](pks, "{{.GetPrimaryKeyName}}", _db)
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKs[T](pks, "{{.GetPrimaryKeyName}}", _db)
 }
 
 // FindOne{{.ClassName}} returns a row from {{.Name}} table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne{{.ClassName}}(whereSQL string, params ...any) *{{.ClassName}} {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.FindOne[{{.ClassName}}](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[{{.ClassName}}](w, _db)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return corelib.QueryInt("SELECT COUNT(*) FROM {{.Name}} " + whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM {{.Name}} " + whereSQL, _db, params...)
 }
 
 // FindOne returns a row with selected fields from {{.Name}} table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.FindOne[T](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[T](w, _db)
 }
 
 // Find{{.ClassName}} returns rows from {{.Name}} table with arbitary where query
 // whereSQL must start with "where ..."
 func Find{{.ClassName}}(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.Find[{{.ClassName}}](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[{{.ClassName}}](w, _db)
 }
 
 // Find returns rows with selected fields from {{.Name}} table with arbitary where query
 // whereSQL must start with "where ..."
 func Find[T any](whereSQL string, params ...any) ([]*T, error) {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.Find[T](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[T](w, _db)
 }
 
 // Column types
@@ -167,7 +167,7 @@ func (c *{{.GoName}}) GetValPointer() any {
 	return &c.val
 }
 
-func (c *{{.GoName}}) GetTableType() corelib.TableType {
+func (c *{{.GoName}}) GetTableType() coredb.TableType {
 	return table
 }
 {{- end }}
@@ -194,7 +194,7 @@ func (c *{{.ClassName}}) Insert() error {
 		{{- if $i}}, {{end}}?
 		{{- end }})`
 
-	result, err := corelib.Exec(sql, _db, {{- range $i, $c := .NonPrimaryColumns }}
+	result, err := coredb.Exec(sql, _db, {{- range $i, $c := .NonPrimaryColumns }}
 	{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
 	{{- end }})
 
@@ -229,7 +229,7 @@ func (c *{{.ClassName}}) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeyName}} = ?"
 	params = append(params, c.Get{{.GetPrimaryKey}}())
 
-	_, err := corelib.Exec(sql, _db, params...)
+	_, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
 		return false, err
 	}
@@ -240,10 +240,10 @@ func (c *{{.ClassName}}) Update() (bool, error) {
 func (c *{{.ClassName}}) Delete() (error) {
 	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeyName}} = ?`
 
-	_, err := corelib.Exec(sql, _db, c.Get{{.GetPrimaryKey}}())
+	_, err := coredb.Exec(sql, _db, c.Get{{.GetPrimaryKey}}())
 	return err
 }
 
 func Update[T any](obj *T) (bool, error) {
-	return corelib.Update(obj, _db)
+	return coredb.Update(obj, _db)
 }

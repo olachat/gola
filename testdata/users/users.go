@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"strings"
 
-	"github.com/olachat/gola/corelib"
+	"github.com/olachat/gola/coredb"
 )
 
 var _db *sql.DB
@@ -53,58 +53,58 @@ var table *UserTable
 
 // FetchUserByPKs returns a row from users table with given primary key value
 func FetchUserByPK(val int) *User {
-	return corelib.FetchByPK[User](val, "id", _db)
+	return coredb.FetchByPK[User](val, "id", _db)
 }
 
 // FetchByPKs returns a row with selected fields from users table with given primary key value
 func FetchByPK[T any](val int) *T {
-	return corelib.FetchByPK[T](val, "id", _db)
+	return coredb.FetchByPK[T](val, "id", _db)
 }
 
 // FetchUserByPKs returns rows with from users table with given primary key values
 func FetchUserByPKs(vals ...int) []*User {
-	pks := corelib.GetAnySlice(vals)
-	return corelib.FetchByPKs[User](pks, "id", _db)
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKs[User](pks, "id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from users table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
-	pks := corelib.GetAnySlice(vals)
-	return corelib.FetchByPKs[T](pks, "id", _db)
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKs[T](pks, "id", _db)
 }
 
 // FindOneUser returns a row from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneUser(whereSQL string, params ...any) *User {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.FindOne[User](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[User](w, _db)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return corelib.QueryInt("SELECT COUNT(*) FROM users "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM users "+whereSQL, _db, params...)
 }
 
 // FindOne returns a row with selected fields from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.FindOne[T](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[T](w, _db)
 }
 
 // FindUser returns rows from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindUser(whereSQL string, params ...any) ([]*User, error) {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.Find[User](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[User](w, _db)
 }
 
 // Find returns rows with selected fields from users table with arbitary where query
 // whereSQL must start with "where ..."
 func Find[T any](whereSQL string, params ...any) ([]*T, error) {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.Find[T](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[T](w, _db)
 }
 
 // Column types
@@ -193,7 +193,7 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Id) GetTableType() corelib.TableType {
+func (c *Id) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -233,7 +233,7 @@ func (c *Name) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Name) GetTableType() corelib.TableType {
+func (c *Name) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -273,7 +273,7 @@ func (c *Email) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Email) GetTableType() corelib.TableType {
+func (c *Email) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -313,7 +313,7 @@ func (c *CreatedAt) GetValPointer() any {
 	return &c.val
 }
 
-func (c *CreatedAt) GetTableType() corelib.TableType {
+func (c *CreatedAt) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -353,7 +353,7 @@ func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
 }
 
-func (c *UpdatedAt) GetTableType() corelib.TableType {
+func (c *UpdatedAt) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -393,7 +393,7 @@ func (c *FloatType) GetValPointer() any {
 	return &c.val
 }
 
-func (c *FloatType) GetTableType() corelib.TableType {
+func (c *FloatType) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -433,7 +433,7 @@ func (c *DoubleType) GetValPointer() any {
 	return &c.val
 }
 
-func (c *DoubleType) GetTableType() corelib.TableType {
+func (c *DoubleType) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -473,7 +473,7 @@ func (c *Hobby) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Hobby) GetTableType() corelib.TableType {
+func (c *Hobby) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -513,7 +513,7 @@ func (c *HobbyNoDefault) GetValPointer() any {
 	return &c.val
 }
 
-func (c *HobbyNoDefault) GetTableType() corelib.TableType {
+func (c *HobbyNoDefault) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -558,7 +558,7 @@ func (c *Sports) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Sports) GetTableType() corelib.TableType {
+func (c *Sports) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -603,7 +603,7 @@ func (c *Sports2) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Sports2) GetTableType() corelib.TableType {
+func (c *Sports2) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -648,7 +648,7 @@ func (c *SportsNoDefault) GetValPointer() any {
 	return &c.val
 }
 
-func (c *SportsNoDefault) GetTableType() corelib.TableType {
+func (c *SportsNoDefault) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -672,7 +672,7 @@ func NewUser() *User {
 func (c *User) Insert() error {
 	sql := `INSERT INTO users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports, sports2, sports_no_default) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	result, err := corelib.Exec(sql, _db, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+	result, err := coredb.Exec(sql, _db, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 
 	if err != nil {
 		return err
@@ -743,7 +743,7 @@ func (c *User) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
 	params = append(params, c.GetId())
 
-	_, err := corelib.Exec(sql, _db, params...)
+	_, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
 		return false, err
 	}
@@ -754,10 +754,10 @@ func (c *User) Update() (bool, error) {
 func (c *User) Delete() error {
 	sql := `DELETE FROM users WHERE id = ?`
 
-	_, err := corelib.Exec(sql, _db, c.GetId())
+	_, err := coredb.Exec(sql, _db, c.GetId())
 	return err
 }
 
 func Update[T any](obj *T) (bool, error) {
-	return corelib.Update(obj, _db)
+	return coredb.Update(obj, _db)
 }

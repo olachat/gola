@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"strings"
 
-	"github.com/olachat/gola/corelib"
+	"github.com/olachat/gola/coredb"
 )
 
 var _db *sql.DB
@@ -49,58 +49,58 @@ var table *BlogTable
 
 // FetchBlogByPKs returns a row from blogs table with given primary key value
 func FetchBlogByPK(val int) *Blog {
-	return corelib.FetchByPK[Blog](val, "id", _db)
+	return coredb.FetchByPK[Blog](val, "id", _db)
 }
 
 // FetchByPKs returns a row with selected fields from blogs table with given primary key value
 func FetchByPK[T any](val int) *T {
-	return corelib.FetchByPK[T](val, "id", _db)
+	return coredb.FetchByPK[T](val, "id", _db)
 }
 
 // FetchBlogByPKs returns rows with from blogs table with given primary key values
 func FetchBlogByPKs(vals ...int) []*Blog {
-	pks := corelib.GetAnySlice(vals)
-	return corelib.FetchByPKs[Blog](pks, "id", _db)
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKs[Blog](pks, "id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from blogs table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
-	pks := corelib.GetAnySlice(vals)
-	return corelib.FetchByPKs[T](pks, "id", _db)
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKs[T](pks, "id", _db)
 }
 
 // FindOneBlog returns a row from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneBlog(whereSQL string, params ...any) *Blog {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.FindOne[Blog](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[Blog](w, _db)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return corelib.QueryInt("SELECT COUNT(*) FROM blogs "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM blogs "+whereSQL, _db, params...)
 }
 
 // FindOne returns a row with selected fields from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.FindOne[T](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[T](w, _db)
 }
 
 // FindBlog returns rows from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindBlog(whereSQL string, params ...any) ([]*Blog, error) {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.Find[Blog](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[Blog](w, _db)
 }
 
 // Find returns rows with selected fields from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func Find[T any](whereSQL string, params ...any) ([]*T, error) {
-	w := corelib.NewWhere(whereSQL, params...)
-	return corelib.Find[T](w, _db)
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[T](w, _db)
 }
 
 // Column types
@@ -141,7 +141,7 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Id) GetTableType() corelib.TableType {
+func (c *Id) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -181,7 +181,7 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
-func (c *UserId) GetTableType() corelib.TableType {
+func (c *UserId) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -221,7 +221,7 @@ func (c *Slug) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Slug) GetTableType() corelib.TableType {
+func (c *Slug) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -261,7 +261,7 @@ func (c *Title) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Title) GetTableType() corelib.TableType {
+func (c *Title) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -301,7 +301,7 @@ func (c *CategoryId) GetValPointer() any {
 	return &c.val
 }
 
-func (c *CategoryId) GetTableType() corelib.TableType {
+func (c *CategoryId) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -341,7 +341,7 @@ func (c *IsPinned) GetValPointer() any {
 	return &c.val
 }
 
-func (c *IsPinned) GetTableType() corelib.TableType {
+func (c *IsPinned) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -381,7 +381,7 @@ func (c *IsVip) GetValPointer() any {
 	return &c.val
 }
 
-func (c *IsVip) GetTableType() corelib.TableType {
+func (c *IsVip) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -421,7 +421,7 @@ func (c *Country) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Country) GetTableType() corelib.TableType {
+func (c *Country) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -461,7 +461,7 @@ func (c *CreatedAt) GetValPointer() any {
 	return &c.val
 }
 
-func (c *CreatedAt) GetTableType() corelib.TableType {
+func (c *CreatedAt) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -501,7 +501,7 @@ func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
 }
 
-func (c *UpdatedAt) GetTableType() corelib.TableType {
+func (c *UpdatedAt) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -523,7 +523,7 @@ func NewBlog() *Blog {
 func (c *Blog) Insert() error {
 	sql := `INSERT INTO blogs (user_id, slug, title, category_id, is_pinned, is_vip, country, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	result, err := corelib.Exec(sql, _db, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
@@ -586,7 +586,7 @@ func (c *Blog) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
 	params = append(params, c.GetId())
 
-	_, err := corelib.Exec(sql, _db, params...)
+	_, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
 		return false, err
 	}
@@ -597,10 +597,10 @@ func (c *Blog) Update() (bool, error) {
 func (c *Blog) Delete() error {
 	sql := `DELETE FROM blogs WHERE id = ?`
 
-	_, err := corelib.Exec(sql, _db, c.GetId())
+	_, err := coredb.Exec(sql, _db, c.GetId())
 	return err
 }
 
 func Update[T any](obj *T) (bool, error) {
-	return corelib.Update(obj, _db)
+	return coredb.Update(obj, _db)
 }

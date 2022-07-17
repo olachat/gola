@@ -12,7 +12,7 @@ import (
 	gsql "github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/olachat/gola/corelib"
+	"github.com/olachat/gola/coredb"
 	"github.com/olachat/gola/mysqldriver"
 	"github.com/olachat/gola/testdata"
 	"github.com/olachat/gola/testdata/users"
@@ -50,7 +50,7 @@ func init() {
 		panic(err)
 	}
 
-	corelib.Setup(db)
+	coredb.Setup(db)
 
 	//create tables
 	for _, tableName := range tableNames {

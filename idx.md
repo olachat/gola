@@ -39,12 +39,12 @@ func TestBlogMethods(t *testing.T) {
 ```
 
 ```go
-import "github.com/olachat/gola/corelib"
+import "github.com/olachat/gola/coredb"
 
 
 
 type IdxSlug struct {
-  op corelib.Ops
+  op coredb.Ops
 }
 
 func (i *IdxSlug) SlugIs(slug string) string {
@@ -55,7 +55,7 @@ func (i *IdxSlug) SlugIn(slugs []string) string {
 
 func (i *IdxSlug) GetWhere() string {
   switch i.op {
-  case corelib.OpEqual:
+  case coredb.OpEqual:
     return "slug = ?"
   }
 
@@ -75,8 +75,8 @@ func (i *IdxFirstColumns) Count() {
 func Query() *IdxFirstColumns {
   return new(IdxFirstColumns)
 
-  corelib.FindWithSlug().Find()
+  coredb.FindWithSlug().Find()
 
-  return corelib.FindOne[Blog](i)
+  return coredb.FindOne[Blog](i)
 }
 ```

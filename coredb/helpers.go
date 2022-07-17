@@ -1,4 +1,4 @@
-package corelib
+package coredb
 
 import (
 	"strings"
