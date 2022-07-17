@@ -40,7 +40,7 @@ func FetchByPKs[T any](vals []any, pkName string, db *sql.DB) []*T {
 		return make([]*T, 0)
 	}
 
-	query := fmt.Sprintf("WHERE %s in (%s)", pkName, GetParamPlaceHolder(len(vals)))
+	query := fmt.Sprintf("WHERE %s IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
 	w := NewWhere(query, vals...)
 
 	result, _ := Find[T](w, db)
