@@ -320,7 +320,7 @@ func (c *SongUserFavourite) Insert() error {
 		return err
 	}
 
-	c.SetUserId(int(id))
+	c.SetUserId(uint(id))
 	return nil
 }
 

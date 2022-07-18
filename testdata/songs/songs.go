@@ -232,7 +232,7 @@ func (c *Song) Insert() error {
 		return err
 	}
 
-	c.SetId(int(id))
+	c.SetId(uint(id))
 	return nil
 }
 

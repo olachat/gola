@@ -206,7 +206,7 @@ func (c *{{.ClassName}}) Insert() error {
 		return err
 	}
 
-	c.Set{{.GetPrimaryKey}}(int(id))
+	c.Set{{.GetPrimaryKey}}({{.GetPrimaryKeyType}}(id))
 	return nil
 }
 
