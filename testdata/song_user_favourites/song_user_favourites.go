@@ -350,6 +350,10 @@ func (c *SongUserFavourite) resetUpdated() {
 func (c *SongUserFavourite) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
+	if c.UserId.IsUpdated() {
+		updatedFields = append(updatedFields, "user_id = ?")
+		params = append(params, c.GetUserId())
+	}
 	if c.SongId.IsUpdated() {
 		updatedFields = append(updatedFields, "song_id = ?")
 		params = append(params, c.GetSongId())
