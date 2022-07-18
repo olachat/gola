@@ -30,7 +30,7 @@ var fixtures embed.FS
 var s *server.Server
 var testDBPort int = 33066
 var testDBName string = "testdb"
-var testTables = []string{"blogs", "users", "song", "song_user_favourite"}
+var testTables = []string{"blogs", "users", "songs", "song_user_favourites"}
 var testDataPath = "testdata" + string(filepath.Separator)
 
 var update = flag.Bool("update", false, "update generated files")

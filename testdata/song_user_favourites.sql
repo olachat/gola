@@ -1,4 +1,4 @@
-CREATE TABLE `song_user_favourite` (
+CREATE TABLE `song_user_favourites` (
   `user_id` int(10) unsigned NOT NULL COMMENT 'User ID',
   `song_id` int(10) unsigned NOT NULL COMMENT 'Song ID',
   `is_favourite` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Is favourite',

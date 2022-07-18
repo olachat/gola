@@ -1,4 +1,4 @@
-CREATE TABLE `song` (
+CREATE TABLE `songs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL COMMENT 'Song title',
   `hash` varchar(128) NOT NULL DEFAULT '' COMMENT 'Song file hash checksum',
