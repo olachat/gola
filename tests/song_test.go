@@ -1,7 +1,11 @@
 package tests
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/olachat/gola/testdata/songs"
+)
 
 func TestSong(t *testing.T) {
-	song.FetchByPK(1)
+	songs.FetchSongByPK(1)
 }
