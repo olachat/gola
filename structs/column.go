@@ -349,9 +349,5 @@ func (c Column) IsPrimaryKey() bool {
 
 // IsAutoIncrement returns if column value is auto incremented
 func (c Column) IsAutoIncrement() bool {
-	if c.Default == "auto_increment" {
-		return true
-	}
-
-	return false
+	return c.Default == "auto_increment"
 }

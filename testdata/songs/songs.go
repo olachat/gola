@@ -221,18 +221,19 @@ func NewSong() *Song {
 
 func (c *Song) Insert() error {
 	sql := `INSERT INTO songs (title, hash) values (?, ?)`
-
 	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetHash())
 
 	if err != nil {
 		return err
 	}
+
 	id, err := result.LastInsertId()
 	if err != nil {
 		return err
 	}
 
 	c.SetId(uint(id))
+
 	return nil
 }
 

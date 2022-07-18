@@ -308,19 +308,13 @@ func NewSongUserFavourite() *SongUserFavourite {
 }
 
 func (c *SongUserFavourite) Insert() error {
-	sql := `INSERT INTO song_user_favourites (song_id, is_favourite, created_at, updated_at) values (?, ?, ?, ?)`
-
-	result, err := coredb.Exec(sql, _db, c.GetSongId(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
+	sql := `INSERT INTO song_user_favourites (user_id, song_id, is_favourite, created_at, updated_at) values (?, ?, ?, ?, ?)`
+	_, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return err
-	}
 
-	c.SetUserId(uint(id))
 	return nil
 }
 
