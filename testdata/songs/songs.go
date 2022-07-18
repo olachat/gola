@@ -233,18 +233,26 @@ func NewSong() *Song {
 
 func (c *Song) Insert() error {
 	sql := `INSERT INTO songs (title, hash) values (?, ?)`
+
 	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetHash())
 
 	if err != nil {
 		return err
 	}
-
 	id, err := result.LastInsertId()
 	if err != nil {
 		return err
 	}
 
 	c.SetId(uint(id))
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affectedRows != 1 {
+		return coredb.ErrAvoidInsert
+	}
 
 	c.resetUpdated()
 	return nil
@@ -277,9 +285,20 @@ func (c *Song) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
 	params = append(params, c.GetId())
 
-	_, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
 		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
 	}
 
 	c.resetUpdated()

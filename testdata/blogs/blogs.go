@@ -562,18 +562,26 @@ func NewBlog() *Blog {
 
 func (c *Blog) Insert() error {
 	sql := `INSERT INTO blogs (user_id, slug, title, category_id, is_pinned, is_vip, country, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
 	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
 	}
-
 	id, err := result.LastInsertId()
 	if err != nil {
 		return err
 	}
 
 	c.SetId(int(id))
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affectedRows != 1 {
+		return coredb.ErrAvoidInsert
+	}
 
 	c.resetUpdated()
 	return nil
@@ -641,9 +649,20 @@ func (c *Blog) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
 	params = append(params, c.GetId())
 
-	_, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
 		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
 	}
 
 	c.resetUpdated()

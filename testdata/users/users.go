@@ -719,18 +719,26 @@ func NewUser() *User {
 
 func (c *User) Insert() error {
 	sql := `INSERT INTO users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports, sports2, sports_no_default) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
 	result, err := coredb.Exec(sql, _db, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 
 	if err != nil {
 		return err
 	}
-
 	id, err := result.LastInsertId()
 	if err != nil {
 		return err
 	}
 
 	c.SetId(int(id))
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affectedRows != 1 {
+		return coredb.ErrAvoidInsert
+	}
 
 	c.resetUpdated()
 	return nil
@@ -808,9 +816,20 @@ func (c *User) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
 	params = append(params, c.GetId())
 
-	_, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
 		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
 	}
 
 	c.resetUpdated()

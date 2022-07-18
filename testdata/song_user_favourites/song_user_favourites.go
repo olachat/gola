@@ -329,10 +329,19 @@ func NewSongUserFavourite() *SongUserFavourite {
 
 func (c *SongUserFavourite) Insert() error {
 	sql := `INSERT INTO song_user_favourites (user_id, song_id, is_favourite, created_at, updated_at) values (?, ?, ?, ?, ?)`
-	_, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
+
+	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affectedRows != 1 {
+		return coredb.ErrAvoidInsert
 	}
 
 	c.resetUpdated()
@@ -380,9 +389,20 @@ func (c *SongUserFavourite) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE user_id = ?"
 	params = append(params, c.GetUserId())
 
-	_, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
 		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
 	}
 
 	c.resetUpdated()
