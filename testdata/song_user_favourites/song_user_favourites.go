@@ -125,6 +125,10 @@ func (c *UserId) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *UserId) resetUpdated() {
+	c._updated = false
+}
+
 func (c *UserId) IsPrimaryKey() bool {
 	return true
 }
@@ -163,6 +167,10 @@ func (c *SongId) GetColumnName() string {
 
 func (c *SongId) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *SongId) resetUpdated() {
+	c._updated = false
 }
 
 func (c *SongId) IsPrimaryKey() bool {
@@ -205,6 +213,10 @@ func (c *IsFavourite) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *IsFavourite) resetUpdated() {
+	c._updated = false
+}
+
 func (c *IsFavourite) IsPrimaryKey() bool {
 	return false
 }
@@ -243,6 +255,10 @@ func (c *CreatedAt) GetColumnName() string {
 
 func (c *CreatedAt) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *CreatedAt) resetUpdated() {
+	c._updated = false
 }
 
 func (c *CreatedAt) IsPrimaryKey() bool {
@@ -285,6 +301,10 @@ func (c *UpdatedAt) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *UpdatedAt) resetUpdated() {
+	c._updated = false
+}
+
 func (c *UpdatedAt) IsPrimaryKey() bool {
 	return false
 }
@@ -315,7 +335,16 @@ func (c *SongUserFavourite) Insert() error {
 		return err
 	}
 
+	c.resetUpdated()
 	return nil
+}
+
+func (c *SongUserFavourite) resetUpdated() {
+	c.UserId.resetUpdated()
+	c.SongId.resetUpdated()
+	c.IsFavourite.resetUpdated()
+	c.CreatedAt.resetUpdated()
+	c.UpdatedAt.resetUpdated()
 }
 
 func (c *SongUserFavourite) Update() (bool, error) {
@@ -352,6 +381,7 @@ func (c *SongUserFavourite) Update() (bool, error) {
 		return false, err
 	}
 
+	c.resetUpdated()
 	return true, nil
 }
 

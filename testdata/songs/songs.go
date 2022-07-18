@@ -119,6 +119,10 @@ func (c *Id) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *Id) resetUpdated() {
+	c._updated = false
+}
+
 func (c *Id) IsPrimaryKey() bool {
 	return true
 }
@@ -157,6 +161,10 @@ func (c *Title) GetColumnName() string {
 
 func (c *Title) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *Title) resetUpdated() {
+	c._updated = false
 }
 
 func (c *Title) IsPrimaryKey() bool {
@@ -199,6 +207,10 @@ func (c *Hash) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *Hash) resetUpdated() {
+	c._updated = false
+}
+
 func (c *Hash) IsPrimaryKey() bool {
 	return false
 }
@@ -234,7 +246,14 @@ func (c *Song) Insert() error {
 
 	c.SetId(uint(id))
 
+	c.resetUpdated()
 	return nil
+}
+
+func (c *Song) resetUpdated() {
+	c.Id.resetUpdated()
+	c.Title.resetUpdated()
+	c.Hash.resetUpdated()
 }
 
 func (c *Song) Update() (bool, error) {
@@ -263,6 +282,7 @@ func (c *Song) Update() (bool, error) {
 		return false, err
 	}
 
+	c.resetUpdated()
 	return true, nil
 }
 

@@ -133,6 +133,10 @@ func (c *Id) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *Id) resetUpdated() {
+	c._updated = false
+}
+
 func (c *Id) IsPrimaryKey() bool {
 	return true
 }
@@ -171,6 +175,10 @@ func (c *UserId) GetColumnName() string {
 
 func (c *UserId) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *UserId) resetUpdated() {
+	c._updated = false
 }
 
 func (c *UserId) IsPrimaryKey() bool {
@@ -213,6 +221,10 @@ func (c *Slug) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *Slug) resetUpdated() {
+	c._updated = false
+}
+
 func (c *Slug) IsPrimaryKey() bool {
 	return false
 }
@@ -251,6 +263,10 @@ func (c *Title) GetColumnName() string {
 
 func (c *Title) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *Title) resetUpdated() {
+	c._updated = false
 }
 
 func (c *Title) IsPrimaryKey() bool {
@@ -293,6 +309,10 @@ func (c *CategoryId) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *CategoryId) resetUpdated() {
+	c._updated = false
+}
+
 func (c *CategoryId) IsPrimaryKey() bool {
 	return false
 }
@@ -331,6 +351,10 @@ func (c *IsPinned) GetColumnName() string {
 
 func (c *IsPinned) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *IsPinned) resetUpdated() {
+	c._updated = false
 }
 
 func (c *IsPinned) IsPrimaryKey() bool {
@@ -373,6 +397,10 @@ func (c *IsVip) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *IsVip) resetUpdated() {
+	c._updated = false
+}
+
 func (c *IsVip) IsPrimaryKey() bool {
 	return false
 }
@@ -411,6 +439,10 @@ func (c *Country) GetColumnName() string {
 
 func (c *Country) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *Country) resetUpdated() {
+	c._updated = false
 }
 
 func (c *Country) IsPrimaryKey() bool {
@@ -453,6 +485,10 @@ func (c *CreatedAt) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *CreatedAt) resetUpdated() {
+	c._updated = false
+}
+
 func (c *CreatedAt) IsPrimaryKey() bool {
 	return false
 }
@@ -491,6 +527,10 @@ func (c *UpdatedAt) GetColumnName() string {
 
 func (c *UpdatedAt) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *UpdatedAt) resetUpdated() {
+	c._updated = false
 }
 
 func (c *UpdatedAt) IsPrimaryKey() bool {
@@ -535,7 +575,21 @@ func (c *Blog) Insert() error {
 
 	c.SetId(int(id))
 
+	c.resetUpdated()
 	return nil
+}
+
+func (c *Blog) resetUpdated() {
+	c.Id.resetUpdated()
+	c.UserId.resetUpdated()
+	c.Slug.resetUpdated()
+	c.Title.resetUpdated()
+	c.CategoryId.resetUpdated()
+	c.IsPinned.resetUpdated()
+	c.IsVip.resetUpdated()
+	c.Country.resetUpdated()
+	c.CreatedAt.resetUpdated()
+	c.UpdatedAt.resetUpdated()
 }
 
 func (c *Blog) Update() (bool, error) {
@@ -592,6 +646,7 @@ func (c *Blog) Update() (bool, error) {
 		return false, err
 	}
 
+	c.resetUpdated()
 	return true, nil
 }
 

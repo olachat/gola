@@ -159,6 +159,10 @@ func (c *{{.GoName}}) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *{{.GoName}}) resetUpdated()  {
+	c._updated = false
+}
+
 func (c *{{.GoName}}) IsPrimaryKey() bool {
 	return {{.IsPrimaryKey}}
 }
@@ -219,7 +223,14 @@ func (c *{{.ClassName}}) Insert() error {
 	}
 	{{- end }}
 
+	c.resetUpdated()
 	return nil
+}
+
+func (c *{{.ClassName}}) resetUpdated() {
+	{{- range .Columns }}
+	c.{{.GoName}}.resetUpdated()
+	{{- end }}
 }
 
 func (c *{{.ClassName}}) Update() (bool, error) {
@@ -246,6 +257,7 @@ func (c *{{.ClassName}}) Update() (bool, error) {
 		return false, err
 	}
 
+	c.resetUpdated()
 	return true, nil
 }
 
