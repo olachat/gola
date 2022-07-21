@@ -33,13 +33,21 @@ func (*{{.ClassName}}Table) GetTableName() string {
 
 var table *{{.ClassName}}Table
 
+{{- if .HasCompositePrimaryKey }}
+type PK struct {
+	{{- range .GetPKColumns }}
+	{{.GoName}} {{.GoType}}
+	{{- end }}
+}
+{{- end}}
+
 // Fetch{{.ClassName}}ByPKs returns a row from {{.Name}} table with given primary key value
 func Fetch{{.ClassName}}ByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
-	return coredb.FetchByPK[{{.ClassName}}](val, "{{.GetPrimaryKeyName}}", _db)
+	return coredb.FetchByPK[{{.ClassName}}](_db, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 // FetchByPKs returns a row with selected fields from {{.Name}} table with given primary key value
 func FetchByPK[T any](val {{.GetPrimaryKeyType}}) *T {
-	return coredb.FetchByPK[T](val, "{{.GetPrimaryKeyName}}", _db)
+	return coredb.FetchByPK[T](_db, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 
 // Fetch{{.ClassName}}ByPKs returns rows with from {{.Name}} table with given primary key values

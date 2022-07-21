@@ -29,8 +29,12 @@ func getDB(db *sql.DB) *sql.DB {
 }
 
 // FetchByPK returns a row of T type with given primary key value
-func FetchByPK[T any](val any, pkName string, db *sql.DB) *T {
-	w := NewWhere("WHERE "+pkName+"=?", val)
+func FetchByPK[T any](db *sql.DB, pkName []string, val ...any) *T {
+	sql := "WHERE " + pkName[0] + "=?"
+	for _, name := range pkName[1:] {
+		sql += " AND " + name + "=?"
+	}
+	w := NewWhere(sql, val...)
 	return FindOne[T](w, db)
 }
 
