@@ -174,7 +174,7 @@ func (c *SongId) resetUpdated() {
 }
 
 func (c *SongId) IsPrimaryKey() bool {
-	return false
+	return true
 }
 
 func (c *SongId) GetValPointer() any {

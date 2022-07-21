@@ -22,10 +22,14 @@ func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 		}
 
 		for _, rd := range tableDesc {
-			if rd.Key == "PRI" && t.PKey == nil {
-				t.PKey = &structs.PrimaryKey{}
-				t.PKey.Name = rd.Field
-				t.PKey.Columns = []string{rd.Field}
+			if rd.Key == "PRI" {
+				if t.PKey == nil {
+					t.PKey = &structs.PrimaryKey{}
+					t.PKey.Name = rd.Field
+					t.PKey.Columns = []string{rd.Field}
+				} else {
+					t.PKey.Columns = append(t.PKey.Columns, rd.Field)
+				}
 			}
 		}
 
