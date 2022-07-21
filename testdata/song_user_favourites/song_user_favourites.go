@@ -39,24 +39,29 @@ func (*SongUserFavouriteTable) GetTableName() string {
 
 var table *SongUserFavouriteTable
 
+type PK struct {
+	UserId uint
+	SongId uint
+}
+
 // FetchSongUserFavouriteByPKs returns a row from song_user_favourites table with given primary key value
-func FetchSongUserFavouriteByPK(val uint) *SongUserFavourite {
-	return coredb.FetchByPK[SongUserFavourite](val, "user_id", _db)
+func FetchSongUserFavouriteByPK(val PK) *SongUserFavourite {
+	return coredb.FetchByPK[SongUserFavourite](_db, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FetchByPKs returns a row with selected fields from song_user_favourites table with given primary key value
-func FetchByPK[T any](val uint) *T {
-	return coredb.FetchByPK[T](val, "user_id", _db)
+func FetchByPK[T any](val PK) *T {
+	return coredb.FetchByPK[T](_db, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FetchSongUserFavouriteByPKs returns rows with from song_user_favourites table with given primary key values
-func FetchSongUserFavouriteByPKs(vals ...uint) []*SongUserFavourite {
+func FetchSongUserFavouriteByPKs(vals ...PK) []*SongUserFavourite {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[SongUserFavourite](pks, "user_id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from song_user_favourites table with given primary key values
-func FetchByPKs[T any](vals ...uint) []*T {
+func FetchByPKs[T any](vals ...PK) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](pks, "user_id", _db)
 }

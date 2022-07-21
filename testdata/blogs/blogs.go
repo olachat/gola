@@ -49,12 +49,12 @@ var table *BlogTable
 
 // FetchBlogByPKs returns a row from blogs table with given primary key value
 func FetchBlogByPK(val int) *Blog {
-	return coredb.FetchByPK[Blog](val, "id", _db)
+	return coredb.FetchByPK[Blog](_db, []string{"id"}, val)
 }
 
 // FetchByPKs returns a row with selected fields from blogs table with given primary key value
 func FetchByPK[T any](val int) *T {
-	return coredb.FetchByPK[T](val, "id", _db)
+	return coredb.FetchByPK[T](_db, []string{"id"}, val)
 }
 
 // FetchBlogByPKs returns rows with from blogs table with given primary key values

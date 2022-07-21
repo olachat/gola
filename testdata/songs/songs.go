@@ -35,12 +35,12 @@ var table *SongTable
 
 // FetchSongByPKs returns a row from songs table with given primary key value
 func FetchSongByPK(val uint) *Song {
-	return coredb.FetchByPK[Song](val, "id", _db)
+	return coredb.FetchByPK[Song](_db, []string{"id"}, val)
 }
 
 // FetchByPKs returns a row with selected fields from songs table with given primary key value
 func FetchByPK[T any](val uint) *T {
-	return coredb.FetchByPK[T](val, "id", _db)
+	return coredb.FetchByPK[T](_db, []string{"id"}, val)
 }
 
 // FetchSongByPKs returns rows with from songs table with given primary key values

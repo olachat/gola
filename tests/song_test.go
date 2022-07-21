@@ -37,7 +37,10 @@ func TestSong(t *testing.T) {
 	if updated != false {
 		t.Error("Avoid update failed")
 	}
-	obj := song_user_favourites.FetchSongUserFavouriteByPK(3)
+	obj := song_user_favourites.FetchSongUserFavouriteByPK(song_user_favourites.PK{
+		UserId: 3,
+		SongId: 99,
+	})
 	if obj == nil || obj.GetSongId() != 99 {
 		t.Error("SongUserFavourite insert failed")
 	}
@@ -62,7 +65,10 @@ func TestSong(t *testing.T) {
 		t.Error("SongUserFavourite void update failed")
 	}
 
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(4)
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(song_user_favourites.PK{
+		UserId: 4,
+		SongId: 99,
+	})
 	if obj != nil {
 		t.Error("SongUserFavourite update PK failed")
 	}

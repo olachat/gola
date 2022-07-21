@@ -53,12 +53,12 @@ var table *UserTable
 
 // FetchUserByPKs returns a row from users table with given primary key value
 func FetchUserByPK(val int) *User {
-	return coredb.FetchByPK[User](val, "id", _db)
+	return coredb.FetchByPK[User](_db, []string{"id"}, val)
 }
 
 // FetchByPKs returns a row with selected fields from users table with given primary key value
 func FetchByPK[T any](val int) *T {
-	return coredb.FetchByPK[T](val, "id", _db)
+	return coredb.FetchByPK[T](_db, []string{"id"}, val)
 }
 
 // FetchUserByPKs returns rows with from users table with given primary key values
