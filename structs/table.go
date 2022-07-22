@@ -64,13 +64,7 @@ func (t *Table) GetPrimaryKeyType() string {
 
 // GetPrimaryKeyName returns the first column name of the primary key
 func (t *Table) GetPrimaryKeyName() string {
-	for _, c := range t.Columns {
-		if c.IsPrimaryKey() {
-			return c.Name
-		}
-	}
-
-	return ""
+	return t.GetPKColumns()[0].Name
 }
 
 // GetPrimaryKeyNames returns the column name of the primary key
