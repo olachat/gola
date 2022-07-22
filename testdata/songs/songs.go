@@ -102,15 +102,6 @@ func (c *Id) GetId() uint {
 	return c.val
 }
 
-func (c *Id) SetId(val uint) bool {
-	if c.val == val {
-		return false
-	}
-	c._updated = true
-	c.val = val
-	return true
-}
-
 func (c *Id) GetColumnName() string {
 	return "id"
 }
@@ -231,6 +222,16 @@ func NewSong() *Song {
 	}
 }
 
+func NewSongWithPK(val uint) *Song {
+	c := &Song{
+		Id{},
+		Title{},
+		Hash{val: ""},
+	}
+	c.Id.val = val
+	return c
+}
+
 func (c *Song) Insert() error {
 	sql := `INSERT INTO songs (title, hash) values (?, ?)`
 
@@ -244,7 +245,7 @@ func (c *Song) Insert() error {
 		return err
 	}
 
-	c.SetId(uint(id))
+	c.Id.val = uint(id)
 
 	affectedRows, err := result.RowsAffected()
 	if err != nil {

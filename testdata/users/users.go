@@ -168,15 +168,6 @@ func (c *Id) GetId() int {
 	return c.val
 }
 
-func (c *Id) SetId(val int) bool {
-	if c.val == val {
-		return false
-	}
-	c._updated = true
-	c.val = val
-	return true
-}
-
 func (c *Id) GetColumnName() string {
 	return "id"
 }
@@ -717,6 +708,25 @@ func NewUser() *User {
 	}
 }
 
+func NewUserWithPK(val int) *User {
+	c := &User{
+		Id{},
+		Name{val: ""},
+		Email{val: ""},
+		CreatedAt{val: uint(0)},
+		UpdatedAt{val: uint(0)},
+		FloatType{val: float32(0)},
+		DoubleType{val: float64(0)},
+		Hobby{val: "swimming"},
+		HobbyNoDefault{},
+		Sports{val: "swim,football"},
+		Sports2{val: "swim,football"},
+		SportsNoDefault{},
+	}
+	c.Id.val = val
+	return c
+}
+
 func (c *User) Insert() error {
 	sql := `INSERT INTO users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports, sports2, sports_no_default) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
@@ -730,7 +740,7 @@ func (c *User) Insert() error {
 		return err
 	}
 
-	c.SetId(int(id))
+	c.Id.val = int(id)
 
 	affectedRows, err := result.RowsAffected()
 	if err != nil {

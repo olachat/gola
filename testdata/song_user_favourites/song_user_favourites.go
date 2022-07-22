@@ -103,15 +103,6 @@ func (c *UserId) GetUserId() uint {
 	return c.val
 }
 
-func (c *UserId) SetUserId(val uint) bool {
-	if c.val == val {
-		return false
-	}
-	c._updated = true
-	c.val = val
-	return true
-}
-
 func (c *UserId) GetColumnName() string {
 	return "user_id"
 }
@@ -145,15 +136,6 @@ type SongId struct {
 
 func (c *SongId) GetSongId() uint {
 	return c.val
-}
-
-func (c *SongId) SetSongId(val uint) bool {
-	if c.val == val {
-		return false
-	}
-	c._updated = true
-	c.val = val
-	return true
 }
 
 func (c *SongId) GetColumnName() string {
@@ -356,8 +338,8 @@ func (c *UpdatedAt) GetTableType() coredb.TableType {
 	return table
 }
 
-func NewSongUserFavourite() *SongUserFavourite {
-	return &SongUserFavourite{
+func NewSongUserFavouriteWithPK(val PK) *SongUserFavourite {
+	c := &SongUserFavourite{
 		UserId{},
 		SongId{},
 		Remark{},
@@ -365,6 +347,9 @@ func NewSongUserFavourite() *SongUserFavourite {
 		CreatedAt{val: time.Now()},
 		UpdatedAt{val: time.Now()},
 	}
+	c.UserId.val = val.UserId
+	c.SongId.val = val.SongId
+	return c
 }
 
 func (c *SongUserFavourite) Insert() error {

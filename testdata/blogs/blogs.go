@@ -116,15 +116,6 @@ func (c *Id) GetId() int {
 	return c.val
 }
 
-func (c *Id) SetId(val int) bool {
-	if c.val == val {
-		return false
-	}
-	c._updated = true
-	c.val = val
-	return true
-}
-
 func (c *Id) GetColumnName() string {
 	return "id"
 }
@@ -560,6 +551,23 @@ func NewBlog() *Blog {
 	}
 }
 
+func NewBlogWithPK(val int) *Blog {
+	c := &Blog{
+		Id{},
+		UserId{val: int(0)},
+		Slug{val: ""},
+		Title{val: ""},
+		CategoryId{val: int(0)},
+		IsPinned{val: int8(0)},
+		IsVip{val: int8(0)},
+		Country{val: ""},
+		CreatedAt{val: uint(0)},
+		UpdatedAt{val: uint(0)},
+	}
+	c.Id.val = val
+	return c
+}
+
 func (c *Blog) Insert() error {
 	sql := `INSERT INTO blogs (user_id, slug, title, category_id, is_pinned, is_vip, country, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
@@ -573,7 +581,7 @@ func (c *Blog) Insert() error {
 		return err
 	}
 
-	c.SetId(int(id))
+	c.Id.val = int(id)
 
 	affectedRows, err := result.RowsAffected()
 	if err != nil {
