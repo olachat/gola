@@ -24,6 +24,8 @@ const (
 	UserIdDesc
 	SongIdAsc
 	SongIdDesc
+	RemarkAsc
+	RemarkDesc
 	IsFavouriteAsc
 	IsFavouriteDesc
 	CreatedAtAsc
@@ -44,6 +46,10 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 			q.orders[i] = "song_id asc"
 		case SongIdDesc:
 			q.orders[i] = "song_id desc"
+		case RemarkAsc:
+			q.orders[i] = "remark asc"
+		case RemarkDesc:
+			q.orders[i] = "remark desc"
 		case IsFavouriteAsc:
 			q.orders[i] = "is_favourite asc"
 		case IsFavouriteDesc:

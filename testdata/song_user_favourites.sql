@@ -1,6 +1,7 @@
 CREATE TABLE `song_user_favourites` (
   `user_id` int(10) unsigned NOT NULL COMMENT 'User ID',
   `song_id` int(10) unsigned NOT NULL COMMENT 'Song ID',
+  `remark` varchar(100) NOT NULL COMMENT 'favourite remark',
   `is_favourite` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Is favourite',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create Time',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Last Update Time',

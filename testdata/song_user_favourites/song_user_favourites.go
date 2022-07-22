@@ -23,6 +23,8 @@ type SongUserFavourite struct {
 	UserId
 	// Song ID int unsigned
 	SongId
+	// favourite remark varchar(100)
+	Remark
 	// Is favourite tinyint
 	IsFavourite
 	// Create Time timestamp
@@ -178,6 +180,50 @@ func (c *SongId) GetTableType() coredb.TableType {
 	return table
 }
 
+// Remark field
+// favourite remark
+type Remark struct {
+	_updated bool
+	val      string
+}
+
+func (c *Remark) GetRemark() string {
+	return c.val
+}
+
+func (c *Remark) SetRemark(val string) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
+	c.val = val
+	return true
+}
+
+func (c *Remark) GetColumnName() string {
+	return "remark"
+}
+
+func (c *Remark) IsUpdated() bool {
+	return c._updated
+}
+
+func (c *Remark) resetUpdated() {
+	c._updated = false
+}
+
+func (c *Remark) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Remark) GetValPointer() any {
+	return &c.val
+}
+
+func (c *Remark) GetTableType() coredb.TableType {
+	return table
+}
+
 // IsFavourite field
 // Is favourite
 type IsFavourite struct {
@@ -314,6 +360,7 @@ func NewSongUserFavourite() *SongUserFavourite {
 	return &SongUserFavourite{
 		UserId{},
 		SongId{},
+		Remark{},
 		IsFavourite{val: int8(1)},
 		CreatedAt{val: time.Now()},
 		UpdatedAt{val: time.Now()},
@@ -321,9 +368,9 @@ func NewSongUserFavourite() *SongUserFavourite {
 }
 
 func (c *SongUserFavourite) Insert() error {
-	sql := `INSERT INTO song_user_favourites (user_id, song_id, is_favourite, created_at, updated_at) values (?, ?, ?, ?, ?)`
+	sql := `INSERT INTO song_user_favourites (user_id, song_id, remark, is_favourite, created_at, updated_at) values (?, ?, ?, ?, ?, ?)`
 
-	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
@@ -344,6 +391,7 @@ func (c *SongUserFavourite) Insert() error {
 func (c *SongUserFavourite) resetUpdated() {
 	c.UserId.resetUpdated()
 	c.SongId.resetUpdated()
+	c.Remark.resetUpdated()
 	c.IsFavourite.resetUpdated()
 	c.CreatedAt.resetUpdated()
 	c.UpdatedAt.resetUpdated()
@@ -357,6 +405,10 @@ func (c *SongUserFavourite) Update() (bool, error) {
 	}
 	if c.SongId.IsUpdated() {
 		return false, coredb.ErrPKChanged
+	}
+	if c.Remark.IsUpdated() {
+		updatedFields = append(updatedFields, "remark = ?")
+		params = append(params, c.GetRemark())
 	}
 	if c.IsFavourite.IsUpdated() {
 		updatedFields = append(updatedFields, "is_favourite = ?")
@@ -377,8 +429,8 @@ func (c *SongUserFavourite) Update() (bool, error) {
 		return false, nil
 	}
 
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE user_id = ?"
-	params = append(params, c.GetUserId())
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE user_id = ? and song_id = ?"
+	params = append(params, c.GetUserId(), c.GetSongId())
 
 	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
@@ -401,9 +453,9 @@ func (c *SongUserFavourite) Update() (bool, error) {
 }
 
 func (c *SongUserFavourite) Delete() error {
-	sql := `DELETE FROM song_user_favourites WHERE user_id = ?`
+	sql := `DELETE FROM song_user_favourites WHERE user_id = ? and song_id = ?`
 
-	_, err := coredb.Exec(sql, _db, c.GetUserId())
+	_, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId())
 	return err
 }
 

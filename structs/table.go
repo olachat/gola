@@ -67,6 +67,16 @@ func (t *Table) GetPrimaryKeyName() string {
 	return t.GetPKColumns()[0].Name
 }
 
+// GetPrimaryKeySQL returns primary key for sql where condition
+func (t *Table) GetPrimaryKeySQL() string {
+	var result []string
+	for _, c := range t.GetPKColumns() {
+		result = append(result, c.Name+" = ?")
+	}
+
+	return strings.Join(result, " and ")
+}
+
 // GetPrimaryKeyNames returns the column name of the primary key
 func (t *Table) GetPrimaryKeyNames() string {
 	var result []string
@@ -87,6 +97,16 @@ func (t *Table) GetPrimaryKeyVals() string {
 	var result []string
 	for _, c := range cols {
 		result = append(result, "val."+c.GoName())
+	}
+
+	return strings.Join(result, ", ")
+}
+
+// GetPrimaryKeyParams returns primary key for paramters
+func (t *Table) GetPrimaryKeyParams() string {
+	var result []string
+	for _, c := range t.GetPKColumns() {
+		result = append(result, "c.Get"+c.GoName()+"()")
 	}
 
 	return strings.Join(result, ", ")

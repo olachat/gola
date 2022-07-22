@@ -45,6 +45,20 @@ func TestSong(t *testing.T) {
 		t.Error("SongUserFavourite insert failed")
 	}
 
+	obj.SetRemark("bingo")
+	ok, err := obj.Update()
+	if !ok || err != nil {
+		t.Error("SongUserFavourite update failed")
+	}
+
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(song_user_favourites.PK{
+		UserId: 3,
+		SongId: 99,
+	})
+	if obj.GetRemark() != "bingo" {
+		t.Error("SongUserFavourite update failed")
+	}
+
 	/* TODO: This case is not yet supported, as it actually result in SQL
 		update song_user_favourites set user_id=4 where user_id=4
 
@@ -73,5 +87,22 @@ func TestSong(t *testing.T) {
 	})
 	if obj != nil {
 		t.Error("SongUserFavourite update PK failed")
+	}
+
+	// test delete
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(song_user_favourites.PK{
+		UserId: 3,
+		SongId: 99,
+	})
+	err = obj.Delete()
+	if err != nil {
+		t.Error("SongUserFavourite delete fail")
+	}
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(song_user_favourites.PK{
+		UserId: 3,
+		SongId: 99,
+	})
+	if obj != nil {
+		t.Error("SongUserFavourite delete failed")
 	}
 }
