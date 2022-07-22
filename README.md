@@ -45,9 +45,10 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
     - [ ] uniuqe index
     - [x] paging & order
       - [ ] paging using cursor
-- [ ] better primary key support
+- [x] better primary key support
   - [x] Single Key types / names
-  - [ ] Composite key
+  - [x] Composite key
+  - [x] Non auto incremental pk
 - [ ] db types
   - [ ] timestamp
   - [x] boolean
