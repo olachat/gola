@@ -54,18 +54,6 @@ func FetchByPK[T any](val PK) *T {
 	return coredb.FetchByPK[T](_db, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
-// FetchSongUserFavouriteByPKs returns rows with from song_user_favourites table with given primary key values
-func FetchSongUserFavouriteByPKs(vals ...PK) []*SongUserFavourite {
-	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[SongUserFavourite](pks, "user_id", _db)
-}
-
-// FetchByPKs returns rows with selected fields from song_user_favourites table with given primary key values
-func FetchByPKs[T any](vals ...PK) []*T {
-	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "user_id", _db)
-}
-
 // FindOneSongUserFavourite returns a row from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneSongUserFavourite(whereSQL string, params ...any) *SongUserFavourite {

@@ -49,7 +49,7 @@ func Fetch{{.ClassName}}ByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 func FetchByPK[T any](val {{.GetPrimaryKeyType}}) *T {
 	return coredb.FetchByPK[T](_db, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
-
+{{- if not .HasCompositePrimaryKey }}
 // Fetch{{.ClassName}}ByPKs returns rows with from {{.Name}} table with given primary key values
 func Fetch{{.ClassName}}ByPKs(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
 	pks := coredb.GetAnySlice(vals)
@@ -61,6 +61,7 @@ func FetchByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](pks, "{{.GetPrimaryKeyName}}", _db)
 }
+{{- end}}
 
 // FindOne{{.ClassName}} returns a row from {{.Name}} table with arbitary where query
 // whereSQL must start with "where ..."
