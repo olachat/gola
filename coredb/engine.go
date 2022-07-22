@@ -29,8 +29,12 @@ func getDB(db *sql.DB) *sql.DB {
 }
 
 // FetchByPK returns a row of T type with given primary key value
-func FetchByPK[T any](val any, pkName string, db *sql.DB) *T {
-	w := NewWhere("WHERE "+pkName+"=?", val)
+func FetchByPK[T any](db *sql.DB, pkName []string, val ...any) *T {
+	sql := "WHERE " + pkName[0] + "=?"
+	for _, name := range pkName[1:] {
+		sql += " AND " + name + "=?"
+	}
+	w := NewWhere(sql, val...)
 	return FindOne[T](w, db)
 }
 
@@ -40,7 +44,7 @@ func FetchByPKs[T any](vals []any, pkName string, db *sql.DB) []*T {
 		return make([]*T, 0)
 	}
 
-	query := fmt.Sprintf("WHERE %s in (%s)", pkName, GetParamPlaceHolder(len(vals)))
+	query := fmt.Sprintf("WHERE %s IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
 	w := NewWhere(query, vals...)
 
 	result, _ := Find[T](w, db)
@@ -66,10 +70,13 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	err2 := mydb.QueryRow(query, params...).Scan(data...)
 
 	if err2 != nil {
-		if err2 == sql.ErrNoRows {
-			return nil
+		// It's on purpose the hide the error
+		// But should re-consider later
+		if err2 != sql.ErrNoRows {
+			log.Fatal(err2)
 		}
-		log.Fatal(err2)
+
+		return nil
 	}
 
 	return u

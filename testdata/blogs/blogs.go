@@ -49,12 +49,12 @@ var table *BlogTable
 
 // FetchBlogByPKs returns a row from blogs table with given primary key value
 func FetchBlogByPK(val int) *Blog {
-	return coredb.FetchByPK[Blog](val, "id", _db)
+	return coredb.FetchByPK[Blog](_db, []string{"id"}, val)
 }
 
 // FetchByPKs returns a row with selected fields from blogs table with given primary key value
 func FetchByPK[T any](val int) *T {
-	return coredb.FetchByPK[T](val, "id", _db)
+	return coredb.FetchByPK[T](_db, []string{"id"}, val)
 }
 
 // FetchBlogByPKs returns rows with from blogs table with given primary key values
@@ -116,21 +116,16 @@ func (c *Id) GetId() int {
 	return c.val
 }
 
-func (c *Id) SetId(val int) bool {
-	if c.val == val {
-		return false
-	}
-	c._updated = true
-	c.val = val
-	return true
-}
-
 func (c *Id) GetColumnName() string {
 	return "id"
 }
 
 func (c *Id) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *Id) resetUpdated() {
+	c._updated = false
 }
 
 func (c *Id) IsPrimaryKey() bool {
@@ -173,6 +168,10 @@ func (c *UserId) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *UserId) resetUpdated() {
+	c._updated = false
+}
+
 func (c *UserId) IsPrimaryKey() bool {
 	return false
 }
@@ -211,6 +210,10 @@ func (c *Slug) GetColumnName() string {
 
 func (c *Slug) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *Slug) resetUpdated() {
+	c._updated = false
 }
 
 func (c *Slug) IsPrimaryKey() bool {
@@ -253,6 +256,10 @@ func (c *Title) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *Title) resetUpdated() {
+	c._updated = false
+}
+
 func (c *Title) IsPrimaryKey() bool {
 	return false
 }
@@ -291,6 +298,10 @@ func (c *CategoryId) GetColumnName() string {
 
 func (c *CategoryId) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *CategoryId) resetUpdated() {
+	c._updated = false
 }
 
 func (c *CategoryId) IsPrimaryKey() bool {
@@ -333,6 +344,10 @@ func (c *IsPinned) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *IsPinned) resetUpdated() {
+	c._updated = false
+}
+
 func (c *IsPinned) IsPrimaryKey() bool {
 	return false
 }
@@ -371,6 +386,10 @@ func (c *IsVip) GetColumnName() string {
 
 func (c *IsVip) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *IsVip) resetUpdated() {
+	c._updated = false
 }
 
 func (c *IsVip) IsPrimaryKey() bool {
@@ -413,6 +432,10 @@ func (c *Country) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *Country) resetUpdated() {
+	c._updated = false
+}
+
 func (c *Country) IsPrimaryKey() bool {
 	return false
 }
@@ -451,6 +474,10 @@ func (c *CreatedAt) GetColumnName() string {
 
 func (c *CreatedAt) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *CreatedAt) resetUpdated() {
+	c._updated = false
 }
 
 func (c *CreatedAt) IsPrimaryKey() bool {
@@ -493,6 +520,10 @@ func (c *UpdatedAt) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *UpdatedAt) resetUpdated() {
+	c._updated = false
+}
+
 func (c *UpdatedAt) IsPrimaryKey() bool {
 	return false
 }
@@ -520,6 +551,23 @@ func NewBlog() *Blog {
 	}
 }
 
+func NewBlogWithPK(val int) *Blog {
+	c := &Blog{
+		Id{},
+		UserId{val: int(0)},
+		Slug{val: ""},
+		Title{val: ""},
+		CategoryId{val: int(0)},
+		IsPinned{val: int8(0)},
+		IsVip{val: int8(0)},
+		Country{val: ""},
+		CreatedAt{val: uint(0)},
+		UpdatedAt{val: uint(0)},
+	}
+	c.Id.val = val
+	return c
+}
+
 func (c *Blog) Insert() error {
 	sql := `INSERT INTO blogs (user_id, slug, title, category_id, is_pinned, is_vip, country, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
@@ -533,13 +581,39 @@ func (c *Blog) Insert() error {
 		return err
 	}
 
-	c.SetId(int(id))
+	c.Id.val = int(id)
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affectedRows != 1 {
+		return coredb.ErrAvoidInsert
+	}
+
+	c.resetUpdated()
 	return nil
+}
+
+func (c *Blog) resetUpdated() {
+	c.Id.resetUpdated()
+	c.UserId.resetUpdated()
+	c.Slug.resetUpdated()
+	c.Title.resetUpdated()
+	c.CategoryId.resetUpdated()
+	c.IsPinned.resetUpdated()
+	c.IsVip.resetUpdated()
+	c.Country.resetUpdated()
+	c.CreatedAt.resetUpdated()
+	c.UpdatedAt.resetUpdated()
 }
 
 func (c *Blog) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
+	if c.Id.IsUpdated() {
+		return false, coredb.ErrPKChanged
+	}
 	if c.UserId.IsUpdated() {
 		updatedFields = append(updatedFields, "user_id = ?")
 		params = append(params, c.GetUserId())
@@ -586,11 +660,23 @@ func (c *Blog) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
 	params = append(params, c.GetId())
 
-	_, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
 		return false, err
 	}
 
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	c.resetUpdated()
 	return true, nil
 }
 

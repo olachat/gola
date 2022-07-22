@@ -235,53 +235,9 @@ func (m *MySQLDriver) Columns(schema string, table *structs.Table, tableName str
 
 // PrimaryKeyInfo looks up the primary key for a table.
 func (m *MySQLDriver) PrimaryKeyInfo(schema, tableName string) (*structs.PrimaryKey, error) {
-	pkey := &structs.PrimaryKey{}
-	var err error
-
-	query := `
-	select tc.constraint_name
-	from information_schema.table_constraints as tc
-	where tc.table_name = ? and tc.constraint_type = 'PRIMARY KEY' and tc.table_schema = ?;`
-
-	row := m.conn.QueryRow(query, tableName, schema)
-	if err = row.Scan(&pkey.Name); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	queryColumns := `
-	select kcu.column_name
-	from   information_schema.key_column_usage as kcu
-	where  table_name = ? and constraint_name = ? and table_schema = ?
-	order by kcu.ordinal_position;`
-
-	var rows *sql.Rows
-	if rows, err = m.conn.Query(queryColumns, tableName, pkey.Name, schema); err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var columns []string
-	for rows.Next() {
-		var column string
-
-		err = rows.Scan(&column)
-		if err != nil {
-			return nil, err
-		}
-
-		columns = append(columns, column)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	pkey.Columns = columns
-
-	return pkey, nil
+	// dummy
+	// actual implementation in SetIndexAndKey
+	return nil, nil
 }
 
 // ForeignKeyInfo retrieves the foreign keys for a given table name.

@@ -53,12 +53,12 @@ var table *UserTable
 
 // FetchUserByPKs returns a row from users table with given primary key value
 func FetchUserByPK(val int) *User {
-	return coredb.FetchByPK[User](val, "id", _db)
+	return coredb.FetchByPK[User](_db, []string{"id"}, val)
 }
 
 // FetchByPKs returns a row with selected fields from users table with given primary key value
 func FetchByPK[T any](val int) *T {
-	return coredb.FetchByPK[T](val, "id", _db)
+	return coredb.FetchByPK[T](_db, []string{"id"}, val)
 }
 
 // FetchUserByPKs returns rows with from users table with given primary key values
@@ -168,21 +168,16 @@ func (c *Id) GetId() int {
 	return c.val
 }
 
-func (c *Id) SetId(val int) bool {
-	if c.val == val {
-		return false
-	}
-	c._updated = true
-	c.val = val
-	return true
-}
-
 func (c *Id) GetColumnName() string {
 	return "id"
 }
 
 func (c *Id) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *Id) resetUpdated() {
+	c._updated = false
 }
 
 func (c *Id) IsPrimaryKey() bool {
@@ -225,6 +220,10 @@ func (c *Name) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *Name) resetUpdated() {
+	c._updated = false
+}
+
 func (c *Name) IsPrimaryKey() bool {
 	return false
 }
@@ -263,6 +262,10 @@ func (c *Email) GetColumnName() string {
 
 func (c *Email) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *Email) resetUpdated() {
+	c._updated = false
 }
 
 func (c *Email) IsPrimaryKey() bool {
@@ -305,6 +308,10 @@ func (c *CreatedAt) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *CreatedAt) resetUpdated() {
+	c._updated = false
+}
+
 func (c *CreatedAt) IsPrimaryKey() bool {
 	return false
 }
@@ -343,6 +350,10 @@ func (c *UpdatedAt) GetColumnName() string {
 
 func (c *UpdatedAt) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *UpdatedAt) resetUpdated() {
+	c._updated = false
 }
 
 func (c *UpdatedAt) IsPrimaryKey() bool {
@@ -385,6 +396,10 @@ func (c *FloatType) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *FloatType) resetUpdated() {
+	c._updated = false
+}
+
 func (c *FloatType) IsPrimaryKey() bool {
 	return false
 }
@@ -423,6 +438,10 @@ func (c *DoubleType) GetColumnName() string {
 
 func (c *DoubleType) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *DoubleType) resetUpdated() {
+	c._updated = false
 }
 
 func (c *DoubleType) IsPrimaryKey() bool {
@@ -465,6 +484,10 @@ func (c *Hobby) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *Hobby) resetUpdated() {
+	c._updated = false
+}
+
 func (c *Hobby) IsPrimaryKey() bool {
 	return false
 }
@@ -503,6 +526,10 @@ func (c *HobbyNoDefault) GetColumnName() string {
 
 func (c *HobbyNoDefault) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *HobbyNoDefault) resetUpdated() {
+	c._updated = false
 }
 
 func (c *HobbyNoDefault) IsPrimaryKey() bool {
@@ -550,6 +577,10 @@ func (c *Sports) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *Sports) resetUpdated() {
+	c._updated = false
+}
+
 func (c *Sports) IsPrimaryKey() bool {
 	return false
 }
@@ -593,6 +624,10 @@ func (c *Sports2) GetColumnName() string {
 
 func (c *Sports2) IsUpdated() bool {
 	return c._updated
+}
+
+func (c *Sports2) resetUpdated() {
+	c._updated = false
 }
 
 func (c *Sports2) IsPrimaryKey() bool {
@@ -640,6 +675,10 @@ func (c *SportsNoDefault) IsUpdated() bool {
 	return c._updated
 }
 
+func (c *SportsNoDefault) resetUpdated() {
+	c._updated = false
+}
+
 func (c *SportsNoDefault) IsPrimaryKey() bool {
 	return false
 }
@@ -669,6 +708,25 @@ func NewUser() *User {
 	}
 }
 
+func NewUserWithPK(val int) *User {
+	c := &User{
+		Id{},
+		Name{val: ""},
+		Email{val: ""},
+		CreatedAt{val: uint(0)},
+		UpdatedAt{val: uint(0)},
+		FloatType{val: float32(0)},
+		DoubleType{val: float64(0)},
+		Hobby{val: "swimming"},
+		HobbyNoDefault{},
+		Sports{val: "swim,football"},
+		Sports2{val: "swim,football"},
+		SportsNoDefault{},
+	}
+	c.Id.val = val
+	return c
+}
+
 func (c *User) Insert() error {
 	sql := `INSERT INTO users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports, sports2, sports_no_default) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
@@ -682,13 +740,41 @@ func (c *User) Insert() error {
 		return err
 	}
 
-	c.SetId(int(id))
+	c.Id.val = int(id)
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affectedRows != 1 {
+		return coredb.ErrAvoidInsert
+	}
+
+	c.resetUpdated()
 	return nil
+}
+
+func (c *User) resetUpdated() {
+	c.Id.resetUpdated()
+	c.Name.resetUpdated()
+	c.Email.resetUpdated()
+	c.CreatedAt.resetUpdated()
+	c.UpdatedAt.resetUpdated()
+	c.FloatType.resetUpdated()
+	c.DoubleType.resetUpdated()
+	c.Hobby.resetUpdated()
+	c.HobbyNoDefault.resetUpdated()
+	c.Sports.resetUpdated()
+	c.Sports2.resetUpdated()
+	c.SportsNoDefault.resetUpdated()
 }
 
 func (c *User) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
+	if c.Id.IsUpdated() {
+		return false, coredb.ErrPKChanged
+	}
 	if c.Name.IsUpdated() {
 		updatedFields = append(updatedFields, "name = ?")
 		params = append(params, c.GetName())
@@ -743,11 +829,23 @@ func (c *User) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
 	params = append(params, c.GetId())
 
-	_, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
 		return false, err
 	}
 
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	c.resetUpdated()
 	return true, nil
 }
 

@@ -23,7 +23,7 @@ const (
 	testDBName string = "testdb"
 )
 
-var tableNames = []string{"users", "blogs"}
+var tableNames = []string{"users", "blogs", "songs", "song_user_favourites"}
 
 func init() {
 	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
@@ -75,8 +75,7 @@ type SimpleUser struct {
 }
 
 func TestUserInsert(t *testing.T) {
-	u := users.NewUser()
-	u.SetId(11)
+	u := users.NewUserWithPK(11)
 	u.SetEmail("hello")
 	u.SetName("maou sheng")
 	u.SetCreatedAt(111)
