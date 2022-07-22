@@ -244,7 +244,13 @@ func (c *{{.ClassName}}) resetUpdated() {
 func (c *{{.ClassName}}) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	{{- range $i, $c := .GetNonAutoIncrementColumns }}
+	{{- range $i, $c := .GetPKColumns }}
+	if c.{{ $c.GoName }}.IsUpdated() {
+		return false, coredb.ErrPKChanged
+	}
+	{{- end }}
+
+	{{- range $i, $c := .GetNonPKColumns }}
 	if c.{{ $c.GoName }}.IsUpdated() {
 		updatedFields = append(updatedFields, "{{ $c.Name }} = ?")
 		params = append(params, c.Get{{ $c.GoName }}())

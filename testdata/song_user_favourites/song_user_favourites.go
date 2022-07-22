@@ -365,12 +365,10 @@ func (c *SongUserFavourite) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
 	if c.UserId.IsUpdated() {
-		updatedFields = append(updatedFields, "user_id = ?")
-		params = append(params, c.GetUserId())
+		return false, coredb.ErrPKChanged
 	}
 	if c.SongId.IsUpdated() {
-		updatedFields = append(updatedFields, "song_id = ?")
-		params = append(params, c.GetSongId())
+		return false, coredb.ErrPKChanged
 	}
 	if c.IsFavourite.IsUpdated() {
 		updatedFields = append(updatedFields, "is_favourite = ?")

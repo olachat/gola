@@ -139,8 +139,8 @@ func (t *Table) GetNonAutoIncrementColumns() []Column {
 	return result
 }
 
-// NonPrimaryColumns returns all columns except primary key
-func (t *Table) NonPrimaryColumns() []Column {
+// GetNonPKColumns returns all columns except primary key
+func (t *Table) GetNonPKColumns() []Column {
 	result := make([]Column, 0, len(t.Columns))
 
 	for _, c := range t.Columns {

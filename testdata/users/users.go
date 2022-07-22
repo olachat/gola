@@ -762,6 +762,9 @@ func (c *User) resetUpdated() {
 func (c *User) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
+	if c.Id.IsUpdated() {
+		return false, coredb.ErrPKChanged
+	}
 	if c.Name.IsUpdated() {
 		updatedFields = append(updatedFields, "name = ?")
 		params = append(params, c.GetName())

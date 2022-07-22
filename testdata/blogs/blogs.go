@@ -603,6 +603,9 @@ func (c *Blog) resetUpdated() {
 func (c *Blog) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
+	if c.Id.IsUpdated() {
+		return false, coredb.ErrPKChanged
+	}
 	if c.UserId.IsUpdated() {
 		updatedFields = append(updatedFields, "user_id = ?")
 		params = append(params, c.GetUserId())

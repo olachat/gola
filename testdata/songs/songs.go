@@ -267,6 +267,9 @@ func (c *Song) resetUpdated() {
 func (c *Song) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
+	if c.Id.IsUpdated() {
+		return false, coredb.ErrPKChanged
+	}
 	if c.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "title = ?")
 		params = append(params, c.GetTitle())

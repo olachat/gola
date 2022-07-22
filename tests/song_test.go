@@ -56,10 +56,12 @@ func TestSong(t *testing.T) {
 	Just keep test cases here, if they failed, guess it means PK updated is supported
 	And these test case should be udpated.
 	*/
+
+	// TODO: Better hide this method
 	f.SetUserId(4)
 	updated, err = f.Update()
-	if err != coredb.ErrAvoidUpdate {
-		t.Error("Avoid update detect failed")
+	if err != coredb.ErrPKChanged {
+		t.Error("ErrPKChanged detect failed")
 	}
 	if updated != false || f.GetUserId() != 4 {
 		t.Error("SongUserFavourite void update failed")
