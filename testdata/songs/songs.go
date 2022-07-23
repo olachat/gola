@@ -20,9 +20,9 @@ func Setup(db *sql.DB) {
 type Song struct {
 	//  int unsigned
 	Id
-	// Song title varchar(100)
+	// Song title varchar
 	Title
-	// Song file hash checksum varchar(128)
+	// Song file hash checksum varchar
 	Hash
 }
 
@@ -223,7 +223,7 @@ func NewSong() *Song {
 	return &Song{
 		Id{},
 		Title{},
-		Hash{val: ""},
+		Hash{},
 	}
 }
 
@@ -231,7 +231,7 @@ func NewSongWithPK(val uint) *Song {
 	c := &Song{
 		Id{},
 		Title{},
-		Hash{val: ""},
+		Hash{},
 	}
 	c.Id.val = val
 	return c

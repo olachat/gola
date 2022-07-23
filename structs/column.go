@@ -68,18 +68,6 @@ var dbTypeToGoTypes = map[string]string{
 	"bigint unsigned":   "uint64",
 }
 
-var dbTypeToPHPTypes = map[string]string{
-	"tinyint":           "int",
-	"smallint":          "int",
-	"int":               "int",
-	"bigint":            "int",
-	"tinyint unsigned":  "int",
-	"smallint unsigned": "int",
-	"int unsigned":      "int",
-	"bigint unsigned":   "int",
-	"double":            "float",
-}
-
 // SQLType returns data type in mysql of the column
 func (c Column) SQLType() string {
 	if sqlType, ok := dbTypeToSQLTypes[c.FullDBType]; ok {
@@ -159,6 +147,10 @@ func (c Column) SQLType() string {
 
 // GoType returns type in go of the column
 func (c Column) GoType() string {
+	if c.FullDBType == "tinyint(1)" {
+		return "bool"
+	}
+
 	if goType, ok := dbTypeToGoTypes[c.DBType]; ok {
 		return goType
 	}
@@ -177,48 +169,6 @@ func (c Column) GoType() string {
 
 	if c.IsSet() {
 		return c.Table.ClassName() + c.GoName()
-	}
-
-	if strings.HasPrefix(c.DBType, "set") {
-		return "string"
-	}
-
-	if strings.Contains(c.DBType, "text") || strings.HasPrefix(c.DBType, "blob") {
-		return "string"
-	}
-
-	if strings.HasPrefix(c.DBType, "timestamp") {
-		return "time.Time"
-	}
-
-	ct := &sqlparser.ColumnType{
-		Type: c.DBType,
-	}
-	res, err := sql.ColumnTypeToType(ct)
-	if err != nil {
-		panic(err)
-	}
-
-	baseType := strings.ToLower(res.Type().String())
-	return baseType
-}
-
-// PHPType returns data type in PHP of the column
-func (c Column) PHPType() string {
-	if goType, ok := dbTypeToPHPTypes[c.DBType]; ok {
-		return goType
-	}
-
-	if strings.HasPrefix(c.DBType, "varchar") || strings.HasPrefix(c.DBType, "char") {
-		return "string"
-	}
-
-	if strings.HasPrefix(c.DBType, "decimal") {
-		return "float"
-	}
-
-	if c.IsEnum() {
-		return "string"
 	}
 
 	if strings.HasPrefix(c.DBType, "set") {
@@ -268,22 +218,26 @@ func (c Column) HasDefault() bool {
 	return len(c.Default) > 0
 }
 
+func getQuotedStr(str string) string {
+	if strings.HasPrefix(str, "\"") && strings.HasSuffix(str, "\"") {
+		return str
+	}
+	return "\"" + str + "\""
+}
+
 // GoDefaultValue returns the go value of column's default value
 func (c Column) GoDefaultValue() string {
 	goType := c.GoType()
 	lowerCaseDefault := strings.ToLower(c.Default)
 	if goType == "string" || c.IsEnum() {
-		if strings.HasPrefix(lowerCaseDefault, "\"") && strings.HasSuffix(lowerCaseDefault, "\"") {
-			return lowerCaseDefault
-		}
-		return "\"" + lowerCaseDefault + "\""
+		return getQuotedStr(lowerCaseDefault)
 	}
 	if goType == "string" || c.IsSet() {
 		lowerCaseNoSpaceDefault := strings.ReplaceAll(lowerCaseDefault, " ", "")
 		if strings.HasPrefix(lowerCaseNoSpaceDefault, "(") && strings.HasSuffix(lowerCaseNoSpaceDefault, ")") {
 			return lowerCaseNoSpaceDefault[1 : len(lowerCaseNoSpaceDefault)-1]
 		}
-		return lowerCaseNoSpaceDefault
+		return getQuotedStr(lowerCaseDefault)
 	}
 
 	if goType == "time.Time" {
@@ -291,6 +245,13 @@ func (c Column) GoDefaultValue() string {
 			return "time.Now()"
 		}
 		return c.Default
+	}
+
+	if goType == "bool" {
+		if c.Default == "0" {
+			return "false"
+		}
+		return "true"
 	}
 
 	if strings.Contains(goType, "int") || strings.Contains(goType, "float") {
@@ -308,6 +269,11 @@ func (c Column) IsEnum() bool {
 // IsSet returns if column type is set
 func (c Column) IsSet() bool {
 	return strings.HasPrefix(c.DBType, "set")
+}
+
+// IsBool returns if column type is boolean as tinyint(1)
+func (c Column) IsBool() bool {
+	return c.FullDBType == "tinyint(1)"
 }
 
 // GetEnumConst returns enum const definitions in go

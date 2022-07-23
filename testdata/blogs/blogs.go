@@ -22,9 +22,9 @@ type Blog struct {
 	Id
 	// User Id int
 	UserId
-	// Slug varchar(255)
+	// Slug varchar
 	Slug
-	// Title varchar(255)
+	// Title varchar
 	Title
 	// Category Id int
 	CategoryId
@@ -32,7 +32,7 @@ type Blog struct {
 	IsPinned
 	// Is VIP reader only tinyint
 	IsVip
-	// Country of the blog user varchar(255)
+	// Country of the blog user varchar
 	Country
 	// Created Timestamp int unsigned
 	CreatedAt
@@ -325,14 +325,14 @@ func (c *CategoryId) GetTableType() coredb.TableType {
 // Is pinned to top
 type IsPinned struct {
 	_updated bool
-	val      int8
+	val      bool
 }
 
-func (c *IsPinned) GetIsPinned() int8 {
+func (c *IsPinned) GetIsPinned() bool {
 	return c.val
 }
 
-func (c *IsPinned) SetIsPinned(val int8) bool {
+func (c *IsPinned) SetIsPinned(val bool) bool {
 	if c.val == val {
 		return false
 	}
@@ -369,14 +369,14 @@ func (c *IsPinned) GetTableType() coredb.TableType {
 // Is VIP reader only
 type IsVip struct {
 	_updated bool
-	val      int8
+	val      bool
 }
 
-func (c *IsVip) GetIsVip() int8 {
+func (c *IsVip) GetIsVip() bool {
 	return c.val
 }
 
-func (c *IsVip) SetIsVip(val int8) bool {
+func (c *IsVip) SetIsVip(val bool) bool {
 	if c.val == val {
 		return false
 	}
@@ -545,12 +545,12 @@ func NewBlog() *Blog {
 	return &Blog{
 		Id{},
 		UserId{val: int(0)},
-		Slug{val: ""},
-		Title{val: ""},
+		Slug{},
+		Title{},
 		CategoryId{val: int(0)},
-		IsPinned{val: int8(0)},
-		IsVip{val: int8(0)},
-		Country{val: ""},
+		IsPinned{val: false},
+		IsVip{val: false},
+		Country{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
 	}
@@ -560,12 +560,12 @@ func NewBlogWithPK(val int) *Blog {
 	c := &Blog{
 		Id{},
 		UserId{val: int(0)},
-		Slug{val: ""},
-		Title{val: ""},
+		Slug{},
+		Title{},
 		CategoryId{val: int(0)},
-		IsPinned{val: int8(0)},
-		IsVip{val: int8(0)},
-		Country{val: ""},
+		IsPinned{val: false},
+		IsVip{val: false},
+		Country{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
 	}

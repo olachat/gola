@@ -24,7 +24,7 @@ type SongUserFavourite struct {
 	UserId
 	// Song ID int unsigned
 	SongId
-	// favourite remark varchar(100)
+	// favourite remark varchar
 	Remark
 	// Is favourite tinyint
 	IsFavourite
@@ -216,14 +216,14 @@ func (c *Remark) GetTableType() coredb.TableType {
 // Is favourite
 type IsFavourite struct {
 	_updated bool
-	val      int8
+	val      bool
 }
 
-func (c *IsFavourite) GetIsFavourite() int8 {
+func (c *IsFavourite) GetIsFavourite() bool {
 	return c.val
 }
 
-func (c *IsFavourite) SetIsFavourite(val int8) bool {
+func (c *IsFavourite) SetIsFavourite(val bool) bool {
 	if c.val == val {
 		return false
 	}
@@ -349,7 +349,7 @@ func NewSongUserFavouriteWithPK(val PK) *SongUserFavourite {
 		UserId{},
 		SongId{},
 		Remark{},
-		IsFavourite{val: int8(1)},
+		IsFavourite{val: true},
 		CreatedAt{val: time.Now()},
 		UpdatedAt{val: time.Now()},
 	}

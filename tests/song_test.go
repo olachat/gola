@@ -49,13 +49,61 @@ func TestSong(t *testing.T) {
 	if !ok || err != nil {
 		t.Error("SongUserFavourite update failed")
 	}
-
 	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
 	if obj.GetRemark() != "bingo" {
 		t.Error("SongUserFavourite update failed")
 	}
 }
-func TestSongDelte(t *testing.T) {
+
+func TestSongBoolUpdate(t *testing.T) {
+	pk := song_user_favourites.PK{
+		UserId: 3,
+		SongId: 99,
+	}
+	obj := song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	if obj.GetRemark() != "bingo" {
+		t.Error("SongUserFavourite update failed")
+	}
+	if obj.GetIsFavourite() != true {
+		t.Error("SongUserFavourite GetIsFavourite failed")
+	}
+	obj.SetIsFavourite(false)
+	obj.Update()
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	if obj.GetIsFavourite() != false {
+		t.Error("SongUserFavourite GetIsFavourite update false failed")
+	}
+
+	obj.SetIsFavourite(true)
+	obj.Update()
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	if obj.GetIsFavourite() != true {
+		t.Error("SongUserFavourite GetIsFavourite update true failed")
+	}
+
+	pb := song_user_favourites.FetchByPK[struct {
+		song_user_favourites.SongId
+		song_user_favourites.UserId
+		song_user_favourites.IsFavourite
+	}](pk)
+	if obj.GetIsFavourite() != true {
+		t.Error("SongUserFavourite GetIsFavourite failed")
+	}
+	ok := pb.SetIsFavourite(false)
+	if !ok {
+		t.Error("SetIsFavourite failed")
+	}
+	ok, err := song_user_favourites.Update(pb)
+	if !ok || err != nil {
+		t.Error("pb update failed")
+	}
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	if obj.GetIsFavourite() != false {
+		t.Error("SongUserFavourite GetIsFavourite update failed")
+	}
+}
+
+func TestSongDelete(t *testing.T) {
 	pk := song_user_favourites.PK{
 		UserId: 3,
 		SongId: 99,

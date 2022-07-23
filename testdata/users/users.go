@@ -20,9 +20,9 @@ func Setup(db *sql.DB) {
 type User struct {
 	//  int
 	Id
-	// Name varchar(255)
+	// Name varchar
 	Name
-	// Email address varchar(255)
+	// Email address varchar
 	Email
 	// Created Timestamp int unsigned
 	CreatedAt
@@ -699,15 +699,15 @@ func (c *SportsNoDefault) GetTableType() coredb.TableType {
 func NewUser() *User {
 	return &User{
 		Id{},
-		Name{val: ""},
-		Email{val: ""},
+		Name{},
+		Email{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
 		FloatType{val: float32(0)},
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
-		Sports{val: "swim,football"},
+		Sports{val: "swim, football"},
 		Sports2{val: "swim,football"},
 		SportsNoDefault{},
 	}
@@ -716,15 +716,15 @@ func NewUser() *User {
 func NewUserWithPK(val int) *User {
 	c := &User{
 		Id{},
-		Name{val: ""},
-		Email{val: ""},
+		Name{},
+		Email{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
 		FloatType{val: float32(0)},
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
-		Sports{val: "swim,football"},
+		Sports{val: "swim, football"},
 		Sports2{val: "swim,football"},
 		SportsNoDefault{},
 	}
