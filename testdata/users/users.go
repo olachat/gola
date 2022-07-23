@@ -773,65 +773,64 @@ func (c *User) resetUpdated() {
 	c.SportsNoDefault.resetUpdated()
 }
 
-func (c *User) Update() (bool, error) {
+func (obj *User) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	if c.Id.IsUpdated() {
+	if obj.Id.IsUpdated() {
 		return false, coredb.ErrPKChanged
 	}
-	if c.Name.IsUpdated() {
+	if obj.Name.IsUpdated() {
 		updatedFields = append(updatedFields, "name = ?")
-		params = append(params, c.GetName())
+		params = append(params, obj.GetName())
 	}
-	if c.Email.IsUpdated() {
+	if obj.Email.IsUpdated() {
 		updatedFields = append(updatedFields, "email = ?")
-		params = append(params, c.GetEmail())
+		params = append(params, obj.GetEmail())
 	}
-	if c.CreatedAt.IsUpdated() {
+	if obj.CreatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "created_at = ?")
-		params = append(params, c.GetCreatedAt())
+		params = append(params, obj.GetCreatedAt())
 	}
-	if c.UpdatedAt.IsUpdated() {
+	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "updated_at = ?")
-		params = append(params, c.GetUpdatedAt())
+		params = append(params, obj.GetUpdatedAt())
 	}
-	if c.FloatType.IsUpdated() {
+	if obj.FloatType.IsUpdated() {
 		updatedFields = append(updatedFields, "float_type = ?")
-		params = append(params, c.GetFloatType())
+		params = append(params, obj.GetFloatType())
 	}
-	if c.DoubleType.IsUpdated() {
+	if obj.DoubleType.IsUpdated() {
 		updatedFields = append(updatedFields, "double_type = ?")
-		params = append(params, c.GetDoubleType())
+		params = append(params, obj.GetDoubleType())
 	}
-	if c.Hobby.IsUpdated() {
+	if obj.Hobby.IsUpdated() {
 		updatedFields = append(updatedFields, "hobby = ?")
-		params = append(params, c.GetHobby())
+		params = append(params, obj.GetHobby())
 	}
-	if c.HobbyNoDefault.IsUpdated() {
+	if obj.HobbyNoDefault.IsUpdated() {
 		updatedFields = append(updatedFields, "hobby_no_default = ?")
-		params = append(params, c.GetHobbyNoDefault())
+		params = append(params, obj.GetHobbyNoDefault())
 	}
-	if c.Sports.IsUpdated() {
+	if obj.Sports.IsUpdated() {
 		updatedFields = append(updatedFields, "sports = ?")
-		params = append(params, c.GetSports())
+		params = append(params, obj.GetSports())
 	}
-	if c.Sports2.IsUpdated() {
+	if obj.Sports2.IsUpdated() {
 		updatedFields = append(updatedFields, "sports2 = ?")
-		params = append(params, c.GetSports2())
+		params = append(params, obj.GetSports2())
 	}
-	if c.SportsNoDefault.IsUpdated() {
+	if obj.SportsNoDefault.IsUpdated() {
 		updatedFields = append(updatedFields, "sports_no_default = ?")
-		params = append(params, c.GetSportsNoDefault())
+		params = append(params, obj.GetSportsNoDefault())
 	}
-
-	sql := "UPDATE users SET "
 
 	if len(updatedFields) == 0 {
 		return false, nil
 	}
 
+	sql := "UPDATE users SET "
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
-	params = append(params, c.GetId())
+	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
@@ -849,7 +848,7 @@ func (c *User) Update() (bool, error) {
 		return false, coredb.ErrMultipleUpdate
 	}
 
-	c.resetUpdated()
+	obj.resetUpdated()
 	return true, nil
 }
 
@@ -857,16 +856,16 @@ func Update[T any](obj *T) (bool, error) {
 	return coredb.Update(obj, _db)
 }
 
-func (c *User) Delete() error {
+func (obj *User) Delete() error {
 	sql := `DELETE FROM users WHERE id = ?`
 
-	_, err := coredb.Exec(sql, _db, c.GetId())
+	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }
 
-func Delete(c WithPK) error {
+func Delete(obj WithPK) error {
 	sql := `DELETE FROM users WHERE id = ?`
 
-	_, err := coredb.Exec(sql, _db, c.GetId())
+	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }

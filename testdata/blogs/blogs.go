@@ -612,57 +612,56 @@ func (c *Blog) resetUpdated() {
 	c.UpdatedAt.resetUpdated()
 }
 
-func (c *Blog) Update() (bool, error) {
+func (obj *Blog) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	if c.Id.IsUpdated() {
+	if obj.Id.IsUpdated() {
 		return false, coredb.ErrPKChanged
 	}
-	if c.UserId.IsUpdated() {
+	if obj.UserId.IsUpdated() {
 		updatedFields = append(updatedFields, "user_id = ?")
-		params = append(params, c.GetUserId())
+		params = append(params, obj.GetUserId())
 	}
-	if c.Slug.IsUpdated() {
+	if obj.Slug.IsUpdated() {
 		updatedFields = append(updatedFields, "slug = ?")
-		params = append(params, c.GetSlug())
+		params = append(params, obj.GetSlug())
 	}
-	if c.Title.IsUpdated() {
+	if obj.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "title = ?")
-		params = append(params, c.GetTitle())
+		params = append(params, obj.GetTitle())
 	}
-	if c.CategoryId.IsUpdated() {
+	if obj.CategoryId.IsUpdated() {
 		updatedFields = append(updatedFields, "category_id = ?")
-		params = append(params, c.GetCategoryId())
+		params = append(params, obj.GetCategoryId())
 	}
-	if c.IsPinned.IsUpdated() {
+	if obj.IsPinned.IsUpdated() {
 		updatedFields = append(updatedFields, "is_pinned = ?")
-		params = append(params, c.GetIsPinned())
+		params = append(params, obj.GetIsPinned())
 	}
-	if c.IsVip.IsUpdated() {
+	if obj.IsVip.IsUpdated() {
 		updatedFields = append(updatedFields, "is_vip = ?")
-		params = append(params, c.GetIsVip())
+		params = append(params, obj.GetIsVip())
 	}
-	if c.Country.IsUpdated() {
+	if obj.Country.IsUpdated() {
 		updatedFields = append(updatedFields, "country = ?")
-		params = append(params, c.GetCountry())
+		params = append(params, obj.GetCountry())
 	}
-	if c.CreatedAt.IsUpdated() {
+	if obj.CreatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "created_at = ?")
-		params = append(params, c.GetCreatedAt())
+		params = append(params, obj.GetCreatedAt())
 	}
-	if c.UpdatedAt.IsUpdated() {
+	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "updated_at = ?")
-		params = append(params, c.GetUpdatedAt())
+		params = append(params, obj.GetUpdatedAt())
 	}
-
-	sql := "UPDATE blogs SET "
 
 	if len(updatedFields) == 0 {
 		return false, nil
 	}
 
+	sql := "UPDATE blogs SET "
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
-	params = append(params, c.GetId())
+	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
@@ -680,7 +679,7 @@ func (c *Blog) Update() (bool, error) {
 		return false, coredb.ErrMultipleUpdate
 	}
 
-	c.resetUpdated()
+	obj.resetUpdated()
 	return true, nil
 }
 
@@ -688,16 +687,16 @@ func Update[T any](obj *T) (bool, error) {
 	return coredb.Update(obj, _db)
 }
 
-func (c *Blog) Delete() error {
+func (obj *Blog) Delete() error {
 	sql := `DELETE FROM blogs WHERE id = ?`
 
-	_, err := coredb.Exec(sql, _db, c.GetId())
+	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }
 
-func Delete(c WithPK) error {
+func Delete(obj WithPK) error {
 	sql := `DELETE FROM blogs WHERE id = ?`
 
-	_, err := coredb.Exec(sql, _db, c.GetId())
+	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }

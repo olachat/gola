@@ -106,7 +106,7 @@ func (t *Table) GetPrimaryKeyVals() string {
 func (t *Table) GetPrimaryKeyParams() string {
 	var result []string
 	for _, c := range t.GetPKColumns() {
-		result = append(result, "c.Get"+c.GoName()+"()")
+		result = append(result, "obj.Get"+c.GoName()+"()")
 	}
 
 	return strings.Join(result, ", ")

@@ -272,28 +272,27 @@ func (c *{{.ClassName}}) resetUpdated() {
 	{{- end }}
 }
 
-func (c *{{.ClassName}}) Update() (bool, error) {
+func (obj *{{.ClassName}}) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
 	{{- range $i, $c := .GetPKColumns }}
-	if c.{{ $c.GoName }}.IsUpdated() {
+	if obj.{{ $c.GoName }}.IsUpdated() {
 		return false, coredb.ErrPKChanged
 	}
 	{{- end }}
 
 	{{- range $i, $c := .GetNonPKColumns }}
-	if c.{{ $c.GoName }}.IsUpdated() {
+	if obj.{{ $c.GoName }}.IsUpdated() {
 		updatedFields = append(updatedFields, "{{ $c.Name }} = ?")
-		params = append(params, c.Get{{ $c.GoName }}())
+		params = append(params, obj.Get{{ $c.GoName }}())
 	}
 	{{- end }}
-
-	sql := "UPDATE {{.Name}} SET "
 
 	if len(updatedFields) == 0 {
 		return false, nil
 	}
 
+	sql := "UPDATE {{.Name}} SET "
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeySQL}}"
 	params = append(params, {{.GetPrimaryKeyParams}})
 
@@ -313,7 +312,7 @@ func (c *{{.ClassName}}) Update() (bool, error) {
 		return false, coredb.ErrMultipleUpdate
 	}
 
-	c.resetUpdated()
+	obj.resetUpdated()
 	return true, nil
 }
 
@@ -321,14 +320,14 @@ func Update[T any](obj *T) (bool, error) {
 	return coredb.Update(obj, _db)
 }
 
-func (c *{{.ClassName}}) Delete() (error) {
+func (obj *{{.ClassName}}) Delete() (error) {
 	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeySQL}}`
 
 	_, err := coredb.Exec(sql, _db, {{.GetPrimaryKeyParams}})
 	return err
 }
 
-func Delete(c WithPK) (error) {
+func Delete(obj WithPK) (error) {
 	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeySQL}}`
 
 	_, err := coredb.Exec(sql, _db, {{.GetPrimaryKeyParams}})

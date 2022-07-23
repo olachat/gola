@@ -269,29 +269,28 @@ func (c *Song) resetUpdated() {
 	c.Hash.resetUpdated()
 }
 
-func (c *Song) Update() (bool, error) {
+func (obj *Song) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	if c.Id.IsUpdated() {
+	if obj.Id.IsUpdated() {
 		return false, coredb.ErrPKChanged
 	}
-	if c.Title.IsUpdated() {
+	if obj.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "title = ?")
-		params = append(params, c.GetTitle())
+		params = append(params, obj.GetTitle())
 	}
-	if c.Hash.IsUpdated() {
+	if obj.Hash.IsUpdated() {
 		updatedFields = append(updatedFields, "hash = ?")
-		params = append(params, c.GetHash())
+		params = append(params, obj.GetHash())
 	}
-
-	sql := "UPDATE songs SET "
 
 	if len(updatedFields) == 0 {
 		return false, nil
 	}
 
+	sql := "UPDATE songs SET "
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
-	params = append(params, c.GetId())
+	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
@@ -309,7 +308,7 @@ func (c *Song) Update() (bool, error) {
 		return false, coredb.ErrMultipleUpdate
 	}
 
-	c.resetUpdated()
+	obj.resetUpdated()
 	return true, nil
 }
 
@@ -317,16 +316,16 @@ func Update[T any](obj *T) (bool, error) {
 	return coredb.Update(obj, _db)
 }
 
-func (c *Song) Delete() error {
+func (obj *Song) Delete() error {
 	sql := `DELETE FROM songs WHERE id = ?`
 
-	_, err := coredb.Exec(sql, _db, c.GetId())
+	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }
 
-func Delete(c WithPK) error {
+func Delete(obj WithPK) error {
 	sql := `DELETE FROM songs WHERE id = ?`
 
-	_, err := coredb.Exec(sql, _db, c.GetId())
+	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }
