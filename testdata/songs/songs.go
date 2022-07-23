@@ -99,8 +99,7 @@ func Find[T any](whereSQL string, params ...any) ([]*T, error) {
 // Id field
 //
 type Id struct {
-	_updated bool
-	val      uint
+	val uint
 }
 
 func (c *Id) GetId() uint {

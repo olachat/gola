@@ -101,8 +101,7 @@ func Find[T any](whereSQL string, params ...any) ([]*T, error) {
 // UserId field
 // User ID
 type UserId struct {
-	_updated bool
-	val      uint
+	val uint
 }
 
 func (c *UserId) GetUserId() uint {
@@ -128,8 +127,7 @@ func (c *UserId) GetTableType() coredb.TableType {
 // SongId field
 // Song ID
 type SongId struct {
-	_updated bool
-	val      uint
+	val uint
 }
 
 func (c *SongId) GetSongId() uint {

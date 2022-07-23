@@ -165,8 +165,7 @@ const (
 // Id field
 //
 type Id struct {
-	_updated bool
-	val      int
+	val int
 }
 
 func (c *Id) GetId() int {

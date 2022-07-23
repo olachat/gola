@@ -150,7 +150,9 @@ func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) bool {
 }
 {{else}}
 type {{.GoName}} struct {
+{{- if not .IsPrimaryKey}}
 	_updated bool
+{{- end}}
 	val {{.GoType}}
 }
 
