@@ -4,6 +4,7 @@ package {{.Package}}
 {{$table := .}}
 import (
 	"database/sql"
+	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
@@ -40,6 +41,12 @@ type PK struct {
 	{{- end }}
 }
 {{- end}}
+
+type WithPK interface {
+	{{- range .GetPKColumns }}
+	Get{{.GoName}}() {{.GoType}}
+	{{- end }}
+}
 
 // Fetch{{.ClassName}}ByPKs returns a row from {{.Name}} table with given primary key value
 func Fetch{{.ClassName}}ByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
@@ -266,28 +273,27 @@ func (c *{{.ClassName}}) resetUpdated() {
 	{{- end }}
 }
 
-func (c *{{.ClassName}}) Update() (bool, error) {
+func (obj *{{.ClassName}}) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
 	{{- range $i, $c := .GetPKColumns }}
-	if c.{{ $c.GoName }}.IsUpdated() {
+	if obj.{{ $c.GoName }}.IsUpdated() {
 		return false, coredb.ErrPKChanged
 	}
 	{{- end }}
 
 	{{- range $i, $c := .GetNonPKColumns }}
-	if c.{{ $c.GoName }}.IsUpdated() {
+	if obj.{{ $c.GoName }}.IsUpdated() {
 		updatedFields = append(updatedFields, "{{ $c.Name }} = ?")
-		params = append(params, c.Get{{ $c.GoName }}())
+		params = append(params, obj.Get{{ $c.GoName }}())
 	}
 	{{- end }}
-
-	sql := `UPDATE {{.Name}} SET `
 
 	if len(updatedFields) == 0 {
 		return false, nil
 	}
 
+	sql := "UPDATE {{.Name}} SET "
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeySQL}}"
 	params = append(params, {{.GetPrimaryKeyParams}})
 
@@ -307,17 +313,74 @@ func (c *{{.ClassName}}) Update() (bool, error) {
 		return false, coredb.ErrMultipleUpdate
 	}
 
-	c.resetUpdated()
+	obj.resetUpdated()
 	return true, nil
 }
 
-func (c *{{.ClassName}}) Delete() (error) {
+func Update(obj WithPK) (bool, error) {
+	var updatedFields []string
+	var params []any
+	var resetFuncs []func()
+
+	val := reflect.ValueOf(obj).Elem()
+	updatedFields = make([]string, 0, val.NumField())
+	params = make([]any, 0, val.NumField())
+
+	for i := 0; i < val.NumField(); i++ {
+		col := val.Field(i).Addr().Interface()
+
+		switch c := col.(type) {
+		{{- range $i, $c := .GetNonPKColumns }}
+		case *{{.GoName}}:
+		if c.IsUpdated() {
+			updatedFields = append(updatedFields, "{{ $c.Name }} = ?")
+			params = append(params, c.Get{{ $c.GoName }}())
+			resetFuncs = append(resetFuncs, c.resetUpdated)
+		}
+		{{- end }}
+		}
+	}
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql := "UPDATE {{.Name}} SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeySQL}}"
+	params = append(params, {{.GetPrimaryKeyParams}})
+
+	result, err := coredb.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	for _, f := range resetFuncs {
+		f()
+	}
+	return true, nil
+}
+
+func (obj *{{.ClassName}}) Delete() (error) {
 	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeySQL}}`
 
 	_, err := coredb.Exec(sql, _db, {{.GetPrimaryKeyParams}})
 	return err
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Delete(obj WithPK) (error) {
+	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeySQL}}`
+
+	_, err := coredb.Exec(sql, _db, {{.GetPrimaryKeyParams}})
+	return err
 }

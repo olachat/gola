@@ -4,6 +4,7 @@ package songs
 
 import (
 	"database/sql"
+	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
@@ -32,6 +33,10 @@ func (*SongTable) GetTableName() string {
 }
 
 var table *SongTable
+
+type WithPK interface {
+	GetId() uint
+}
 
 // FetchSongByPKs returns a row from songs table with given primary key value
 func FetchSongByPK(val uint) *Song {
@@ -265,29 +270,28 @@ func (c *Song) resetUpdated() {
 	c.Hash.resetUpdated()
 }
 
-func (c *Song) Update() (bool, error) {
+func (obj *Song) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	if c.Id.IsUpdated() {
+	if obj.Id.IsUpdated() {
 		return false, coredb.ErrPKChanged
 	}
-	if c.Title.IsUpdated() {
+	if obj.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "title = ?")
-		params = append(params, c.GetTitle())
+		params = append(params, obj.GetTitle())
 	}
-	if c.Hash.IsUpdated() {
+	if obj.Hash.IsUpdated() {
 		updatedFields = append(updatedFields, "hash = ?")
-		params = append(params, c.GetHash())
+		params = append(params, obj.GetHash())
 	}
-
-	sql := `UPDATE songs SET `
 
 	if len(updatedFields) == 0 {
 		return false, nil
 	}
 
+	sql := "UPDATE songs SET "
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
-	params = append(params, c.GetId())
+	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
@@ -305,17 +309,78 @@ func (c *Song) Update() (bool, error) {
 		return false, coredb.ErrMultipleUpdate
 	}
 
-	c.resetUpdated()
+	obj.resetUpdated()
 	return true, nil
 }
 
-func (c *Song) Delete() error {
+func Update(obj WithPK) (bool, error) {
+	var updatedFields []string
+	var params []any
+	var resetFuncs []func()
+
+	val := reflect.ValueOf(obj).Elem()
+	updatedFields = make([]string, 0, val.NumField())
+	params = make([]any, 0, val.NumField())
+
+	for i := 0; i < val.NumField(); i++ {
+		col := val.Field(i).Addr().Interface()
+
+		switch c := col.(type) {
+		case *Title:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "title = ?")
+				params = append(params, c.GetTitle())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Hash:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "hash = ?")
+				params = append(params, c.GetHash())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		}
+	}
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql := "UPDATE songs SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	params = append(params, obj.GetId())
+
+	result, err := coredb.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	for _, f := range resetFuncs {
+		f()
+	}
+	return true, nil
+}
+
+func (obj *Song) Delete() error {
 	sql := `DELETE FROM songs WHERE id = ?`
 
-	_, err := coredb.Exec(sql, _db, c.GetId())
+	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Delete(obj WithPK) error {
+	sql := `DELETE FROM songs WHERE id = ?`
+
+	_, err := coredb.Exec(sql, _db, obj.GetId())
+	return err
 }

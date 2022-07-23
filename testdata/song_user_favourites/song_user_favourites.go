@@ -4,6 +4,7 @@ package song_user_favourites
 
 import (
 	"database/sql"
+	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
@@ -44,6 +45,11 @@ var table *SongUserFavouriteTable
 type PK struct {
 	UserId uint
 	SongId uint
+}
+
+type WithPK interface {
+	GetUserId() uint
+	GetSongId() uint
 }
 
 // FetchSongUserFavouriteByPKs returns a row from song_user_favourites table with given primary key value
@@ -382,40 +388,39 @@ func (c *SongUserFavourite) resetUpdated() {
 	c.UpdatedAt.resetUpdated()
 }
 
-func (c *SongUserFavourite) Update() (bool, error) {
+func (obj *SongUserFavourite) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	if c.UserId.IsUpdated() {
+	if obj.UserId.IsUpdated() {
 		return false, coredb.ErrPKChanged
 	}
-	if c.SongId.IsUpdated() {
+	if obj.SongId.IsUpdated() {
 		return false, coredb.ErrPKChanged
 	}
-	if c.Remark.IsUpdated() {
+	if obj.Remark.IsUpdated() {
 		updatedFields = append(updatedFields, "remark = ?")
-		params = append(params, c.GetRemark())
+		params = append(params, obj.GetRemark())
 	}
-	if c.IsFavourite.IsUpdated() {
+	if obj.IsFavourite.IsUpdated() {
 		updatedFields = append(updatedFields, "is_favourite = ?")
-		params = append(params, c.GetIsFavourite())
+		params = append(params, obj.GetIsFavourite())
 	}
-	if c.CreatedAt.IsUpdated() {
+	if obj.CreatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "created_at = ?")
-		params = append(params, c.GetCreatedAt())
+		params = append(params, obj.GetCreatedAt())
 	}
-	if c.UpdatedAt.IsUpdated() {
+	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "updated_at = ?")
-		params = append(params, c.GetUpdatedAt())
+		params = append(params, obj.GetUpdatedAt())
 	}
-
-	sql := `UPDATE song_user_favourites SET `
 
 	if len(updatedFields) == 0 {
 		return false, nil
 	}
 
+	sql := "UPDATE song_user_favourites SET "
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE user_id = ? and song_id = ?"
-	params = append(params, c.GetUserId(), c.GetSongId())
+	params = append(params, obj.GetUserId(), obj.GetSongId())
 
 	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
@@ -433,17 +438,90 @@ func (c *SongUserFavourite) Update() (bool, error) {
 		return false, coredb.ErrMultipleUpdate
 	}
 
-	c.resetUpdated()
+	obj.resetUpdated()
 	return true, nil
 }
 
-func (c *SongUserFavourite) Delete() error {
+func Update(obj WithPK) (bool, error) {
+	var updatedFields []string
+	var params []any
+	var resetFuncs []func()
+
+	val := reflect.ValueOf(obj).Elem()
+	updatedFields = make([]string, 0, val.NumField())
+	params = make([]any, 0, val.NumField())
+
+	for i := 0; i < val.NumField(); i++ {
+		col := val.Field(i).Addr().Interface()
+
+		switch c := col.(type) {
+		case *Remark:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "remark = ?")
+				params = append(params, c.GetRemark())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *IsFavourite:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "is_favourite = ?")
+				params = append(params, c.GetIsFavourite())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *CreatedAt:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "created_at = ?")
+				params = append(params, c.GetCreatedAt())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *UpdatedAt:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "updated_at = ?")
+				params = append(params, c.GetUpdatedAt())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		}
+	}
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql := "UPDATE song_user_favourites SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE user_id = ? and song_id = ?"
+	params = append(params, obj.GetUserId(), obj.GetSongId())
+
+	result, err := coredb.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	for _, f := range resetFuncs {
+		f()
+	}
+	return true, nil
+}
+
+func (obj *SongUserFavourite) Delete() error {
 	sql := `DELETE FROM song_user_favourites WHERE user_id = ? and song_id = ?`
 
-	_, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId())
+	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetSongId())
 	return err
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Delete(obj WithPK) error {
+	sql := `DELETE FROM song_user_favourites WHERE user_id = ? and song_id = ?`
+
+	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetSongId())
+	return err
 }

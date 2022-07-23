@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/olachat/gola/testdata/song_user_favourites"
@@ -38,10 +39,7 @@ func TestSong(t *testing.T) {
 	if updated != false {
 		t.Error("Avoid update failed")
 	}
-	obj := song_user_favourites.FetchSongUserFavouriteByPK(song_user_favourites.PK{
-		UserId: 3,
-		SongId: 99,
-	})
+	obj := song_user_favourites.FetchSongUserFavouriteByPK(pk)
 	if obj == nil || obj.GetSongId() != 99 {
 		t.Error("SongUserFavourite insert failed")
 	}
@@ -52,28 +50,81 @@ func TestSong(t *testing.T) {
 		t.Error("SongUserFavourite update failed")
 	}
 
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(song_user_favourites.PK{
-		UserId: 3,
-		SongId: 99,
-	})
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
 	if obj.GetRemark() != "bingo" {
 		t.Error("SongUserFavourite update failed")
 	}
 
 	// test delete
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(song_user_favourites.PK{
-		UserId: 3,
-		SongId: 99,
-	})
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
 	err = obj.Delete()
 	if err != nil {
 		t.Error("SongUserFavourite delete fail")
 	}
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(song_user_favourites.PK{
-		UserId: 3,
-		SongId: 99,
-	})
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
 	if obj != nil {
 		t.Error("SongUserFavourite delete failed")
+	}
+
+	obj = song_user_favourites.NewSongUserFavouriteWithPK(pk)
+	obj.SetRemark("remark")
+	err = obj.Insert()
+	if err != nil {
+		t.Error(err)
+	}
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	if obj.GetRemark() != "remark" {
+		t.Error("SongUserFavourite reinsert failed")
+	}
+
+	partialObj := song_user_favourites.FetchByPK[struct {
+		song_user_favourites.SongId
+		song_user_favourites.UserId
+		song_user_favourites.Remark
+	}](pk)
+	if partialObj.GetRemark() != "remark" {
+		t.Error("SongUserFavourite reinsert failed")
+	}
+
+	err = song_user_favourites.Delete(partialObj)
+	if err != nil {
+		t.Error(err)
+	}
+	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	if obj != nil {
+		t.Error("SongUserFavourite partial delete failed")
+	}
+}
+
+func TestSongUpdate(t *testing.T) {
+	s := songs.NewSong()
+	s.SetHash("hashhash")
+	err := s.Insert()
+	if err != nil {
+		t.Error(err)
+	}
+
+	id := s.GetId()
+
+	obj := songs.FetchByPK[struct {
+		songs.Id
+		songs.Hash
+	}](id)
+	obj.SetHash("bingo")
+	ok, err := songs.Update(obj)
+	if !ok || err != nil {
+		t.Error("Partail update failed")
+	}
+
+	s = songs.FetchSongByPK(id)
+	if s.GetHash() != "bingo" {
+		t.Error("Partail update failed")
+	}
+
+	ok, err = songs.Update(obj)
+	if ok || err != nil {
+		fmt.Printf("ok: %v\n", ok)
+		fmt.Printf("err: %v\n", err)
+		t.Error("Partail void update failed")
 	}
 }

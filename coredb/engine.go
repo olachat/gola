@@ -121,11 +121,6 @@ func Query[T any](query string, db *sql.DB, params ...any) (result []*T, err err
 	return
 }
 
-// Update given obj changes with given db instances or default
-func Update[T any](obj *T, db *sql.DB) (bool, error) {
-	return true, nil
-}
-
 // GetTableAndColumnsNames returns tablesName & column names joined by , of given type
 func GetTableAndColumnsNames[T any]() (tableName string, joinedColumnNames string) {
 	var o *T
