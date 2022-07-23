@@ -229,7 +229,10 @@ func (c Column) GoDefaultValue() string {
 		if strings.HasPrefix(lowerCaseNoSpaceDefault, "(") && strings.HasSuffix(lowerCaseNoSpaceDefault, ")") {
 			return lowerCaseNoSpaceDefault[1 : len(lowerCaseNoSpaceDefault)-1]
 		}
-		return lowerCaseNoSpaceDefault
+		if strings.HasPrefix(lowerCaseNoSpaceDefault, "\"") && strings.HasSuffix(lowerCaseNoSpaceDefault, "\"") {
+			return lowerCaseNoSpaceDefault
+		}
+		return "\"" + lowerCaseNoSpaceDefault + "\""
 	}
 
 	if goType == "time.Time" {
