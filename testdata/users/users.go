@@ -177,14 +177,6 @@ func (c *Id) GetColumnName() string {
 	return "id"
 }
 
-func (c *Id) IsUpdated() bool {
-	return c._updated
-}
-
-func (c *Id) resetUpdated() {
-	c._updated = false
-}
-
 func (c *Id) IsPrimaryKey() bool {
 	return true
 }
@@ -217,16 +209,16 @@ func (c *Name) SetName(val string) bool {
 	return true
 }
 
-func (c *Name) GetColumnName() string {
-	return "name"
-}
-
 func (c *Name) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Name) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Name) GetColumnName() string {
+	return "name"
 }
 
 func (c *Name) IsPrimaryKey() bool {
@@ -261,16 +253,16 @@ func (c *Email) SetEmail(val string) bool {
 	return true
 }
 
-func (c *Email) GetColumnName() string {
-	return "email"
-}
-
 func (c *Email) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Email) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Email) GetColumnName() string {
+	return "email"
 }
 
 func (c *Email) IsPrimaryKey() bool {
@@ -305,16 +297,16 @@ func (c *CreatedAt) SetCreatedAt(val uint) bool {
 	return true
 }
 
-func (c *CreatedAt) GetColumnName() string {
-	return "created_at"
-}
-
 func (c *CreatedAt) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *CreatedAt) resetUpdated() {
 	c._updated = false
+}
+
+func (c *CreatedAt) GetColumnName() string {
+	return "created_at"
 }
 
 func (c *CreatedAt) IsPrimaryKey() bool {
@@ -349,16 +341,16 @@ func (c *UpdatedAt) SetUpdatedAt(val uint) bool {
 	return true
 }
 
-func (c *UpdatedAt) GetColumnName() string {
-	return "updated_at"
-}
-
 func (c *UpdatedAt) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *UpdatedAt) resetUpdated() {
 	c._updated = false
+}
+
+func (c *UpdatedAt) GetColumnName() string {
+	return "updated_at"
 }
 
 func (c *UpdatedAt) IsPrimaryKey() bool {
@@ -393,16 +385,16 @@ func (c *FloatType) SetFloatType(val float32) bool {
 	return true
 }
 
-func (c *FloatType) GetColumnName() string {
-	return "float_type"
-}
-
 func (c *FloatType) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *FloatType) resetUpdated() {
 	c._updated = false
+}
+
+func (c *FloatType) GetColumnName() string {
+	return "float_type"
 }
 
 func (c *FloatType) IsPrimaryKey() bool {
@@ -437,16 +429,16 @@ func (c *DoubleType) SetDoubleType(val float64) bool {
 	return true
 }
 
-func (c *DoubleType) GetColumnName() string {
-	return "double_type"
-}
-
 func (c *DoubleType) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *DoubleType) resetUpdated() {
 	c._updated = false
+}
+
+func (c *DoubleType) GetColumnName() string {
+	return "double_type"
 }
 
 func (c *DoubleType) IsPrimaryKey() bool {
@@ -481,16 +473,16 @@ func (c *Hobby) SetHobby(val UserHobby) bool {
 	return true
 }
 
-func (c *Hobby) GetColumnName() string {
-	return "hobby"
-}
-
 func (c *Hobby) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Hobby) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Hobby) GetColumnName() string {
+	return "hobby"
 }
 
 func (c *Hobby) IsPrimaryKey() bool {
@@ -525,16 +517,16 @@ func (c *HobbyNoDefault) SetHobbyNoDefault(val UserHobbyNoDefault) bool {
 	return true
 }
 
-func (c *HobbyNoDefault) GetColumnName() string {
-	return "hobby_no_default"
-}
-
 func (c *HobbyNoDefault) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *HobbyNoDefault) resetUpdated() {
 	c._updated = false
+}
+
+func (c *HobbyNoDefault) GetColumnName() string {
+	return "hobby_no_default"
 }
 
 func (c *HobbyNoDefault) IsPrimaryKey() bool {
@@ -574,16 +566,16 @@ func (c *Sports) SetSports(val []UserSports) bool {
 	return true
 }
 
-func (c *Sports) GetColumnName() string {
-	return "sports"
-}
-
 func (c *Sports) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Sports) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Sports) GetColumnName() string {
+	return "sports"
 }
 
 func (c *Sports) IsPrimaryKey() bool {
@@ -623,16 +615,16 @@ func (c *Sports2) SetSports2(val []UserSports2) bool {
 	return true
 }
 
-func (c *Sports2) GetColumnName() string {
-	return "sports2"
-}
-
 func (c *Sports2) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Sports2) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Sports2) GetColumnName() string {
+	return "sports2"
 }
 
 func (c *Sports2) IsPrimaryKey() bool {
@@ -672,16 +664,16 @@ func (c *SportsNoDefault) SetSportsNoDefault(val []UserSportsNoDefault) bool {
 	return true
 }
 
-func (c *SportsNoDefault) GetColumnName() string {
-	return "sports_no_default"
-}
-
 func (c *SportsNoDefault) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *SportsNoDefault) resetUpdated() {
 	c._updated = false
+}
+
+func (c *SportsNoDefault) GetColumnName() string {
+	return "sports_no_default"
 }
 
 func (c *SportsNoDefault) IsPrimaryKey() bool {
@@ -760,7 +752,6 @@ func (c *User) Insert() error {
 }
 
 func (c *User) resetUpdated() {
-	c.Id.resetUpdated()
 	c.Name.resetUpdated()
 	c.Email.resetUpdated()
 	c.CreatedAt.resetUpdated()
@@ -777,9 +768,6 @@ func (c *User) resetUpdated() {
 func (obj *User) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	if obj.Id.IsUpdated() {
-		return false, coredb.ErrPKChanged
-	}
 	if obj.Name.IsUpdated() {
 		updatedFields = append(updatedFields, "name = ?")
 		params = append(params, obj.GetName())

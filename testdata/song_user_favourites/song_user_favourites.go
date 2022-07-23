@@ -113,14 +113,6 @@ func (c *UserId) GetColumnName() string {
 	return "user_id"
 }
 
-func (c *UserId) IsUpdated() bool {
-	return c._updated
-}
-
-func (c *UserId) resetUpdated() {
-	c._updated = false
-}
-
 func (c *UserId) IsPrimaryKey() bool {
 	return true
 }
@@ -146,14 +138,6 @@ func (c *SongId) GetSongId() uint {
 
 func (c *SongId) GetColumnName() string {
 	return "song_id"
-}
-
-func (c *SongId) IsUpdated() bool {
-	return c._updated
-}
-
-func (c *SongId) resetUpdated() {
-	c._updated = false
 }
 
 func (c *SongId) IsPrimaryKey() bool {
@@ -188,16 +172,16 @@ func (c *Remark) SetRemark(val string) bool {
 	return true
 }
 
-func (c *Remark) GetColumnName() string {
-	return "remark"
-}
-
 func (c *Remark) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Remark) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Remark) GetColumnName() string {
+	return "remark"
 }
 
 func (c *Remark) IsPrimaryKey() bool {
@@ -232,16 +216,16 @@ func (c *IsFavourite) SetIsFavourite(val bool) bool {
 	return true
 }
 
-func (c *IsFavourite) GetColumnName() string {
-	return "is_favourite"
-}
-
 func (c *IsFavourite) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *IsFavourite) resetUpdated() {
 	c._updated = false
+}
+
+func (c *IsFavourite) GetColumnName() string {
+	return "is_favourite"
 }
 
 func (c *IsFavourite) IsPrimaryKey() bool {
@@ -276,16 +260,16 @@ func (c *CreatedAt) SetCreatedAt(val time.Time) bool {
 	return true
 }
 
-func (c *CreatedAt) GetColumnName() string {
-	return "created_at"
-}
-
 func (c *CreatedAt) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *CreatedAt) resetUpdated() {
 	c._updated = false
+}
+
+func (c *CreatedAt) GetColumnName() string {
+	return "created_at"
 }
 
 func (c *CreatedAt) IsPrimaryKey() bool {
@@ -320,16 +304,16 @@ func (c *UpdatedAt) SetUpdatedAt(val time.Time) bool {
 	return true
 }
 
-func (c *UpdatedAt) GetColumnName() string {
-	return "updated_at"
-}
-
 func (c *UpdatedAt) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *UpdatedAt) resetUpdated() {
 	c._updated = false
+}
+
+func (c *UpdatedAt) GetColumnName() string {
+	return "updated_at"
 }
 
 func (c *UpdatedAt) IsPrimaryKey() bool {
@@ -380,8 +364,6 @@ func (c *SongUserFavourite) Insert() error {
 }
 
 func (c *SongUserFavourite) resetUpdated() {
-	c.UserId.resetUpdated()
-	c.SongId.resetUpdated()
 	c.Remark.resetUpdated()
 	c.IsFavourite.resetUpdated()
 	c.CreatedAt.resetUpdated()
@@ -391,12 +373,6 @@ func (c *SongUserFavourite) resetUpdated() {
 func (obj *SongUserFavourite) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	if obj.UserId.IsUpdated() {
-		return false, coredb.ErrPKChanged
-	}
-	if obj.SongId.IsUpdated() {
-		return false, coredb.ErrPKChanged
-	}
 	if obj.Remark.IsUpdated() {
 		updatedFields = append(updatedFields, "remark = ?")
 		params = append(params, obj.GetRemark())

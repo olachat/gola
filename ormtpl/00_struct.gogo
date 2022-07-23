@@ -168,16 +168,19 @@ func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) bool {
 }
 {{- end}}
 {{end}}
-func (c *{{.GoName}}) GetColumnName() string {
-	return "{{.Name}}"
-}
 
+{{- if not .IsPrimaryKey}}
 func (c *{{.GoName}}) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *{{.GoName}}) resetUpdated()  {
 	c._updated = false
+}
+{{- end}}
+
+func (c *{{.GoName}}) GetColumnName() string {
+	return "{{.Name}}"
 }
 
 func (c *{{.GoName}}) IsPrimaryKey() bool {
@@ -268,7 +271,7 @@ func (c *{{.ClassName}}) Insert() error {
 }
 
 func (c *{{.ClassName}}) resetUpdated() {
-	{{- range .Columns }}
+	{{- range .GetNonPKColumns }}
 	c.{{.GoName}}.resetUpdated()
 	{{- end }}
 }
@@ -276,11 +279,6 @@ func (c *{{.ClassName}}) resetUpdated() {
 func (obj *{{.ClassName}}) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	{{- range $i, $c := .GetPKColumns }}
-	if obj.{{ $c.GoName }}.IsUpdated() {
-		return false, coredb.ErrPKChanged
-	}
-	{{- end }}
 
 	{{- range $i, $c := .GetNonPKColumns }}
 	if obj.{{ $c.GoName }}.IsUpdated() {

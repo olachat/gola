@@ -125,14 +125,6 @@ func (c *Id) GetColumnName() string {
 	return "id"
 }
 
-func (c *Id) IsUpdated() bool {
-	return c._updated
-}
-
-func (c *Id) resetUpdated() {
-	c._updated = false
-}
-
 func (c *Id) IsPrimaryKey() bool {
 	return true
 }
@@ -165,16 +157,16 @@ func (c *UserId) SetUserId(val int) bool {
 	return true
 }
 
-func (c *UserId) GetColumnName() string {
-	return "user_id"
-}
-
 func (c *UserId) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *UserId) resetUpdated() {
 	c._updated = false
+}
+
+func (c *UserId) GetColumnName() string {
+	return "user_id"
 }
 
 func (c *UserId) IsPrimaryKey() bool {
@@ -209,16 +201,16 @@ func (c *Slug) SetSlug(val string) bool {
 	return true
 }
 
-func (c *Slug) GetColumnName() string {
-	return "slug"
-}
-
 func (c *Slug) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Slug) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Slug) GetColumnName() string {
+	return "slug"
 }
 
 func (c *Slug) IsPrimaryKey() bool {
@@ -253,16 +245,16 @@ func (c *Title) SetTitle(val string) bool {
 	return true
 }
 
-func (c *Title) GetColumnName() string {
-	return "title"
-}
-
 func (c *Title) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Title) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Title) GetColumnName() string {
+	return "title"
 }
 
 func (c *Title) IsPrimaryKey() bool {
@@ -297,16 +289,16 @@ func (c *CategoryId) SetCategoryId(val int) bool {
 	return true
 }
 
-func (c *CategoryId) GetColumnName() string {
-	return "category_id"
-}
-
 func (c *CategoryId) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *CategoryId) resetUpdated() {
 	c._updated = false
+}
+
+func (c *CategoryId) GetColumnName() string {
+	return "category_id"
 }
 
 func (c *CategoryId) IsPrimaryKey() bool {
@@ -341,16 +333,16 @@ func (c *IsPinned) SetIsPinned(val bool) bool {
 	return true
 }
 
-func (c *IsPinned) GetColumnName() string {
-	return "is_pinned"
-}
-
 func (c *IsPinned) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *IsPinned) resetUpdated() {
 	c._updated = false
+}
+
+func (c *IsPinned) GetColumnName() string {
+	return "is_pinned"
 }
 
 func (c *IsPinned) IsPrimaryKey() bool {
@@ -385,16 +377,16 @@ func (c *IsVip) SetIsVip(val bool) bool {
 	return true
 }
 
-func (c *IsVip) GetColumnName() string {
-	return "is_vip"
-}
-
 func (c *IsVip) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *IsVip) resetUpdated() {
 	c._updated = false
+}
+
+func (c *IsVip) GetColumnName() string {
+	return "is_vip"
 }
 
 func (c *IsVip) IsPrimaryKey() bool {
@@ -429,16 +421,16 @@ func (c *Country) SetCountry(val string) bool {
 	return true
 }
 
-func (c *Country) GetColumnName() string {
-	return "country"
-}
-
 func (c *Country) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Country) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Country) GetColumnName() string {
+	return "country"
 }
 
 func (c *Country) IsPrimaryKey() bool {
@@ -473,16 +465,16 @@ func (c *CreatedAt) SetCreatedAt(val uint) bool {
 	return true
 }
 
-func (c *CreatedAt) GetColumnName() string {
-	return "created_at"
-}
-
 func (c *CreatedAt) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *CreatedAt) resetUpdated() {
 	c._updated = false
+}
+
+func (c *CreatedAt) GetColumnName() string {
+	return "created_at"
 }
 
 func (c *CreatedAt) IsPrimaryKey() bool {
@@ -517,16 +509,16 @@ func (c *UpdatedAt) SetUpdatedAt(val uint) bool {
 	return true
 }
 
-func (c *UpdatedAt) GetColumnName() string {
-	return "updated_at"
-}
-
 func (c *UpdatedAt) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *UpdatedAt) resetUpdated() {
 	c._updated = false
+}
+
+func (c *UpdatedAt) GetColumnName() string {
+	return "updated_at"
 }
 
 func (c *UpdatedAt) IsPrimaryKey() bool {
@@ -601,7 +593,6 @@ func (c *Blog) Insert() error {
 }
 
 func (c *Blog) resetUpdated() {
-	c.Id.resetUpdated()
 	c.UserId.resetUpdated()
 	c.Slug.resetUpdated()
 	c.Title.resetUpdated()
@@ -616,9 +607,6 @@ func (c *Blog) resetUpdated() {
 func (obj *Blog) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	if obj.Id.IsUpdated() {
-		return false, coredb.ErrPKChanged
-	}
 	if obj.UserId.IsUpdated() {
 		updatedFields = append(updatedFields, "user_id = ?")
 		params = append(params, obj.GetUserId())

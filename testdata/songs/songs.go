@@ -111,14 +111,6 @@ func (c *Id) GetColumnName() string {
 	return "id"
 }
 
-func (c *Id) IsUpdated() bool {
-	return c._updated
-}
-
-func (c *Id) resetUpdated() {
-	c._updated = false
-}
-
 func (c *Id) IsPrimaryKey() bool {
 	return true
 }
@@ -151,16 +143,16 @@ func (c *Title) SetTitle(val string) bool {
 	return true
 }
 
-func (c *Title) GetColumnName() string {
-	return "title"
-}
-
 func (c *Title) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Title) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Title) GetColumnName() string {
+	return "title"
 }
 
 func (c *Title) IsPrimaryKey() bool {
@@ -195,16 +187,16 @@ func (c *Hash) SetHash(val string) bool {
 	return true
 }
 
-func (c *Hash) GetColumnName() string {
-	return "hash"
-}
-
 func (c *Hash) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *Hash) resetUpdated() {
 	c._updated = false
+}
+
+func (c *Hash) GetColumnName() string {
+	return "hash"
 }
 
 func (c *Hash) IsPrimaryKey() bool {
@@ -265,7 +257,6 @@ func (c *Song) Insert() error {
 }
 
 func (c *Song) resetUpdated() {
-	c.Id.resetUpdated()
 	c.Title.resetUpdated()
 	c.Hash.resetUpdated()
 }
@@ -273,9 +264,6 @@ func (c *Song) resetUpdated() {
 func (obj *Song) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	if obj.Id.IsUpdated() {
-		return false, coredb.ErrPKChanged
-	}
 	if obj.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "title = ?")
 		params = append(params, obj.GetTitle())
