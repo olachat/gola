@@ -51,6 +51,10 @@ func (*UserTable) GetTableName() string {
 
 var table *UserTable
 
+type WithPK interface {
+	GetId() int
+}
+
 // FetchUserByPKs returns a row from users table with given primary key value
 func FetchUserByPK(val int) *User {
 	return coredb.FetchByPK[User](_db, []string{"id"}, val)
@@ -820,7 +824,7 @@ func (c *User) Update() (bool, error) {
 		params = append(params, c.GetSportsNoDefault())
 	}
 
-	sql := `UPDATE users SET `
+	sql := "UPDATE users SET "
 
 	if len(updatedFields) == 0 {
 		return false, nil
@@ -849,6 +853,10 @@ func (c *User) Update() (bool, error) {
 	return true, nil
 }
 
+func Update[T any](obj *T) (bool, error) {
+	return coredb.Update(obj, _db)
+}
+
 func (c *User) Delete() error {
 	sql := `DELETE FROM users WHERE id = ?`
 
@@ -856,6 +864,9 @@ func (c *User) Delete() error {
 	return err
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Delete(c WithPK) error {
+	sql := `DELETE FROM users WHERE id = ?`
+
+	_, err := coredb.Exec(sql, _db, c.GetId())
+	return err
 }

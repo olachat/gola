@@ -41,6 +41,12 @@ type PK struct {
 }
 {{- end}}
 
+type WithPK interface {
+	{{- range .GetPKColumns }}
+	Get{{.GoName}}() {{.GoType}}
+	{{- end }}
+}
+
 // Fetch{{.ClassName}}ByPKs returns a row from {{.Name}} table with given primary key value
 func Fetch{{.ClassName}}ByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 	return coredb.FetchByPK[{{.ClassName}}](_db, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
@@ -282,7 +288,7 @@ func (c *{{.ClassName}}) Update() (bool, error) {
 	}
 	{{- end }}
 
-	sql := `UPDATE {{.Name}} SET `
+	sql := "UPDATE {{.Name}} SET "
 
 	if len(updatedFields) == 0 {
 		return false, nil
@@ -311,6 +317,10 @@ func (c *{{.ClassName}}) Update() (bool, error) {
 	return true, nil
 }
 
+func Update[T any](obj *T) (bool, error) {
+	return coredb.Update(obj, _db)
+}
+
 func (c *{{.ClassName}}) Delete() (error) {
 	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeySQL}}`
 
@@ -318,6 +328,9 @@ func (c *{{.ClassName}}) Delete() (error) {
 	return err
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Delete(c WithPK) (error) {
+	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeySQL}}`
+
+	_, err := coredb.Exec(sql, _db, {{.GetPrimaryKeyParams}})
+	return err
 }

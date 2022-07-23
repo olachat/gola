@@ -47,6 +47,10 @@ func (*BlogTable) GetTableName() string {
 
 var table *BlogTable
 
+type WithPK interface {
+	GetId() int
+}
+
 // FetchBlogByPKs returns a row from blogs table with given primary key value
 func FetchBlogByPK(val int) *Blog {
 	return coredb.FetchByPK[Blog](_db, []string{"id"}, val)
@@ -651,7 +655,7 @@ func (c *Blog) Update() (bool, error) {
 		params = append(params, c.GetUpdatedAt())
 	}
 
-	sql := `UPDATE blogs SET `
+	sql := "UPDATE blogs SET "
 
 	if len(updatedFields) == 0 {
 		return false, nil
@@ -680,6 +684,10 @@ func (c *Blog) Update() (bool, error) {
 	return true, nil
 }
 
+func Update[T any](obj *T) (bool, error) {
+	return coredb.Update(obj, _db)
+}
+
 func (c *Blog) Delete() error {
 	sql := `DELETE FROM blogs WHERE id = ?`
 
@@ -687,6 +695,9 @@ func (c *Blog) Delete() error {
 	return err
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Delete(c WithPK) error {
+	sql := `DELETE FROM blogs WHERE id = ?`
+
+	_, err := coredb.Exec(sql, _db, c.GetId())
+	return err
 }

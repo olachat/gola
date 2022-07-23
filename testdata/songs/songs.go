@@ -33,6 +33,10 @@ func (*SongTable) GetTableName() string {
 
 var table *SongTable
 
+type WithPK interface {
+	GetId() uint
+}
+
 // FetchSongByPKs returns a row from songs table with given primary key value
 func FetchSongByPK(val uint) *Song {
 	return coredb.FetchByPK[Song](_db, []string{"id"}, val)
@@ -280,7 +284,7 @@ func (c *Song) Update() (bool, error) {
 		params = append(params, c.GetHash())
 	}
 
-	sql := `UPDATE songs SET `
+	sql := "UPDATE songs SET "
 
 	if len(updatedFields) == 0 {
 		return false, nil
@@ -309,6 +313,10 @@ func (c *Song) Update() (bool, error) {
 	return true, nil
 }
 
+func Update[T any](obj *T) (bool, error) {
+	return coredb.Update(obj, _db)
+}
+
 func (c *Song) Delete() error {
 	sql := `DELETE FROM songs WHERE id = ?`
 
@@ -316,6 +324,9 @@ func (c *Song) Delete() error {
 	return err
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Delete(c WithPK) error {
+	sql := `DELETE FROM songs WHERE id = ?`
+
+	_, err := coredb.Exec(sql, _db, c.GetId())
+	return err
 }

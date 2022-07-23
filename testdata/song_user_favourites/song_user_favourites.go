@@ -46,6 +46,11 @@ type PK struct {
 	SongId uint
 }
 
+type WithPK interface {
+	GetUserId() uint
+	GetSongId() uint
+}
+
 // FetchSongUserFavouriteByPKs returns a row from song_user_favourites table with given primary key value
 func FetchSongUserFavouriteByPK(val PK) *SongUserFavourite {
 	return coredb.FetchByPK[SongUserFavourite](_db, []string{"user_id", "song_id"}, val.UserId, val.SongId)
@@ -408,7 +413,7 @@ func (c *SongUserFavourite) Update() (bool, error) {
 		params = append(params, c.GetUpdatedAt())
 	}
 
-	sql := `UPDATE song_user_favourites SET `
+	sql := "UPDATE song_user_favourites SET "
 
 	if len(updatedFields) == 0 {
 		return false, nil
@@ -437,6 +442,10 @@ func (c *SongUserFavourite) Update() (bool, error) {
 	return true, nil
 }
 
+func Update[T any](obj *T) (bool, error) {
+	return coredb.Update(obj, _db)
+}
+
 func (c *SongUserFavourite) Delete() error {
 	sql := `DELETE FROM song_user_favourites WHERE user_id = ? and song_id = ?`
 
@@ -444,6 +453,9 @@ func (c *SongUserFavourite) Delete() error {
 	return err
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Delete(c WithPK) error {
+	sql := `DELETE FROM song_user_favourites WHERE user_id = ? and song_id = ?`
+
+	_, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId())
+	return err
 }
