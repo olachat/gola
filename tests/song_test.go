@@ -54,10 +54,14 @@ func TestSong(t *testing.T) {
 	if obj.GetRemark() != "bingo" {
 		t.Error("SongUserFavourite update failed")
 	}
-
-	// test delete
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
-	err = obj.Delete()
+}
+func TestSongDelte(t *testing.T) {
+	pk := song_user_favourites.PK{
+		UserId: 3,
+		SongId: 99,
+	}
+	obj := song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	err := obj.Delete()
 	if err != nil {
 		t.Error("SongUserFavourite delete fail")
 	}
