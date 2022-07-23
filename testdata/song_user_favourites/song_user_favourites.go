@@ -47,7 +47,7 @@ type PK struct {
 	SongId uint
 }
 
-type WithPK interface {
+type withPK interface {
 	GetUserId() uint
 	GetSongId() uint
 }
@@ -442,7 +442,7 @@ func (obj *SongUserFavourite) Update() (bool, error) {
 	return true, nil
 }
 
-func Update(obj WithPK) (bool, error) {
+func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
 	var resetFuncs []func()
@@ -519,7 +519,7 @@ func (obj *SongUserFavourite) Delete() error {
 	return err
 }
 
-func Delete(obj WithPK) error {
+func Delete(obj withPK) error {
 	sql := `DELETE FROM song_user_favourites WHERE user_id = ? and song_id = ?`
 
 	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetSongId())

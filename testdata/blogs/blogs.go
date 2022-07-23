@@ -48,7 +48,7 @@ func (*BlogTable) GetTableName() string {
 
 var table *BlogTable
 
-type WithPK interface {
+type withPK interface {
 	GetId() int
 }
 
@@ -684,7 +684,7 @@ func (obj *Blog) Update() (bool, error) {
 	return true, nil
 }
 
-func Update(obj WithPK) (bool, error) {
+func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
 	var resetFuncs []func()
@@ -791,7 +791,7 @@ func (obj *Blog) Delete() error {
 	return err
 }
 
-func Delete(obj WithPK) error {
+func Delete(obj withPK) error {
 	sql := `DELETE FROM blogs WHERE id = ?`
 
 	_, err := coredb.Exec(sql, _db, obj.GetId())

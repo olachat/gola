@@ -34,7 +34,7 @@ func (*SongTable) GetTableName() string {
 
 var table *SongTable
 
-type WithPK interface {
+type withPK interface {
 	GetId() uint
 }
 
@@ -313,7 +313,7 @@ func (obj *Song) Update() (bool, error) {
 	return true, nil
 }
 
-func Update(obj WithPK) (bool, error) {
+func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
 	var resetFuncs []func()
@@ -378,7 +378,7 @@ func (obj *Song) Delete() error {
 	return err
 }
 
-func Delete(obj WithPK) error {
+func Delete(obj withPK) error {
 	sql := `DELETE FROM songs WHERE id = ?`
 
 	_, err := coredb.Exec(sql, _db, obj.GetId())

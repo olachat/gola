@@ -42,7 +42,7 @@ type PK struct {
 }
 {{- end}}
 
-type WithPK interface {
+type withPK interface {
 	{{- range .GetPKColumns }}
 	Get{{.GoName}}() {{.GoType}}
 	{{- end }}
@@ -317,7 +317,7 @@ func (obj *{{.ClassName}}) Update() (bool, error) {
 	return true, nil
 }
 
-func Update(obj WithPK) (bool, error) {
+func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
 	var resetFuncs []func()
@@ -378,7 +378,7 @@ func (obj *{{.ClassName}}) Delete() (error) {
 	return err
 }
 
-func Delete(obj WithPK) (error) {
+func Delete(obj withPK) (error) {
 	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeySQL}}`
 
 	_, err := coredb.Exec(sql, _db, {{.GetPrimaryKeyParams}})

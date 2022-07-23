@@ -52,7 +52,7 @@ func (*UserTable) GetTableName() string {
 
 var table *UserTable
 
-type WithPK interface {
+type withPK interface {
 	GetId() int
 }
 
@@ -853,7 +853,7 @@ func (obj *User) Update() (bool, error) {
 	return true, nil
 }
 
-func Update(obj WithPK) (bool, error) {
+func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
 	var resetFuncs []func()
@@ -972,7 +972,7 @@ func (obj *User) Delete() error {
 	return err
 }
 
-func Delete(obj WithPK) error {
+func Delete(obj withPK) error {
 	sql := `DELETE FROM users WHERE id = ?`
 
 	_, err := coredb.Exec(sql, _db, obj.GetId())
