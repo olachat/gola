@@ -24,7 +24,7 @@ type SongUserFavourite struct {
 	UserId
 	// Song ID int unsigned
 	SongId
-	// favourite remark varchar(100)
+	// favourite remark varchar
 	Remark
 	// Is favourite tinyint
 	IsFavourite

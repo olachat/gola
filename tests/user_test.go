@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	sqle "github.com/dolthub/go-mysql-server"
-	"github.com/dolthub/go-mysql-server/auth"
 	"github.com/dolthub/go-mysql-server/memory"
 	"github.com/dolthub/go-mysql-server/server"
 	gsql "github.com/dolthub/go-mysql-server/sql"
@@ -34,7 +33,6 @@ func init() {
 	config := server.Config{
 		Protocol: "tcp",
 		Address:  fmt.Sprintf("localhost:%d", testDBPort),
-		Auth:     auth.NewNativeSingle("root", "", auth.AllPermissions),
 	}
 
 	s, err := server.NewDefaultServer(config, engine)
