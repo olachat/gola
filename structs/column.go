@@ -218,25 +218,26 @@ func (c Column) HasDefault() bool {
 	return len(c.Default) > 0
 }
 
+func getQuotedStr(str string) string {
+	if strings.HasPrefix(str, "\"") && strings.HasSuffix(str, "\"") {
+		return str
+	}
+	return "\"" + str + "\""
+}
+
 // GoDefaultValue returns the go value of column's default value
 func (c Column) GoDefaultValue() string {
 	goType := c.GoType()
 	lowerCaseDefault := strings.ToLower(c.Default)
 	if goType == "string" || c.IsEnum() {
-		if strings.HasPrefix(lowerCaseDefault, "\"") && strings.HasSuffix(lowerCaseDefault, "\"") {
-			return lowerCaseDefault
-		}
-		return "\"" + lowerCaseDefault + "\""
+		return getQuotedStr(lowerCaseDefault)
 	}
 	if goType == "string" || c.IsSet() {
 		lowerCaseNoSpaceDefault := strings.ReplaceAll(lowerCaseDefault, " ", "")
 		if strings.HasPrefix(lowerCaseNoSpaceDefault, "(") && strings.HasSuffix(lowerCaseNoSpaceDefault, ")") {
 			return lowerCaseNoSpaceDefault[1 : len(lowerCaseNoSpaceDefault)-1]
 		}
-		if strings.HasPrefix(lowerCaseNoSpaceDefault, "\"") && strings.HasSuffix(lowerCaseNoSpaceDefault, "\"") {
-			return lowerCaseNoSpaceDefault
-		}
-		return "\"" + lowerCaseNoSpaceDefault + "\""
+		return getQuotedStr(lowerCaseDefault)
 	}
 
 	if goType == "time.Time" {
