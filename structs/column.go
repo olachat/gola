@@ -68,18 +68,6 @@ var dbTypeToGoTypes = map[string]string{
 	"bigint unsigned":   "uint64",
 }
 
-var dbTypeToPHPTypes = map[string]string{
-	"tinyint":           "int",
-	"smallint":          "int",
-	"int":               "int",
-	"bigint":            "int",
-	"tinyint unsigned":  "int",
-	"smallint unsigned": "int",
-	"int unsigned":      "int",
-	"bigint unsigned":   "int",
-	"double":            "float",
-}
-
 // SQLType returns data type in mysql of the column
 func (c Column) SQLType() string {
 	if sqlType, ok := dbTypeToSQLTypes[c.FullDBType]; ok {
