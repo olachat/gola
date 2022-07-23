@@ -203,48 +203,6 @@ func (c Column) GoType() string {
 	return baseType
 }
 
-// PHPType returns data type in PHP of the column
-func (c Column) PHPType() string {
-	if goType, ok := dbTypeToPHPTypes[c.DBType]; ok {
-		return goType
-	}
-
-	if strings.HasPrefix(c.DBType, "varchar") || strings.HasPrefix(c.DBType, "char") {
-		return "string"
-	}
-
-	if strings.HasPrefix(c.DBType, "decimal") {
-		return "float"
-	}
-
-	if c.IsEnum() {
-		return "string"
-	}
-
-	if strings.HasPrefix(c.DBType, "set") {
-		return "string"
-	}
-
-	if strings.Contains(c.DBType, "text") || strings.HasPrefix(c.DBType, "blob") {
-		return "string"
-	}
-
-	if strings.HasPrefix(c.DBType, "timestamp") {
-		return "time.Time"
-	}
-
-	ct := &sqlparser.ColumnType{
-		Type: c.DBType,
-	}
-	res, err := sql.ColumnTypeToType(ct)
-	if err != nil {
-		panic(err)
-	}
-
-	baseType := strings.ToLower(res.Type().String())
-	return baseType
-}
-
 // GoName returns the variable name for go of the column
 func (c Column) GoName() string {
 	return getGoName(c.Name)
