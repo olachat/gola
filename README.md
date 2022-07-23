@@ -49,8 +49,8 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
   - [x] Single Key types / names
   - [x] Composite key
   - [x] Non auto incremental pk
-- [ ] db types
-  - [ ] timestamp
+- [x] db types
+  - [x] timestamp
   - [x] boolean
   - [x] float
   - [x] enum
@@ -67,6 +67,6 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
 - [ ] context support
 - [ ] transaction support
 - [ ] zero reflect verison?
-- [ ] Embed groupcache
+- [ ] Cache support
 - [ ] docs & docs & docs...
  - [ ] IAQ: Index Aware Query doc
