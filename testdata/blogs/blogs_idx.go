@@ -123,36 +123,36 @@ type iQuery[T any] interface {
 	orderReadQuery[T]
 }
 type iQuery1[T any] interface {
-	AndIsPinnedEQ(val int8) iQuery2[T]
-	AndIsPinnedIN(vals ...int8) iQuery2[T]
+	AndIsPinnedEQ(val bool) iQuery2[T]
+	AndIsPinnedIN(vals ...bool) iQuery2[T]
 	orderReadQuery[T]
 }
 
 type iQuery2[T any] interface {
-	AndIsVipEQ(val int8) orderReadQuery[T]
-	AndIsVipIN(vals ...int8) orderReadQuery[T]
+	AndIsVipEQ(val bool) orderReadQuery[T]
+	AndIsVipIN(vals ...bool) orderReadQuery[T]
 	orderReadQuery[T]
 }
 
 type iQuery4[T any] interface {
 	AndCategoryIdEQ(val int) iQuery5[T]
 	AndCategoryIdIN(vals ...int) iQuery5[T]
-	AndIsVipEQ(val int8) orderReadQuery[T]
-	AndIsVipIN(vals ...int8) orderReadQuery[T]
+	AndIsVipEQ(val bool) orderReadQuery[T]
+	AndIsVipIN(vals ...bool) orderReadQuery[T]
 	orderReadQuery[T]
 }
 
 type iQuery5[T any] interface {
-	AndIsVipEQ(val int8) orderReadQuery[T]
-	AndIsVipIN(vals ...int8) orderReadQuery[T]
+	AndIsVipEQ(val bool) orderReadQuery[T]
+	AndIsVipIN(vals ...bool) orderReadQuery[T]
 	orderReadQuery[T]
 }
 
 type iQuery9[T any] interface {
-	AndIsPinnedEQ(val int8) iQuery10[T]
-	AndIsPinnedIN(vals ...int8) iQuery10[T]
-	AndIsVipEQ(val int8) orderReadQuery[T]
-	AndIsVipIN(vals ...int8) orderReadQuery[T]
+	AndIsPinnedEQ(val bool) iQuery10[T]
+	AndIsPinnedIN(vals ...bool) iQuery10[T]
+	AndIsVipEQ(val bool) orderReadQuery[T]
+	AndIsVipIN(vals ...bool) orderReadQuery[T]
 	orderReadQuery[T]
 }
 
@@ -166,13 +166,13 @@ type idxQuery1[T any] struct {
 	*idxQuery[T]
 }
 
-func (q *idxQuery1[T]) AndIsPinnedEQ(val int8) iQuery2[T] {
+func (q *idxQuery1[T]) AndIsPinnedEQ(val bool) iQuery2[T] {
 	q.whereSql = " and category_id = ?"
 	q.whereParams = append(q.whereParams, val)
 	return &idxQuery2[T]{q.idxQuery}
 }
 
-func (q *idxQuery1[T]) AndIsPinnedIN(vals ...int8) iQuery2[T] {
+func (q *idxQuery1[T]) AndIsPinnedIN(vals ...bool) iQuery2[T] {
 	q.whereSql += " and category_id in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
@@ -184,13 +184,13 @@ type idxQuery2[T any] struct {
 	*idxQuery[T]
 }
 
-func (q *idxQuery2[T]) AndIsVipEQ(val int8) orderReadQuery[T] {
+func (q *idxQuery2[T]) AndIsVipEQ(val bool) orderReadQuery[T] {
 	q.whereSql = " and is_pinned = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
-func (q *idxQuery2[T]) AndIsVipIN(vals ...int8) orderReadQuery[T] {
+func (q *idxQuery2[T]) AndIsVipIN(vals ...bool) orderReadQuery[T] {
 	q.whereSql += " and is_pinned in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
@@ -216,13 +216,13 @@ func (q *idxQuery4[T]) AndCategoryIdIN(vals ...int) iQuery5[T] {
 	return &idxQuery5[T]{q.idxQuery}
 }
 
-func (q *idxQuery4[T]) AndIsVipEQ(val int8) orderReadQuery[T] {
+func (q *idxQuery4[T]) AndIsVipEQ(val bool) orderReadQuery[T] {
 	q.whereSql = " and country = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
-func (q *idxQuery4[T]) AndIsVipIN(vals ...int8) orderReadQuery[T] {
+func (q *idxQuery4[T]) AndIsVipIN(vals ...bool) orderReadQuery[T] {
 	q.whereSql += " and country in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
@@ -234,13 +234,13 @@ type idxQuery5[T any] struct {
 	*idxQuery[T]
 }
 
-func (q *idxQuery5[T]) AndIsVipEQ(val int8) orderReadQuery[T] {
+func (q *idxQuery5[T]) AndIsVipEQ(val bool) orderReadQuery[T] {
 	q.whereSql = " and category_id = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
-func (q *idxQuery5[T]) AndIsVipIN(vals ...int8) orderReadQuery[T] {
+func (q *idxQuery5[T]) AndIsVipIN(vals ...bool) orderReadQuery[T] {
 	q.whereSql += " and category_id in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
@@ -252,13 +252,13 @@ type idxQuery9[T any] struct {
 	*idxQuery[T]
 }
 
-func (q *idxQuery9[T]) AndIsPinnedEQ(val int8) iQuery10[T] {
+func (q *idxQuery9[T]) AndIsPinnedEQ(val bool) iQuery10[T] {
 	q.whereSql = " and user_id = ?"
 	q.whereParams = append(q.whereParams, val)
 	return &idxQuery10[T]{q.idxQuery}
 }
 
-func (q *idxQuery9[T]) AndIsPinnedIN(vals ...int8) iQuery10[T] {
+func (q *idxQuery9[T]) AndIsPinnedIN(vals ...bool) iQuery10[T] {
 	q.whereSql += " and user_id in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
@@ -266,13 +266,13 @@ func (q *idxQuery9[T]) AndIsPinnedIN(vals ...int8) iQuery10[T] {
 	return &idxQuery10[T]{q.idxQuery}
 }
 
-func (q *idxQuery9[T]) AndIsVipEQ(val int8) orderReadQuery[T] {
+func (q *idxQuery9[T]) AndIsVipEQ(val bool) orderReadQuery[T] {
 	q.whereSql = " and user_id = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
-func (q *idxQuery9[T]) AndIsVipIN(vals ...int8) orderReadQuery[T] {
+func (q *idxQuery9[T]) AndIsVipIN(vals ...bool) orderReadQuery[T] {
 	q.whereSql += " and user_id in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)

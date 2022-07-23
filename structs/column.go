@@ -147,6 +147,10 @@ func (c Column) SQLType() string {
 
 // GoType returns type in go of the column
 func (c Column) GoType() string {
+	if c.FullDBType == "tinyint(1)" {
+		return "bool"
+	}
+
 	if goType, ok := dbTypeToGoTypes[c.DBType]; ok {
 		return goType
 	}
@@ -242,6 +246,13 @@ func (c Column) GoDefaultValue() string {
 		return c.Default
 	}
 
+	if goType == "bool" {
+		if c.Default == "0" {
+			return "false"
+		}
+		return "true"
+	}
+
 	if strings.Contains(goType, "int") || strings.Contains(goType, "float") {
 		return goType + "(" + strings.ReplaceAll(c.Default, `"`, "") + ")"
 	}
@@ -257,6 +268,11 @@ func (c Column) IsEnum() bool {
 // IsSet returns if column type is set
 func (c Column) IsSet() bool {
 	return strings.HasPrefix(c.DBType, "set")
+}
+
+// IsBool returns if column type is boolean as tinyint(1)
+func (c Column) IsBool() bool {
+	return c.FullDBType == "tinyint(1)"
 }
 
 // GetEnumConst returns enum const definitions in go

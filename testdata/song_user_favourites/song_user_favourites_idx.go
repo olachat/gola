@@ -93,8 +93,8 @@ type iQuery[T any] interface {
 	orderReadQuery[T]
 }
 type iQuery1[T any] interface {
-	AndIsFavouriteEQ(val int8) orderReadQuery[T]
-	AndIsFavouriteIN(vals ...int8) orderReadQuery[T]
+	AndIsFavouriteEQ(val bool) orderReadQuery[T]
+	AndIsFavouriteIN(vals ...bool) orderReadQuery[T]
 	orderReadQuery[T]
 }
 
@@ -102,13 +102,13 @@ type idxQuery1[T any] struct {
 	*idxQuery[T]
 }
 
-func (q *idxQuery1[T]) AndIsFavouriteEQ(val int8) orderReadQuery[T] {
+func (q *idxQuery1[T]) AndIsFavouriteEQ(val bool) orderReadQuery[T] {
 	q.whereSql = " and user_id = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
-func (q *idxQuery1[T]) AndIsFavouriteIN(vals ...int8) orderReadQuery[T] {
+func (q *idxQuery1[T]) AndIsFavouriteIN(vals ...bool) orderReadQuery[T] {
 	q.whereSql += " and user_id in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
