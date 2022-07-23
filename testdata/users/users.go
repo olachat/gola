@@ -707,7 +707,7 @@ func NewUser() *User {
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
-		Sports{val: "swim,football"},
+		Sports{val: "swim, football"},
 		Sports2{val: "swim,football"},
 		SportsNoDefault{},
 	}
@@ -724,7 +724,7 @@ func NewUserWithPK(val int) *User {
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
-		Sports{val: "swim,football"},
+		Sports{val: "swim, football"},
 		Sports2{val: "swim,football"},
 		SportsNoDefault{},
 	}
