@@ -29,7 +29,7 @@ Use `go test -update`, if template is changed, and want to update `testdata/*.go
     - [x] Default Value
     - [x] LAST_INSERT_ID()
   - [x] Update
-    - [ ] Partial Update
+    - [x] Partial Update
     - [ ] Auto updatedt field value
   - [x] Delete
   - [x] Count

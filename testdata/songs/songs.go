@@ -4,6 +4,7 @@ package songs
 
 import (
 	"database/sql"
+	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
@@ -312,8 +313,62 @@ func (obj *Song) Update() (bool, error) {
 	return true, nil
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Update(obj WithPK) (bool, error) {
+	var updatedFields []string
+	var params []any
+	var resetFuncs []func()
+
+	val := reflect.ValueOf(obj).Elem()
+	updatedFields = make([]string, 0, val.NumField())
+	params = make([]any, 0, val.NumField())
+
+	for i := 0; i < val.NumField(); i++ {
+		col := val.Field(i).Addr().Interface()
+
+		switch c := col.(type) {
+		case *Title:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "title = ?")
+				params = append(params, c.GetTitle())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Hash:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "hash = ?")
+				params = append(params, c.GetHash())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		}
+	}
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql := "UPDATE songs SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	params = append(params, obj.GetId())
+
+	result, err := coredb.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	for _, f := range resetFuncs {
+		f()
+	}
+	return true, nil
 }
 
 func (obj *Song) Delete() error {

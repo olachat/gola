@@ -4,6 +4,7 @@ package users
 
 import (
 	"database/sql"
+	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
@@ -852,8 +853,116 @@ func (obj *User) Update() (bool, error) {
 	return true, nil
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Update(obj WithPK) (bool, error) {
+	var updatedFields []string
+	var params []any
+	var resetFuncs []func()
+
+	val := reflect.ValueOf(obj).Elem()
+	updatedFields = make([]string, 0, val.NumField())
+	params = make([]any, 0, val.NumField())
+
+	for i := 0; i < val.NumField(); i++ {
+		col := val.Field(i).Addr().Interface()
+
+		switch c := col.(type) {
+		case *Name:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "name = ?")
+				params = append(params, c.GetName())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Email:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "email = ?")
+				params = append(params, c.GetEmail())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *CreatedAt:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "created_at = ?")
+				params = append(params, c.GetCreatedAt())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *UpdatedAt:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "updated_at = ?")
+				params = append(params, c.GetUpdatedAt())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *FloatType:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "float_type = ?")
+				params = append(params, c.GetFloatType())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *DoubleType:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "double_type = ?")
+				params = append(params, c.GetDoubleType())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Hobby:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "hobby = ?")
+				params = append(params, c.GetHobby())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *HobbyNoDefault:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "hobby_no_default = ?")
+				params = append(params, c.GetHobbyNoDefault())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Sports:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "sports = ?")
+				params = append(params, c.GetSports())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Sports2:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "sports2 = ?")
+				params = append(params, c.GetSports2())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *SportsNoDefault:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "sports_no_default = ?")
+				params = append(params, c.GetSportsNoDefault())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		}
+	}
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql := "UPDATE users SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	params = append(params, obj.GetId())
+
+	result, err := coredb.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	for _, f := range resetFuncs {
+		f()
+	}
+	return true, nil
 }
 
 func (obj *User) Delete() error {

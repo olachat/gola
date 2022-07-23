@@ -4,6 +4,7 @@ package {{.Package}}
 {{$table := .}}
 import (
 	"database/sql"
+	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
@@ -316,8 +317,58 @@ func (obj *{{.ClassName}}) Update() (bool, error) {
 	return true, nil
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Update(obj WithPK) (bool, error) {
+	var updatedFields []string
+	var params []any
+	var resetFuncs []func()
+
+	val := reflect.ValueOf(obj).Elem()
+	updatedFields = make([]string, 0, val.NumField())
+	params = make([]any, 0, val.NumField())
+
+	for i := 0; i < val.NumField(); i++ {
+		col := val.Field(i).Addr().Interface()
+
+		switch c := col.(type) {
+		{{- range $i, $c := .GetNonPKColumns }}
+		case *{{.GoName}}:
+		if c.IsUpdated() {
+			updatedFields = append(updatedFields, "{{ $c.Name }} = ?")
+			params = append(params, c.Get{{ $c.GoName }}())
+			resetFuncs = append(resetFuncs, c.resetUpdated)
+		}
+		{{- end }}
+		}
+	}
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql := "UPDATE {{.Name}} SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeySQL}}"
+	params = append(params, {{.GetPrimaryKeyParams}})
+
+	result, err := coredb.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	for _, f := range resetFuncs {
+		f()
+	}
+	return true, nil
 }
 
 func (obj *{{.ClassName}}) Delete() (error) {

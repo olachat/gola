@@ -4,6 +4,7 @@ package song_user_favourites
 
 import (
 	"database/sql"
+	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
@@ -441,8 +442,74 @@ func (obj *SongUserFavourite) Update() (bool, error) {
 	return true, nil
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Update(obj WithPK) (bool, error) {
+	var updatedFields []string
+	var params []any
+	var resetFuncs []func()
+
+	val := reflect.ValueOf(obj).Elem()
+	updatedFields = make([]string, 0, val.NumField())
+	params = make([]any, 0, val.NumField())
+
+	for i := 0; i < val.NumField(); i++ {
+		col := val.Field(i).Addr().Interface()
+
+		switch c := col.(type) {
+		case *Remark:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "remark = ?")
+				params = append(params, c.GetRemark())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *IsFavourite:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "is_favourite = ?")
+				params = append(params, c.GetIsFavourite())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *CreatedAt:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "created_at = ?")
+				params = append(params, c.GetCreatedAt())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *UpdatedAt:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "updated_at = ?")
+				params = append(params, c.GetUpdatedAt())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		}
+	}
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql := "UPDATE song_user_favourites SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE user_id = ? and song_id = ?"
+	params = append(params, obj.GetUserId(), obj.GetSongId())
+
+	result, err := coredb.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	for _, f := range resetFuncs {
+		f()
+	}
+	return true, nil
 }
 
 func (obj *SongUserFavourite) Delete() error {

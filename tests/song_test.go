@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/olachat/gola/testdata/song_user_favourites"
@@ -92,5 +93,38 @@ func TestSong(t *testing.T) {
 	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
 	if obj != nil {
 		t.Error("SongUserFavourite partial delete failed")
+	}
+}
+
+func TestSongUpdate(t *testing.T) {
+	s := songs.NewSong()
+	s.SetHash("hashhash")
+	err := s.Insert()
+	if err != nil {
+		t.Error(err)
+	}
+
+	id := s.GetId()
+
+	obj := songs.FetchByPK[struct {
+		songs.Id
+		songs.Hash
+	}](id)
+	obj.SetHash("bingo")
+	ok, err := songs.Update(obj)
+	if !ok || err != nil {
+		t.Error("Partail update failed")
+	}
+
+	s = songs.FetchSongByPK(id)
+	if s.GetHash() != "bingo" {
+		t.Error("Partail update failed")
+	}
+
+	ok, err = songs.Update(obj)
+	if ok || err != nil {
+		fmt.Printf("ok: %v\n", ok)
+		fmt.Printf("err: %v\n", err)
+		t.Error("Partail void update failed")
 	}
 }

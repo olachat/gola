@@ -4,6 +4,7 @@ package blogs
 
 import (
 	"database/sql"
+	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
@@ -683,8 +684,104 @@ func (obj *Blog) Update() (bool, error) {
 	return true, nil
 }
 
-func Update[T any](obj *T) (bool, error) {
-	return coredb.Update(obj, _db)
+func Update(obj WithPK) (bool, error) {
+	var updatedFields []string
+	var params []any
+	var resetFuncs []func()
+
+	val := reflect.ValueOf(obj).Elem()
+	updatedFields = make([]string, 0, val.NumField())
+	params = make([]any, 0, val.NumField())
+
+	for i := 0; i < val.NumField(); i++ {
+		col := val.Field(i).Addr().Interface()
+
+		switch c := col.(type) {
+		case *UserId:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "user_id = ?")
+				params = append(params, c.GetUserId())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Slug:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "slug = ?")
+				params = append(params, c.GetSlug())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Title:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "title = ?")
+				params = append(params, c.GetTitle())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *CategoryId:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "category_id = ?")
+				params = append(params, c.GetCategoryId())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *IsPinned:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "is_pinned = ?")
+				params = append(params, c.GetIsPinned())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *IsVip:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "is_vip = ?")
+				params = append(params, c.GetIsVip())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Country:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "country = ?")
+				params = append(params, c.GetCountry())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *CreatedAt:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "created_at = ?")
+				params = append(params, c.GetCreatedAt())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *UpdatedAt:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "updated_at = ?")
+				params = append(params, c.GetUpdatedAt())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		}
+	}
+
+	if len(updatedFields) == 0 {
+		return false, nil
+	}
+
+	sql := "UPDATE blogs SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	params = append(params, obj.GetId())
+
+	result, err := coredb.Exec(sql, _db, params...)
+	if err != nil {
+		return false, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affectedRows == 0 {
+		return false, coredb.ErrAvoidUpdate
+	}
+	if affectedRows > 1 {
+		return false, coredb.ErrMultipleUpdate
+	}
+
+	for _, f := range resetFuncs {
+		f()
+	}
+	return true, nil
 }
 
 func (obj *Blog) Delete() error {
