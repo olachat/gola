@@ -102,7 +102,7 @@ func (t *Table) GetPrimaryKeyVals() string {
 	return strings.Join(result, ", ")
 }
 
-// GetPrimaryKeyParams returns primary key for paramters
+// GetPrimaryKeyParams returns primary key for parameters
 func (t *Table) GetPrimaryKeyParams() string {
 	var result []string
 	for _, c := range t.GetPKColumns() {
