@@ -833,9 +833,6 @@ func (obj *User) Update() (bool, error) {
 	if affectedRows == 0 {
 		return false, coredb.ErrAvoidUpdate
 	}
-	if affectedRows > 1 {
-		return false, coredb.ErrMultipleUpdate
-	}
 
 	obj.resetUpdated()
 	return true, nil
@@ -942,9 +939,6 @@ func Update(obj withPK) (bool, error) {
 	}
 	if affectedRows == 0 {
 		return false, coredb.ErrAvoidUpdate
-	}
-	if affectedRows > 1 {
-		return false, coredb.ErrMultipleUpdate
 	}
 
 	for _, f := range resetFuncs {
