@@ -230,7 +230,7 @@ func NewSongWithPK(val uint) *Song {
 }
 
 func (c *Song) Insert() error {
-	sql := `INSERT INTO songs (title, hash) values (?, ?)`
+	sql := `INSERT IGNORE INTO songs (title, hash) values (?, ?)`
 
 	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetHash())
 
@@ -248,7 +248,7 @@ func (c *Song) Insert() error {
 	if err != nil {
 		return err
 	}
-	if affectedRows != 1 {
+	if affectedRows == 0 {
 		return coredb.ErrAvoidInsert
 	}
 

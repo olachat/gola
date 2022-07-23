@@ -232,7 +232,7 @@ func New{{.ClassName}}WithPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 }
 
 func (c *{{.ClassName}}) Insert() error {
-	sql := `INSERT INTO {{.Name}} (
+	sql := `INSERT IGNORE INTO {{.Name}} (
 		{{- range $i, $c := .GetNonAutoIncrementColumns }}
 		{{- if $i}}, {{end}}
 		{{- $c.Name}}
@@ -262,7 +262,7 @@ func (c *{{.ClassName}}) Insert() error {
 	if err != nil {
 		return err
 	}
-	if affectedRows != 1 {
+	if affectedRows == 0 {
 		return coredb.ErrAvoidInsert
 	}
 

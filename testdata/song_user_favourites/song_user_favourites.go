@@ -343,7 +343,7 @@ func NewSongUserFavouriteWithPK(val PK) *SongUserFavourite {
 }
 
 func (c *SongUserFavourite) Insert() error {
-	sql := `INSERT INTO song_user_favourites (user_id, song_id, remark, is_favourite, created_at, updated_at) values (?, ?, ?, ?, ?, ?)`
+	sql := `INSERT IGNORE INTO song_user_favourites (user_id, song_id, remark, is_favourite, created_at, updated_at) values (?, ?, ?, ?, ?, ?)`
 
 	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
 
@@ -355,7 +355,7 @@ func (c *SongUserFavourite) Insert() error {
 	if err != nil {
 		return err
 	}
-	if affectedRows != 1 {
+	if affectedRows == 0 {
 		return coredb.ErrAvoidInsert
 	}
 

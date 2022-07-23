@@ -725,7 +725,7 @@ func NewUserWithPK(val int) *User {
 }
 
 func (c *User) Insert() error {
-	sql := `INSERT INTO users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports, sports2, sports_no_default) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	sql := `INSERT IGNORE INTO users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports, sports2, sports_no_default) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	result, err := coredb.Exec(sql, _db, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 
@@ -743,7 +743,7 @@ func (c *User) Insert() error {
 	if err != nil {
 		return err
 	}
-	if affectedRows != 1 {
+	if affectedRows == 0 {
 		return coredb.ErrAvoidInsert
 	}
 
