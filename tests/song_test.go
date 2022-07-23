@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/olachat/gola/coredb"
 	"github.com/olachat/gola/testdata/song_user_favourites"
 	"github.com/olachat/gola/testdata/songs"
 )
@@ -30,6 +31,12 @@ func TestSong(t *testing.T) {
 
 	if f.GetUserId() != 3 {
 		t.Error("Insert non auto-increment PK failed")
+	}
+
+	f2 := song_user_favourites.NewSongUserFavouriteWithPK(pk)
+	err = f2.Insert()
+	if err != coredb.ErrAvoidInsert {
+		t.Error("Repeat insert must fail")
 	}
 
 	updated, err := f.Update()

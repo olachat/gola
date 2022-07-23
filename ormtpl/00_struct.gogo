@@ -150,7 +150,9 @@ func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) bool {
 }
 {{else}}
 type {{.GoName}} struct {
+{{- if not .IsPrimaryKey}}
 	_updated bool
+{{- end}}
 	val {{.GoType}}
 }
 
@@ -168,16 +170,19 @@ func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) bool {
 }
 {{- end}}
 {{end}}
-func (c *{{.GoName}}) GetColumnName() string {
-	return "{{.Name}}"
-}
 
+{{- if not .IsPrimaryKey}}
 func (c *{{.GoName}}) IsUpdated() bool {
 	return c._updated
 }
 
 func (c *{{.GoName}}) resetUpdated()  {
 	c._updated = false
+}
+{{- end}}
+
+func (c *{{.GoName}}) GetColumnName() string {
+	return "{{.Name}}"
 }
 
 func (c *{{.GoName}}) IsPrimaryKey() bool {
@@ -229,7 +234,7 @@ func New{{.ClassName}}WithPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 }
 
 func (c *{{.ClassName}}) Insert() error {
-	sql := `INSERT INTO {{.Name}} (
+	sql := `INSERT IGNORE INTO {{.Name}} (
 		{{- range $i, $c := .GetNonAutoIncrementColumns }}
 		{{- if $i}}, {{end}}
 		{{- $c.Name}}
@@ -259,7 +264,7 @@ func (c *{{.ClassName}}) Insert() error {
 	if err != nil {
 		return err
 	}
-	if affectedRows != 1 {
+	if affectedRows == 0 {
 		return coredb.ErrAvoidInsert
 	}
 
@@ -268,7 +273,7 @@ func (c *{{.ClassName}}) Insert() error {
 }
 
 func (c *{{.ClassName}}) resetUpdated() {
-	{{- range .Columns }}
+	{{- range .GetNonPKColumns }}
 	c.{{.GoName}}.resetUpdated()
 	{{- end }}
 }
@@ -276,11 +281,6 @@ func (c *{{.ClassName}}) resetUpdated() {
 func (obj *{{.ClassName}}) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
-	{{- range $i, $c := .GetPKColumns }}
-	if obj.{{ $c.GoName }}.IsUpdated() {
-		return false, coredb.ErrPKChanged
-	}
-	{{- end }}
 
 	{{- range $i, $c := .GetNonPKColumns }}
 	if obj.{{ $c.GoName }}.IsUpdated() {
@@ -308,9 +308,6 @@ func (obj *{{.ClassName}}) Update() (bool, error) {
 	}
 	if affectedRows == 0 {
 		return false, coredb.ErrAvoidUpdate
-	}
-	if affectedRows > 1 {
-		return false, coredb.ErrMultipleUpdate
 	}
 
 	obj.resetUpdated()
@@ -360,9 +357,6 @@ func Update(obj withPK) (bool, error) {
 	}
 	if affectedRows == 0 {
 		return false, coredb.ErrAvoidUpdate
-	}
-	if affectedRows > 1 {
-		return false, coredb.ErrMultipleUpdate
 	}
 
 	for _, f := range resetFuncs {

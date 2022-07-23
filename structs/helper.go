@@ -1,6 +1,11 @@
 package structs
 
-import "strings"
+import (
+	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+)
 
 func getGoName(sqlName string) string {
 	sap := "_"
@@ -10,7 +15,7 @@ func getGoName(sqlName string) string {
 
 	parts := strings.Split(sqlName, sap)
 	for i, p := range parts {
-		parts[i] = strings.Title(p)
+		parts[i] = cases.Title(language.English).String(p)
 	}
 
 	joinString := strings.Join(parts, "")
