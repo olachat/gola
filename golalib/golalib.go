@@ -54,6 +54,11 @@ func Run(config mysqldriver.DBConfig, output string, gentype string) {
 	for _, t := range db.Tables {
 		switch gentype {
 		case "orm":
+			if len(t.PKey.Columns) == 0 {
+				println(t.Name + " doesn't have primay key")
+				continue
+			}
+
 			files := genORM(t)
 			needMkdir := true
 			for path, data := range files {
