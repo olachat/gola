@@ -25,8 +25,6 @@ func Assemble(config Config) (dbinfo *structs.DBInfo, err error) {
 type MySQLDriver struct {
 	connStr string
 	conn    *sql.DB
-
-	tinyIntAsInt bool
 }
 
 // Assemble all the information we need to provide back to the driver
@@ -48,13 +46,6 @@ func (m *MySQLDriver) Assemble(config Config) (dbinfo *structs.DBInfo, err error
 	schema := dbname
 	whitelist, _ := config.StringSlice(structs.ConfigWhitelist)
 	blacklist, _ := config.StringSlice(structs.ConfigBlacklist)
-
-	tinyIntAsIntIntf, ok := config["tinyint_as_int"]
-	if ok {
-		if b, ok := tinyIntAsIntIntf.(bool); ok {
-			m.tinyIntAsInt = b
-		}
-	}
 
 	m.connStr = MySQLBuildQueryString(user, pass, dbname, host, port, sslmode)
 	m.conn, err = sql.Open("mysql", m.connStr)
@@ -371,8 +362,8 @@ func (m *MySQLDriver) TranslateColumnType(c structs.Column) structs.Column {
 	}
 
 	if c.DBType == "tinyint" {
-		// map tinyint(1) to bool if TinyintAsBool is true
-		if !m.tinyIntAsInt && c.FullDBType == "tinyint(1)" {
+		// map tinyint(1) to bool
+		if c.FullDBType == "tinyint(1)" {
 			c.Type = boolType
 			return c
 		}
