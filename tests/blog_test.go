@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/olachat/gola/testdata/blogs"
+	"github.com/olachat/gola/golalib/testdata/blogs"
 )
 
 func TestBlogMethods(t *testing.T) {

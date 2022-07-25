@@ -1,4 +1,4 @@
-package main
+package golalib
 
 // VERSION define gola's version
 // changes when ormtpl changes

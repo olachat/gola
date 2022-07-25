@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/olachat/gola/coredb"
-	"github.com/olachat/gola/testdata/song_user_favourites"
-	"github.com/olachat/gola/testdata/songs"
+	"github.com/olachat/gola/golalib/testdata/song_user_favourites"
+	"github.com/olachat/gola/golalib/testdata/songs"
 )
 
 func TestSong(t *testing.T) {
