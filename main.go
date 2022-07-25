@@ -25,8 +25,9 @@ func main() {
 	driverName := "mysql"
 
 	var config mysqldriver.Config = viper.GetStringMap(driverName)
+	dbconfig := mysqldriver.NewDBConfig(config)
 	output := config.DefaultString("output", "temp")
 	gentype := config.DefaultString("gentype", "orm")
 
-	golalib.Run(config, output, gentype)
+	golalib.Run(dbconfig, output, gentype)
 }

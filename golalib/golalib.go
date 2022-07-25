@@ -18,7 +18,12 @@ import (
 	"github.com/olachat/gola/structs"
 )
 
-func Run(config mysqldriver.Config, output string, gentype string) {
+/* Run gola to perform code gen
+
+`output`: output file path
+`gentype`: currently must be 'orm'
+*/
+func Run(config mysqldriver.DBConfig, output string, gentype string) {
 	wd, err := os.Getwd()
 	if err != nil {
 		wd = "."

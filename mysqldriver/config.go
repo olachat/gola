@@ -4,10 +4,38 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/olachat/gola/structs"
 	"github.com/pkg/errors"
 )
 
-// Config is a map with helper functions
+// DBConfig define db config value needed
+type DBConfig struct {
+	user      string
+	pass      string
+	dbname    string
+	host      string
+	port      int
+	sslmode   string
+	whitelist []string
+	blacklist []string
+}
+
+// NewDBConfig convert Config obj(read via viper) to DBConfig
+func NewDBConfig(config Config) DBConfig {
+	c := DBConfig{}
+	c.user = config.MustString(structs.ConfigUser)
+	c.pass, _ = config.String(structs.ConfigPass)
+	c.dbname = config.MustString(structs.ConfigDBName)
+	c.host = config.MustString(structs.ConfigHost)
+	c.port = config.DefaultInt(structs.ConfigPort, 3306)
+	c.sslmode = config.DefaultString(structs.ConfigSSLMode, "true")
+	c.whitelist, _ = config.StringSlice(structs.ConfigWhitelist)
+	c.blacklist, _ = config.StringSlice(structs.ConfigBlacklist)
+
+	return c
+}
+
+// Config define config value needed
 type Config map[string]any
 
 // MustString retrieves a string that must exist and must be a string, it must also not be the empty string
