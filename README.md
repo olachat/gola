@@ -13,14 +13,14 @@
 
 # Test
 
-`go test` command will:
+`go test ./golalib` command will:
 
-- Use `testdata` sql to create tables on the fly
+- Use `golalib/testdata` sql files to create tables on the fly
 - Do code generation for tables
-- Compare with `testdata/*.go`
+- Compare with `golalib/testdata/*.go`
 - Report error if file not matching
 
-Use `go test -update`, if template is changed, and want to update `testdata/*.go`
+Use `go test ./golalib -update`, if template is changed, and want to update `golalib/testdata/*.go`
 
 # Todo
 
