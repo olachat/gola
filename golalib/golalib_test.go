@@ -1,4 +1,4 @@
-package main
+package golalib
 
 import (
 	"embed"
@@ -79,9 +79,10 @@ func getDB() *structs.DBInfo {
 		"pass":      "",
 		"sslmode":   "false",
 	}
+	dbconfig := mysqldriver.NewDBConfig(config)
 
 	m := &mysqldriver.MySQLDriver{}
-	db, err := m.Assemble(config)
+	db, err := m.Assemble(dbconfig)
 	if err != nil {
 		panic(err)
 	}

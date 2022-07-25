@@ -15,7 +15,7 @@ import (
 
 // Assemble is more useful for calling into the library so you don't
 // have to instantiate an empty type.
-func Assemble(config Config) (dbinfo *structs.DBInfo, err error) {
+func Assemble(config DBConfig) (dbinfo *structs.DBInfo, err error) {
 	driver := MySQLDriver{}
 	return driver.Assemble(config)
 }
@@ -25,12 +25,10 @@ func Assemble(config Config) (dbinfo *structs.DBInfo, err error) {
 type MySQLDriver struct {
 	connStr string
 	conn    *sql.DB
-
-	tinyIntAsInt bool
 }
 
 // Assemble all the information we need to provide back to the driver
-func (m *MySQLDriver) Assemble(config Config) (dbinfo *structs.DBInfo, err error) {
+func (m *MySQLDriver) Assemble(c DBConfig) (dbinfo *structs.DBInfo, err error) {
 	defer func() {
 		if r := recover(); r != nil && err == nil {
 			dbinfo = nil
@@ -38,25 +36,7 @@ func (m *MySQLDriver) Assemble(config Config) (dbinfo *structs.DBInfo, err error
 		}
 	}()
 
-	user := config.MustString(structs.ConfigUser)
-	pass, _ := config.String(structs.ConfigPass)
-	dbname := config.MustString(structs.ConfigDBName)
-	host := config.MustString(structs.ConfigHost)
-	port := config.DefaultInt(structs.ConfigPort, 3306)
-	sslmode := config.DefaultString(structs.ConfigSSLMode, "true")
-
-	schema := dbname
-	whitelist, _ := config.StringSlice(structs.ConfigWhitelist)
-	blacklist, _ := config.StringSlice(structs.ConfigBlacklist)
-
-	tinyIntAsIntIntf, ok := config["tinyint_as_int"]
-	if ok {
-		if b, ok := tinyIntAsIntIntf.(bool); ok {
-			m.tinyIntAsInt = b
-		}
-	}
-
-	m.connStr = MySQLBuildQueryString(user, pass, dbname, host, port, sslmode)
+	m.connStr = MySQLBuildQueryString(c.user, c.pass, c.dbname, c.host, c.port, c.sslmode)
 	m.conn, err = sql.Open("mysql", m.connStr)
 	if err != nil {
 		return nil, errors.Wrap(err, "sqlboiler-mysql failed to connect to database")
@@ -71,8 +51,8 @@ func (m *MySQLDriver) Assemble(config Config) (dbinfo *structs.DBInfo, err error
 
 	dbinfo = &structs.DBInfo{}
 
-	dbinfo.Schema = schema
-	dbinfo.Tables, err = structs.Tables(m, schema, whitelist, blacklist)
+	dbinfo.Schema = c.dbname
+	dbinfo.Tables, err = structs.Tables(m, c.dbname, c.whitelist, c.blacklist)
 	if err != nil {
 		return nil, err
 	}
@@ -371,8 +351,8 @@ func (m *MySQLDriver) TranslateColumnType(c structs.Column) structs.Column {
 	}
 
 	if c.DBType == "tinyint" {
-		// map tinyint(1) to bool if TinyintAsBool is true
-		if !m.tinyIntAsInt && c.FullDBType == "tinyint(1)" {
+		// map tinyint(1) to bool
+		if c.FullDBType == "tinyint(1)" {
 			c.Type = boolType
 			return c
 		}
