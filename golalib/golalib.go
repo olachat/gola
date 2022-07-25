@@ -75,7 +75,7 @@ func genTPL(t *structs.Table, tplName string) []byte {
 	t.VERSION = VERSION
 	err := ormtpl.GetTpl(tplName).Execute(buf, t)
 	if err != nil {
-		panic(err)
+		panic(tplName + " genTpl error:\n" + err.Error())
 	}
 	return buf.Bytes()
 }
