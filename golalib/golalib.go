@@ -75,7 +75,7 @@ func genTPL(t *structs.Table, tplName string) []byte {
 	t.VERSION = VERSION
 	err := ormtpl.GetTpl(tplName).Execute(buf, t)
 	if err != nil {
-		panic(t.SchemaName + "." + t.Name + " " + tplName +
+		panic(t.Name + " " + tplName +
 			" genTpl error:\n" + err.Error())
 	}
 	return buf.Bytes()
@@ -92,7 +92,10 @@ func genORM(t *structs.Table) map[string][]byte {
 	}
 
 	for genTpl, genPath := range genFiles {
-		data := formatBuffer(genTPL(t, genTpl))
+		data, err := formatBuffer(genTPL(t, genTpl))
+		if err != nil {
+			panic(t.Name + " code error:\n" + err.Error())
+		}
 		files[genPath] = data
 	}
 
@@ -103,10 +106,10 @@ var (
 	rgxSyntaxError = regexp.MustCompile(`(\d+):\d+: `)
 )
 
-func formatBuffer(buf []byte) []byte {
+func formatBuffer(buf []byte) ([]byte, error) {
 	output, err := format.Source(buf)
 	if err == nil {
-		return output
+		return output, nil
 	}
 
 	matches := rgxSyntaxError.FindStringSubmatch(err.Error())
@@ -132,5 +135,5 @@ func formatBuffer(buf []byte) []byte {
 		errBuf.WriteByte('\n')
 	}
 
-	panic(fmt.Errorf("failed to format template\n\n%s", errBuf.Bytes()))
+	return nil, fmt.Errorf("failed to format template\n\n%s", errBuf.Bytes())
 }
