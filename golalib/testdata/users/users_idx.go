@@ -51,53 +51,53 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 	for i, arg := range args {
 		switch arg {
 		case IdAsc:
-			q.orders[i] = "id asc"
+			q.orders[i] = "`id` asc"
 		case IdDesc:
-			q.orders[i] = "id desc"
+			q.orders[i] = "`id` desc"
 		case NameAsc:
-			q.orders[i] = "name asc"
+			q.orders[i] = "`name` asc"
 		case NameDesc:
-			q.orders[i] = "name desc"
+			q.orders[i] = "`name` desc"
 		case EmailAsc:
-			q.orders[i] = "email asc"
+			q.orders[i] = "`email` asc"
 		case EmailDesc:
-			q.orders[i] = "email desc"
+			q.orders[i] = "`email` desc"
 		case CreatedAtAsc:
-			q.orders[i] = "created_at asc"
+			q.orders[i] = "`created_at` asc"
 		case CreatedAtDesc:
-			q.orders[i] = "created_at desc"
+			q.orders[i] = "`created_at` desc"
 		case UpdatedAtAsc:
-			q.orders[i] = "updated_at asc"
+			q.orders[i] = "`updated_at` asc"
 		case UpdatedAtDesc:
-			q.orders[i] = "updated_at desc"
+			q.orders[i] = "`updated_at` desc"
 		case FloatTypeAsc:
-			q.orders[i] = "float_type asc"
+			q.orders[i] = "`float_type` asc"
 		case FloatTypeDesc:
-			q.orders[i] = "float_type desc"
+			q.orders[i] = "`float_type` desc"
 		case DoubleTypeAsc:
-			q.orders[i] = "double_type asc"
+			q.orders[i] = "`double_type` asc"
 		case DoubleTypeDesc:
-			q.orders[i] = "double_type desc"
+			q.orders[i] = "`double_type` desc"
 		case HobbyAsc:
-			q.orders[i] = "hobby asc"
+			q.orders[i] = "`hobby` asc"
 		case HobbyDesc:
-			q.orders[i] = "hobby desc"
+			q.orders[i] = "`hobby` desc"
 		case HobbyNoDefaultAsc:
-			q.orders[i] = "hobby_no_default asc"
+			q.orders[i] = "`hobby_no_default` asc"
 		case HobbyNoDefaultDesc:
-			q.orders[i] = "hobby_no_default desc"
+			q.orders[i] = "`hobby_no_default` desc"
 		case SportsAsc:
-			q.orders[i] = "sports asc"
+			q.orders[i] = "`sports` asc"
 		case SportsDesc:
-			q.orders[i] = "sports desc"
+			q.orders[i] = "`sports` desc"
 		case Sports2Asc:
-			q.orders[i] = "sports2 asc"
+			q.orders[i] = "`sports2` asc"
 		case Sports2Desc:
-			q.orders[i] = "sports2 desc"
+			q.orders[i] = "`sports2` desc"
 		case SportsNoDefaultAsc:
-			q.orders[i] = "sports_no_default asc"
+			q.orders[i] = "`sports_no_default` asc"
 		case SportsNoDefaultDesc:
-			q.orders[i] = "sports_no_default desc"
+			q.orders[i] = "`sports_no_default` desc"
 		}
 	}
 	return q
@@ -141,13 +141,13 @@ func Select[T any]() iQuery[T] {
 }
 
 func (q *idxQuery[T]) WhereEmailEQ(val string) orderReadQuery[T] {
-	q.whereSql += " where email = ?"
+	q.whereSql += " where `email` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q
 }
 
 func (q *idxQuery[T]) WhereEmailIN(vals ...string) orderReadQuery[T] {
-	q.whereSql = " where email in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql = " where `email` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -155,13 +155,13 @@ func (q *idxQuery[T]) WhereEmailIN(vals ...string) orderReadQuery[T] {
 }
 
 func (q *idxQuery[T]) WhereNameEQ(val string) orderReadQuery[T] {
-	q.whereSql += " where name = ?"
+	q.whereSql += " where `name` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q
 }
 
 func (q *idxQuery[T]) WhereNameIN(vals ...string) orderReadQuery[T] {
-	q.whereSql = " where name in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql = " where `name` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}

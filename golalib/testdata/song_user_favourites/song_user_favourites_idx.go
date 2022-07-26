@@ -39,29 +39,29 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 	for i, arg := range args {
 		switch arg {
 		case UserIdAsc:
-			q.orders[i] = "user_id asc"
+			q.orders[i] = "`user_id` asc"
 		case UserIdDesc:
-			q.orders[i] = "user_id desc"
+			q.orders[i] = "`user_id` desc"
 		case SongIdAsc:
-			q.orders[i] = "song_id asc"
+			q.orders[i] = "`song_id` asc"
 		case SongIdDesc:
-			q.orders[i] = "song_id desc"
+			q.orders[i] = "`song_id` desc"
 		case RemarkAsc:
-			q.orders[i] = "remark asc"
+			q.orders[i] = "`remark` asc"
 		case RemarkDesc:
-			q.orders[i] = "remark desc"
+			q.orders[i] = "`remark` desc"
 		case IsFavouriteAsc:
-			q.orders[i] = "is_favourite asc"
+			q.orders[i] = "`is_favourite` asc"
 		case IsFavouriteDesc:
-			q.orders[i] = "is_favourite desc"
+			q.orders[i] = "`is_favourite` desc"
 		case CreatedAtAsc:
-			q.orders[i] = "created_at asc"
+			q.orders[i] = "`created_at` asc"
 		case CreatedAtDesc:
-			q.orders[i] = "created_at desc"
+			q.orders[i] = "`created_at` desc"
 		case UpdatedAtAsc:
-			q.orders[i] = "updated_at asc"
+			q.orders[i] = "`updated_at` asc"
 		case UpdatedAtDesc:
-			q.orders[i] = "updated_at desc"
+			q.orders[i] = "`updated_at` desc"
 		}
 	}
 	return q
@@ -103,13 +103,13 @@ type idxQuery1[T any] struct {
 }
 
 func (q *idxQuery1[T]) AndIsFavouriteEQ(val bool) orderReadQuery[T] {
-	q.whereSql = " and user_id = ?"
+	q.whereSql = " and `user_id` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
 func (q *idxQuery1[T]) AndIsFavouriteIN(vals ...bool) orderReadQuery[T] {
-	q.whereSql += " and user_id in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `user_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -126,13 +126,13 @@ func Select[T any]() iQuery[T] {
 }
 
 func (q *idxQuery[T]) WhereUserIdEQ(val uint) iQuery1[T] {
-	q.whereSql += " where user_id = ?"
+	q.whereSql += " where `user_id` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return &idxQuery1[T]{q}
 }
 
 func (q *idxQuery[T]) WhereUserIdIN(vals ...uint) iQuery1[T] {
-	q.whereSql = " where user_id in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql = " where `user_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
