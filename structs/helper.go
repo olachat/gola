@@ -1,6 +1,7 @@
 package structs
 
 import (
+	"net/url"
 	"strings"
 
 	"golang.org/x/text/cases"
@@ -8,6 +9,9 @@ import (
 )
 
 func getGoName(sqlName string) string {
+	if sqlName == "" {
+		return "Empty"
+	}
 	sap := "_"
 	if strings.Contains(sqlName, "-") {
 		sap = "-"
@@ -19,6 +23,8 @@ func getGoName(sqlName string) string {
 	}
 
 	joinString := strings.Join(parts, "")
+	joinString = url.QueryEscape(joinString)
+	joinString = strings.ReplaceAll(joinString, "%", "x")
 	if sqlName[:1] == "_" {
 		return "X" + joinString
 	}
