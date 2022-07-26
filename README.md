@@ -35,8 +35,8 @@ Use `go test ./golalib -update`, if template is changed, and want to update `gol
   - [x] Count
   - [ ] Count with IAQ
 - [x] Default & per struct connstr
-- [ ] Safety
-  - [ ] SQL escape
+- [x] Safety
+  - [x] SQL escape
   - [x] parameterize
 - [x] code gen template
   - [x] struct
@@ -69,4 +69,4 @@ Use `go test ./golalib -update`, if template is changed, and want to update `gol
 - [ ] zero reflect verison?
 - [ ] Cache support
 - [ ] docs & docs & docs...
- - [ ] IAQ: Index Aware Query doc
+- [ ] IAQ: Index Aware Query doc

@@ -24,6 +24,8 @@ const (
 	IdDesc
 	TitleAsc
 	TitleDesc
+	RankAsc
+	RankDesc
 	HashAsc
 	HashDesc
 )
@@ -33,17 +35,21 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 	for i, arg := range args {
 		switch arg {
 		case IdAsc:
-			q.orders[i] = "id asc"
+			q.orders[i] = "`id` asc"
 		case IdDesc:
-			q.orders[i] = "id desc"
+			q.orders[i] = "`id` desc"
 		case TitleAsc:
-			q.orders[i] = "title asc"
+			q.orders[i] = "`title` asc"
 		case TitleDesc:
-			q.orders[i] = "title desc"
+			q.orders[i] = "`title` desc"
+		case RankAsc:
+			q.orders[i] = "`rank` asc"
+		case RankDesc:
+			q.orders[i] = "`rank` desc"
 		case HashAsc:
-			q.orders[i] = "hash asc"
+			q.orders[i] = "`hash` asc"
 		case HashDesc:
-			q.orders[i] = "hash desc"
+			q.orders[i] = "`hash` desc"
 		}
 	}
 	return q
@@ -85,13 +91,13 @@ func Select[T any]() iQuery[T] {
 }
 
 func (q *idxQuery[T]) WhereHashEQ(val string) orderReadQuery[T] {
-	q.whereSql += " where hash = ?"
+	q.whereSql += " where `hash` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q
 }
 
 func (q *idxQuery[T]) WhereHashIN(vals ...string) orderReadQuery[T] {
-	q.whereSql = " where hash in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql = " where `hash` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}

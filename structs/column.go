@@ -49,6 +49,7 @@ type Column struct {
 var dbTypeToSQLTypes = map[string]string{
 	"tinyint":           "sql.Int8",
 	"smallint":          "sql.Int16",
+	"mediumint":         "sql.Int32",
 	"int":               "sql.Int32",
 	"bigint":            "sql.Int64",
 	"tinyint unsigned":  "sql.Uint8",
@@ -60,6 +61,7 @@ var dbTypeToSQLTypes = map[string]string{
 var dbTypeToGoTypes = map[string]string{
 	"tinyint":           "int8",
 	"smallint":          "int16",
+	"mediumint":         "int",
 	"int":               "int",
 	"bigint":            "int64",
 	"tinyint unsigned":  "uint8",
@@ -79,7 +81,7 @@ func (c Column) SQLType() string {
 		unsignedString = " unsigned"
 	}
 
-	intTypes := []string{"tinyint", "smallint", "bigint", "int"}
+	intTypes := []string{"tinyint", "smallint", "mediumint", "bigint", "int"}
 	for _, intType := range intTypes {
 		if strings.HasPrefix(c.DBType, intType) {
 			if sqlType, ok := dbTypeToSQLTypes[intType+unsignedString]; ok {

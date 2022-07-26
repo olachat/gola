@@ -22,6 +22,8 @@ type Song struct {
 	Id
 	// Song title varchar
 	Title
+	// Song Ranking mediumint
+	Rank
 	// Song file hash checksum varchar
 	Hash
 }
@@ -51,13 +53,13 @@ func FetchByPK[T any](val uint) *T {
 // FetchSongByPKs returns rows with from songs table with given primary key values
 func FetchSongByPKs(vals ...uint) []*Song {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Song](pks, "id", _db)
+	return coredb.FetchByPKs[Song](pks, "`id`", _db)
 }
 
 // FetchByPKs returns rows with selected fields from songs table with given primary key values
 func FetchByPKs[T any](vals ...uint) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "id", _db)
+	return coredb.FetchByPKs[T](pks, "`id`", _db)
 }
 
 // FindOneSong returns a row from songs table with arbitary where query
@@ -70,7 +72,7 @@ func FindOneSong(whereSQL string, params ...any) *Song {
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM songs "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `songs` "+whereSQL, _db, params...)
 }
 
 // FindOne returns a row with selected fields from songs table with arbitary where query
@@ -166,6 +168,50 @@ func (c *Title) GetTableType() coredb.TableType {
 	return table
 }
 
+// Rank field
+// Song Ranking
+type Rank struct {
+	_updated bool
+	val      int
+}
+
+func (c *Rank) GetRank() int {
+	return c.val
+}
+
+func (c *Rank) SetRank(val int) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
+	c.val = val
+	return true
+}
+
+func (c *Rank) IsUpdated() bool {
+	return c._updated
+}
+
+func (c *Rank) resetUpdated() {
+	c._updated = false
+}
+
+func (c *Rank) GetColumnName() string {
+	return "rank"
+}
+
+func (c *Rank) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Rank) GetValPointer() any {
+	return &c.val
+}
+
+func (c *Rank) GetTableType() coredb.TableType {
+	return table
+}
+
 // Hash field
 // Song file hash checksum
 type Hash struct {
@@ -214,6 +260,7 @@ func NewSong() *Song {
 	return &Song{
 		Id{},
 		Title{},
+		Rank{val: int(0)},
 		Hash{},
 	}
 }
@@ -222,6 +269,7 @@ func NewSongWithPK(val uint) *Song {
 	c := &Song{
 		Id{},
 		Title{},
+		Rank{val: int(0)},
 		Hash{},
 	}
 	c.Id.val = val
@@ -229,9 +277,9 @@ func NewSongWithPK(val uint) *Song {
 }
 
 func (c *Song) Insert() error {
-	sql := `INSERT IGNORE INTO songs (title, hash) values (?, ?)`
+	sql := "INSERT IGNORE INTO `songs` (`title`, `rank`, `hash`) values (?, ?, ?)"
 
-	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetHash())
+	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetRank(), c.GetHash())
 
 	if err != nil {
 		return err
@@ -257,6 +305,7 @@ func (c *Song) Insert() error {
 
 func (c *Song) resetUpdated() {
 	c.Title.resetUpdated()
+	c.Rank.resetUpdated()
 	c.Hash.resetUpdated()
 }
 
@@ -264,11 +313,15 @@ func (obj *Song) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
 	if obj.Title.IsUpdated() {
-		updatedFields = append(updatedFields, "title = ?")
+		updatedFields = append(updatedFields, "`title` = ?")
 		params = append(params, obj.GetTitle())
 	}
+	if obj.Rank.IsUpdated() {
+		updatedFields = append(updatedFields, "`rank` = ?")
+		params = append(params, obj.GetRank())
+	}
 	if obj.Hash.IsUpdated() {
-		updatedFields = append(updatedFields, "hash = ?")
+		updatedFields = append(updatedFields, "`hash` = ?")
 		params = append(params, obj.GetHash())
 	}
 
@@ -276,8 +329,8 @@ func (obj *Song) Update() (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE songs SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	sql := "UPDATE `songs` SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
@@ -312,13 +365,19 @@ func Update(obj withPK) (bool, error) {
 		switch c := col.(type) {
 		case *Title:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "title = ?")
+				updatedFields = append(updatedFields, "`title` = ?")
 				params = append(params, c.GetTitle())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Rank:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "`rank` = ?")
+				params = append(params, c.GetRank())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Hash:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "hash = ?")
+				updatedFields = append(updatedFields, "`hash` = ?")
 				params = append(params, c.GetHash())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
@@ -329,8 +388,8 @@ func Update(obj withPK) (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE songs SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	sql := "UPDATE `songs` SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
@@ -353,14 +412,14 @@ func Update(obj withPK) (bool, error) {
 }
 
 func (obj *Song) Delete() error {
-	sql := `DELETE FROM songs WHERE id = ?`
+	sql := "DELETE FROM `songs` WHERE `id` = ?"
 
 	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }
 
 func Delete(obj withPK) error {
-	sql := `DELETE FROM songs WHERE id = ?`
+	sql := "DELETE FROM `songs` WHERE `id` = ?"
 
 	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err

@@ -1,6 +1,7 @@
 CREATE TABLE `songs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL COMMENT 'Song title',
+  `rank` mediumint(8) NOT NULL DEFAULT 0 COMMENT 'Song Ranking',
   `hash` varchar(128) NOT NULL DEFAULT '' COMMENT 'Song file hash checksum',
   PRIMARY KEY (`id`),
   UNIQUE KEY `hash` (`hash`)

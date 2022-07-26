@@ -72,7 +72,7 @@ func FindOneSongUserFavourite(whereSQL string, params ...any) *SongUserFavourite
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM song_user_favourites "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `song_user_favourites` "+whereSQL, _db, params...)
 }
 
 // FindOne returns a row with selected fields from song_user_favourites table with arbitary where query
@@ -341,7 +341,7 @@ func NewSongUserFavouriteWithPK(val PK) *SongUserFavourite {
 }
 
 func (c *SongUserFavourite) Insert() error {
-	sql := `INSERT IGNORE INTO song_user_favourites (user_id, song_id, remark, is_favourite, created_at, updated_at) values (?, ?, ?, ?, ?, ?)`
+	sql := "INSERT IGNORE INTO `song_user_favourites` (`user_id`, `song_id`, `remark`, `is_favourite`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)"
 
 	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
 
@@ -372,19 +372,19 @@ func (obj *SongUserFavourite) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
 	if obj.Remark.IsUpdated() {
-		updatedFields = append(updatedFields, "remark = ?")
+		updatedFields = append(updatedFields, "`remark` = ?")
 		params = append(params, obj.GetRemark())
 	}
 	if obj.IsFavourite.IsUpdated() {
-		updatedFields = append(updatedFields, "is_favourite = ?")
+		updatedFields = append(updatedFields, "`is_favourite` = ?")
 		params = append(params, obj.GetIsFavourite())
 	}
 	if obj.CreatedAt.IsUpdated() {
-		updatedFields = append(updatedFields, "created_at = ?")
+		updatedFields = append(updatedFields, "`created_at` = ?")
 		params = append(params, obj.GetCreatedAt())
 	}
 	if obj.UpdatedAt.IsUpdated() {
-		updatedFields = append(updatedFields, "updated_at = ?")
+		updatedFields = append(updatedFields, "`updated_at` = ?")
 		params = append(params, obj.GetUpdatedAt())
 	}
 
@@ -392,8 +392,8 @@ func (obj *SongUserFavourite) Update() (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE song_user_favourites SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE user_id = ? and song_id = ?"
+	sql := "UPDATE `song_user_favourites` SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `song_id` = ?"
 	params = append(params, obj.GetUserId(), obj.GetSongId())
 
 	result, err := coredb.Exec(sql, _db, params...)
@@ -428,25 +428,25 @@ func Update(obj withPK) (bool, error) {
 		switch c := col.(type) {
 		case *Remark:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "remark = ?")
+				updatedFields = append(updatedFields, "`remark` = ?")
 				params = append(params, c.GetRemark())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsFavourite:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "is_favourite = ?")
+				updatedFields = append(updatedFields, "`is_favourite` = ?")
 				params = append(params, c.GetIsFavourite())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreatedAt:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "created_at = ?")
+				updatedFields = append(updatedFields, "`created_at` = ?")
 				params = append(params, c.GetCreatedAt())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdatedAt:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "updated_at = ?")
+				updatedFields = append(updatedFields, "`updated_at` = ?")
 				params = append(params, c.GetUpdatedAt())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
@@ -457,8 +457,8 @@ func Update(obj withPK) (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE song_user_favourites SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE user_id = ? and song_id = ?"
+	sql := "UPDATE `song_user_favourites` SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `song_id` = ?"
 	params = append(params, obj.GetUserId(), obj.GetSongId())
 
 	result, err := coredb.Exec(sql, _db, params...)
@@ -481,14 +481,14 @@ func Update(obj withPK) (bool, error) {
 }
 
 func (obj *SongUserFavourite) Delete() error {
-	sql := `DELETE FROM song_user_favourites WHERE user_id = ? and song_id = ?`
+	sql := "DELETE FROM `song_user_favourites` WHERE `user_id` = ? and `song_id` = ?"
 
 	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetSongId())
 	return err
 }
 
 func Delete(obj withPK) error {
-	sql := `DELETE FROM song_user_favourites WHERE user_id = ? and song_id = ?`
+	sql := "DELETE FROM `song_user_favourites` WHERE `user_id` = ? and `song_id` = ?"
 
 	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetSongId())
 	return err

@@ -60,13 +60,13 @@ func FetchByPK[T any](val {{.GetPrimaryKeyType}}) *T {
 // Fetch{{.ClassName}}ByPKs returns rows with from {{.Name}} table with given primary key values
 func Fetch{{.ClassName}}ByPKs(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[{{.ClassName}}](pks, "{{.GetPrimaryKeyName}}", _db)
+	return coredb.FetchByPKs[{{.ClassName}}](pks, "`{{.GetPrimaryKeyName}}`", _db)
 }
 
 // FetchByPKs returns rows with selected fields from {{.Name}} table with given primary key values
 func FetchByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "{{.GetPrimaryKeyName}}", _db)
+	return coredb.FetchByPKs[T](pks, "`{{.GetPrimaryKeyName}}`", _db)
 }
 {{- end}}
 
@@ -80,7 +80,7 @@ func FindOne{{.ClassName}}(whereSQL string, params ...any) *{{.ClassName}} {
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM {{.Name}} " + whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, _db, params...)
 }
 
 // FindOne returns a row with selected fields from {{.Name}} table with arbitary where query
@@ -234,14 +234,14 @@ func New{{.ClassName}}WithPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 }
 
 func (c *{{.ClassName}}) Insert() error {
-	sql := `INSERT IGNORE INTO {{.Name}} (
+	sql := "INSERT IGNORE INTO `{{.Name}}` (`
 		{{- range $i, $c := .GetNonAutoIncrementColumns }}
-		{{- if $i}}, {{end}}
+		{{- if $i}}`, `{{end}}
 		{{- $c.Name}}
-		{{- end }}) values (
+		{{- end }}`) values (
 		{{- range $i, $c := .GetNonAutoIncrementColumns }}
 		{{- if $i}}, {{end}}?
-		{{- end }})`
+		{{- end }})"
 
 	result, err := coredb.Exec(sql, _db, {{- range $i, $c := .GetNonAutoIncrementColumns }}
 	{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
@@ -284,7 +284,7 @@ func (obj *{{.ClassName}}) Update() (bool, error) {
 
 	{{- range $i, $c := .GetNonPKColumns }}
 	if obj.{{ $c.GoName }}.IsUpdated() {
-		updatedFields = append(updatedFields, "{{ $c.Name }} = ?")
+		updatedFields = append(updatedFields, "`{{ $c.Name }}` = ?")
 		params = append(params, obj.Get{{ $c.GoName }}())
 	}
 	{{- end }}
@@ -293,7 +293,7 @@ func (obj *{{.ClassName}}) Update() (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE {{.Name}} SET "
+	sql := "UPDATE `{{.Name}}` SET "
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeySQL}}"
 	params = append(params, {{.GetPrimaryKeyParams}})
 
@@ -330,7 +330,7 @@ func Update(obj withPK) (bool, error) {
 		{{- range $i, $c := .GetNonPKColumns }}
 		case *{{.GoName}}:
 		if c.IsUpdated() {
-			updatedFields = append(updatedFields, "{{ $c.Name }} = ?")
+			updatedFields = append(updatedFields, "`{{ $c.Name }}` = ?")
 			params = append(params, c.Get{{ $c.GoName }}())
 			resetFuncs = append(resetFuncs, c.resetUpdated)
 		}
@@ -342,7 +342,7 @@ func Update(obj withPK) (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE {{.Name}} SET "
+	sql := "UPDATE `{{.Name}}` SET "
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeySQL}}"
 	params = append(params, {{.GetPrimaryKeyParams}})
 
@@ -366,14 +366,14 @@ func Update(obj withPK) (bool, error) {
 }
 
 func (obj *{{.ClassName}}) Delete() (error) {
-	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeySQL}}`
+	sql := "DELETE FROM `{{.Name}}` WHERE {{.GetPrimaryKeySQL}}"
 
 	_, err := coredb.Exec(sql, _db, {{.GetPrimaryKeyParams}})
 	return err
 }
 
 func Delete(obj withPK) (error) {
-	sql := `DELETE FROM {{.Name}} WHERE {{.GetPrimaryKeySQL}}`
+	sql := "DELETE FROM `{{.Name}}` WHERE {{.GetPrimaryKeySQL}}"
 
 	_, err := coredb.Exec(sql, _db, {{.GetPrimaryKeyParams}})
 	return err
