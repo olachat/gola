@@ -24,6 +24,8 @@ type Song struct {
 	Title
 	// Song Ranking mediumint
 	Rank
+	//  enum('','101','1+9','%1')
+	Type
 	// Song file hash checksum varchar
 	Hash
 }
@@ -97,6 +99,14 @@ func Find[T any](whereSQL string, params ...any) ([]*T, error) {
 }
 
 // Column types
+type SongType string
+
+const (
+	SongTypeEmpty SongType = ""
+	SongType101   SongType = "101"
+	SongType1x2B9 SongType = "1+9"
+	SongTypex251  SongType = "%1"
+)
 
 // Id field
 //
@@ -212,6 +222,50 @@ func (c *Rank) GetTableType() coredb.TableType {
 	return table
 }
 
+// Type field
+//
+type Type struct {
+	_updated bool
+	val      SongType
+}
+
+func (c *Type) GetType() SongType {
+	return c.val
+}
+
+func (c *Type) SetType(val SongType) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
+	c.val = val
+	return true
+}
+
+func (c *Type) IsUpdated() bool {
+	return c._updated
+}
+
+func (c *Type) resetUpdated() {
+	c._updated = false
+}
+
+func (c *Type) GetColumnName() string {
+	return "type"
+}
+
+func (c *Type) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Type) GetValPointer() any {
+	return &c.val
+}
+
+func (c *Type) GetTableType() coredb.TableType {
+	return table
+}
+
 // Hash field
 // Song file hash checksum
 type Hash struct {
@@ -261,6 +315,7 @@ func NewSong() *Song {
 		Id{},
 		Title{},
 		Rank{val: int(0)},
+		Type{},
 		Hash{},
 	}
 }
@@ -270,6 +325,7 @@ func NewSongWithPK(val uint) *Song {
 		Id{},
 		Title{},
 		Rank{val: int(0)},
+		Type{},
 		Hash{},
 	}
 	c.Id.val = val
@@ -277,9 +333,9 @@ func NewSongWithPK(val uint) *Song {
 }
 
 func (c *Song) Insert() error {
-	sql := "INSERT IGNORE INTO `songs` (`title`, `rank`, `hash`) values (?, ?, ?)"
+	sql := "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`) values (?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetRank(), c.GetHash())
+	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
 
 	if err != nil {
 		return err
@@ -306,6 +362,7 @@ func (c *Song) Insert() error {
 func (c *Song) resetUpdated() {
 	c.Title.resetUpdated()
 	c.Rank.resetUpdated()
+	c.Type.resetUpdated()
 	c.Hash.resetUpdated()
 }
 
@@ -319,6 +376,10 @@ func (obj *Song) Update() (bool, error) {
 	if obj.Rank.IsUpdated() {
 		updatedFields = append(updatedFields, "`rank` = ?")
 		params = append(params, obj.GetRank())
+	}
+	if obj.Type.IsUpdated() {
+		updatedFields = append(updatedFields, "`type` = ?")
+		params = append(params, obj.GetType())
 	}
 	if obj.Hash.IsUpdated() {
 		updatedFields = append(updatedFields, "`hash` = ?")
@@ -373,6 +434,12 @@ func Update(obj withPK) (bool, error) {
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`rank` = ?")
 				params = append(params, c.GetRank())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Type:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "`type` = ?")
+				params = append(params, c.GetType())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Hash:
