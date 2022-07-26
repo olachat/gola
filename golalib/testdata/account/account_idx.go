@@ -81,8 +81,8 @@ type iQuery[T any] interface {
 	orderReadQuery[T]
 }
 type iQuery1[T any] interface {
-	AndCountryCodeEQ(val int) orderReadQuery[T]
-	AndCountryCodeIN(vals ...int) orderReadQuery[T]
+	AndCountryCodeEQ(val uint) orderReadQuery[T]
+	AndCountryCodeIN(vals ...uint) orderReadQuery[T]
 	orderReadQuery[T]
 }
 
@@ -90,13 +90,13 @@ type idxQuery1[T any] struct {
 	*idxQuery[T]
 }
 
-func (q *idxQuery1[T]) AndCountryCodeEQ(val int) orderReadQuery[T] {
+func (q *idxQuery1[T]) AndCountryCodeEQ(val uint) orderReadQuery[T] {
 	q.whereSql = " and `user_id` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
-func (q *idxQuery1[T]) AndCountryCodeIN(vals ...int) orderReadQuery[T] {
+func (q *idxQuery1[T]) AndCountryCodeIN(vals ...uint) orderReadQuery[T] {
 	q.whereSql += " and `user_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)

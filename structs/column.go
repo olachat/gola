@@ -47,27 +47,29 @@ type Column struct {
 }
 
 var dbTypeToSQLTypes = map[string]string{
-	"tinyint":           "sql.Int8",
-	"smallint":          "sql.Int16",
-	"mediumint":         "sql.Int32",
-	"int":               "sql.Int32",
-	"bigint":            "sql.Int64",
-	"tinyint unsigned":  "sql.Uint8",
-	"smallint unsigned": "sql.Uint16",
-	"int unsigned":      "sql.Uint32",
-	"bigint unsigned":   "sql.Uint64",
+	"tinyint":            "sql.Int8",
+	"smallint":           "sql.Int16",
+	"mediumint":          "sql.Int32",
+	"int":                "sql.Int32",
+	"bigint":             "sql.Int64",
+	"tinyint unsigned":   "sql.Uint8",
+	"smallint unsigned":  "sql.Uint16",
+	"mediumint unsigned": "sql.Uint32",
+	"int unsigned":       "sql.Uint32",
+	"bigint unsigned":    "sql.Uint64",
 }
 
 var dbTypeToGoTypes = map[string]string{
-	"tinyint":           "int8",
-	"smallint":          "int16",
-	"mediumint":         "int",
-	"int":               "int",
-	"bigint":            "int64",
-	"tinyint unsigned":  "uint8",
-	"smallint unsigned": "uint16",
-	"int unsigned":      "uint",
-	"bigint unsigned":   "uint64",
+	"tinyint":            "int8",
+	"smallint":           "int16",
+	"mediumint":          "int",
+	"int":                "int",
+	"bigint":             "int64",
+	"tinyint unsigned":   "uint8",
+	"smallint unsigned":  "uint16",
+	"mediumint unsigned": "uint",
+	"int unsigned":       "uint",
+	"bigint unsigned":    "uint64",
 }
 
 // SQLType returns data type in mysql of the column
