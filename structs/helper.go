@@ -25,6 +25,7 @@ func getGoName(sqlName string) string {
 	joinString := strings.Join(parts, "")
 	joinString = url.QueryEscape(joinString)
 	joinString = strings.ReplaceAll(joinString, "%", "x")
+	joinString = strings.ReplaceAll(joinString, ".", "dot")
 	if sqlName[:1] == "_" {
 		return "X" + joinString
 	}

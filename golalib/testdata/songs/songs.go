@@ -24,7 +24,7 @@ type Song struct {
 	Title
 	// Song Ranking mediumint
 	Rank
-	//  enum('','101','1+9','%1')
+	//  enum('','101','1+9','%1','0.9')
 	Type
 	// Song file hash checksum varchar
 	Hash
@@ -106,6 +106,7 @@ const (
 	SongType101   SongType = "101"
 	SongType1x2B9 SongType = "1+9"
 	SongTypex251  SongType = "%1"
+	SongType0dot9 SongType = "0.9"
 )
 
 // Id field
