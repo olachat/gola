@@ -10,7 +10,7 @@ import (
 func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 	for _, t := range tables {
 		var tableDesc []*structs.RowDesc
-		rows, err := m.conn.Query("desc " + t.Name)
+		rows, err := m.conn.Query("desc `" + t.Name + "`")
 		if err != nil {
 			return err
 		}
@@ -34,7 +34,7 @@ func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 		}
 
 		var indexDesc []*structs.IndexDesc
-		rows, err = m.conn.Query("show index from " + t.Name)
+		rows, err = m.conn.Query("show index from `" + t.Name + "`")
 		if err != nil {
 			return err
 		}
