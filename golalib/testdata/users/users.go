@@ -69,13 +69,13 @@ func FetchByPK[T any](val int) *T {
 // FetchUserByPKs returns rows with from users table with given primary key values
 func FetchUserByPKs(vals ...int) []*User {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[User](pks, "id", _db)
+	return coredb.FetchByPKs[User](pks, "`id`", _db)
 }
 
 // FetchByPKs returns rows with selected fields from users table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "id", _db)
+	return coredb.FetchByPKs[T](pks, "`id`", _db)
 }
 
 // FindOneUser returns a row from users table with arbitary where query
@@ -88,7 +88,7 @@ func FindOneUser(whereSQL string, params ...any) *User {
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM users "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `users` "+whereSQL, _db, params...)
 }
 
 // FindOne returns a row with selected fields from users table with arbitary where query
@@ -724,7 +724,7 @@ func NewUserWithPK(val int) *User {
 }
 
 func (c *User) Insert() error {
-	sql := `INSERT IGNORE INTO users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports, sports2, sports_no_default) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	sql := "INSERT IGNORE INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 	result, err := coredb.Exec(sql, _db, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 
@@ -768,47 +768,47 @@ func (obj *User) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
 	if obj.Name.IsUpdated() {
-		updatedFields = append(updatedFields, "name = ?")
+		updatedFields = append(updatedFields, "`name` = ?")
 		params = append(params, obj.GetName())
 	}
 	if obj.Email.IsUpdated() {
-		updatedFields = append(updatedFields, "email = ?")
+		updatedFields = append(updatedFields, "`email` = ?")
 		params = append(params, obj.GetEmail())
 	}
 	if obj.CreatedAt.IsUpdated() {
-		updatedFields = append(updatedFields, "created_at = ?")
+		updatedFields = append(updatedFields, "`created_at` = ?")
 		params = append(params, obj.GetCreatedAt())
 	}
 	if obj.UpdatedAt.IsUpdated() {
-		updatedFields = append(updatedFields, "updated_at = ?")
+		updatedFields = append(updatedFields, "`updated_at` = ?")
 		params = append(params, obj.GetUpdatedAt())
 	}
 	if obj.FloatType.IsUpdated() {
-		updatedFields = append(updatedFields, "float_type = ?")
+		updatedFields = append(updatedFields, "`float_type` = ?")
 		params = append(params, obj.GetFloatType())
 	}
 	if obj.DoubleType.IsUpdated() {
-		updatedFields = append(updatedFields, "double_type = ?")
+		updatedFields = append(updatedFields, "`double_type` = ?")
 		params = append(params, obj.GetDoubleType())
 	}
 	if obj.Hobby.IsUpdated() {
-		updatedFields = append(updatedFields, "hobby = ?")
+		updatedFields = append(updatedFields, "`hobby` = ?")
 		params = append(params, obj.GetHobby())
 	}
 	if obj.HobbyNoDefault.IsUpdated() {
-		updatedFields = append(updatedFields, "hobby_no_default = ?")
+		updatedFields = append(updatedFields, "`hobby_no_default` = ?")
 		params = append(params, obj.GetHobbyNoDefault())
 	}
 	if obj.Sports.IsUpdated() {
-		updatedFields = append(updatedFields, "sports = ?")
+		updatedFields = append(updatedFields, "`sports` = ?")
 		params = append(params, obj.GetSports())
 	}
 	if obj.Sports2.IsUpdated() {
-		updatedFields = append(updatedFields, "sports2 = ?")
+		updatedFields = append(updatedFields, "`sports2` = ?")
 		params = append(params, obj.GetSports2())
 	}
 	if obj.SportsNoDefault.IsUpdated() {
-		updatedFields = append(updatedFields, "sports_no_default = ?")
+		updatedFields = append(updatedFields, "`sports_no_default` = ?")
 		params = append(params, obj.GetSportsNoDefault())
 	}
 
@@ -816,8 +816,8 @@ func (obj *User) Update() (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE users SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	sql := "UPDATE `users` SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
@@ -852,67 +852,67 @@ func Update(obj withPK) (bool, error) {
 		switch c := col.(type) {
 		case *Name:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "name = ?")
+				updatedFields = append(updatedFields, "`name` = ?")
 				params = append(params, c.GetName())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Email:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "email = ?")
+				updatedFields = append(updatedFields, "`email` = ?")
 				params = append(params, c.GetEmail())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreatedAt:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "created_at = ?")
+				updatedFields = append(updatedFields, "`created_at` = ?")
 				params = append(params, c.GetCreatedAt())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdatedAt:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "updated_at = ?")
+				updatedFields = append(updatedFields, "`updated_at` = ?")
 				params = append(params, c.GetUpdatedAt())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *FloatType:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "float_type = ?")
+				updatedFields = append(updatedFields, "`float_type` = ?")
 				params = append(params, c.GetFloatType())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *DoubleType:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "double_type = ?")
+				updatedFields = append(updatedFields, "`double_type` = ?")
 				params = append(params, c.GetDoubleType())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Hobby:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "hobby = ?")
+				updatedFields = append(updatedFields, "`hobby` = ?")
 				params = append(params, c.GetHobby())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *HobbyNoDefault:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "hobby_no_default = ?")
+				updatedFields = append(updatedFields, "`hobby_no_default` = ?")
 				params = append(params, c.GetHobbyNoDefault())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Sports:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "sports = ?")
+				updatedFields = append(updatedFields, "`sports` = ?")
 				params = append(params, c.GetSports())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Sports2:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "sports2 = ?")
+				updatedFields = append(updatedFields, "`sports2` = ?")
 				params = append(params, c.GetSports2())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *SportsNoDefault:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "sports_no_default = ?")
+				updatedFields = append(updatedFields, "`sports_no_default` = ?")
 				params = append(params, c.GetSportsNoDefault())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
@@ -923,8 +923,8 @@ func Update(obj withPK) (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE users SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	sql := "UPDATE `users` SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
@@ -947,14 +947,14 @@ func Update(obj withPK) (bool, error) {
 }
 
 func (obj *User) Delete() error {
-	sql := `DELETE FROM users WHERE id = ?`
+	sql := "DELETE FROM `users` WHERE `id` = ?"
 
 	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }
 
 func Delete(obj withPK) error {
-	sql := `DELETE FROM users WHERE id = ?`
+	sql := "DELETE FROM `users` WHERE `id` = ?"
 
 	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err

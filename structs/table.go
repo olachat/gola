@@ -71,7 +71,7 @@ func (t *Table) GetPrimaryKeyName() string {
 func (t *Table) GetPrimaryKeySQL() string {
 	var result []string
 	for _, c := range t.GetPKColumns() {
-		result = append(result, c.Name+" = ?")
+		result = append(result, "`"+c.Name+"` = ?")
 	}
 
 	return strings.Join(result, " and ")

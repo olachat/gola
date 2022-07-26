@@ -65,13 +65,13 @@ func FetchByPK[T any](val int) *T {
 // FetchBlogByPKs returns rows with from blogs table with given primary key values
 func FetchBlogByPKs(vals ...int) []*Blog {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Blog](pks, "id", _db)
+	return coredb.FetchByPKs[Blog](pks, "`id`", _db)
 }
 
 // FetchByPKs returns rows with selected fields from blogs table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "id", _db)
+	return coredb.FetchByPKs[T](pks, "`id`", _db)
 }
 
 // FindOneBlog returns a row from blogs table with arbitary where query
@@ -84,7 +84,7 @@ func FindOneBlog(whereSQL string, params ...any) *Blog {
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM blogs "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `blogs` "+whereSQL, _db, params...)
 }
 
 // FindOne returns a row with selected fields from blogs table with arbitary where query
@@ -565,7 +565,7 @@ func NewBlogWithPK(val int) *Blog {
 }
 
 func (c *Blog) Insert() error {
-	sql := `INSERT IGNORE INTO blogs (user_id, slug, title, category_id, is_pinned, is_vip, country, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	sql := "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
 
@@ -607,39 +607,39 @@ func (obj *Blog) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
 	if obj.UserId.IsUpdated() {
-		updatedFields = append(updatedFields, "user_id = ?")
+		updatedFields = append(updatedFields, "`user_id` = ?")
 		params = append(params, obj.GetUserId())
 	}
 	if obj.Slug.IsUpdated() {
-		updatedFields = append(updatedFields, "slug = ?")
+		updatedFields = append(updatedFields, "`slug` = ?")
 		params = append(params, obj.GetSlug())
 	}
 	if obj.Title.IsUpdated() {
-		updatedFields = append(updatedFields, "title = ?")
+		updatedFields = append(updatedFields, "`title` = ?")
 		params = append(params, obj.GetTitle())
 	}
 	if obj.CategoryId.IsUpdated() {
-		updatedFields = append(updatedFields, "category_id = ?")
+		updatedFields = append(updatedFields, "`category_id` = ?")
 		params = append(params, obj.GetCategoryId())
 	}
 	if obj.IsPinned.IsUpdated() {
-		updatedFields = append(updatedFields, "is_pinned = ?")
+		updatedFields = append(updatedFields, "`is_pinned` = ?")
 		params = append(params, obj.GetIsPinned())
 	}
 	if obj.IsVip.IsUpdated() {
-		updatedFields = append(updatedFields, "is_vip = ?")
+		updatedFields = append(updatedFields, "`is_vip` = ?")
 		params = append(params, obj.GetIsVip())
 	}
 	if obj.Country.IsUpdated() {
-		updatedFields = append(updatedFields, "country = ?")
+		updatedFields = append(updatedFields, "`country` = ?")
 		params = append(params, obj.GetCountry())
 	}
 	if obj.CreatedAt.IsUpdated() {
-		updatedFields = append(updatedFields, "created_at = ?")
+		updatedFields = append(updatedFields, "`created_at` = ?")
 		params = append(params, obj.GetCreatedAt())
 	}
 	if obj.UpdatedAt.IsUpdated() {
-		updatedFields = append(updatedFields, "updated_at = ?")
+		updatedFields = append(updatedFields, "`updated_at` = ?")
 		params = append(params, obj.GetUpdatedAt())
 	}
 
@@ -647,8 +647,8 @@ func (obj *Blog) Update() (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE blogs SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	sql := "UPDATE `blogs` SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
@@ -683,55 +683,55 @@ func Update(obj withPK) (bool, error) {
 		switch c := col.(type) {
 		case *UserId:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "user_id = ?")
+				updatedFields = append(updatedFields, "`user_id` = ?")
 				params = append(params, c.GetUserId())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Slug:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "slug = ?")
+				updatedFields = append(updatedFields, "`slug` = ?")
 				params = append(params, c.GetSlug())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Title:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "title = ?")
+				updatedFields = append(updatedFields, "`title` = ?")
 				params = append(params, c.GetTitle())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CategoryId:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "category_id = ?")
+				updatedFields = append(updatedFields, "`category_id` = ?")
 				params = append(params, c.GetCategoryId())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsPinned:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "is_pinned = ?")
+				updatedFields = append(updatedFields, "`is_pinned` = ?")
 				params = append(params, c.GetIsPinned())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsVip:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "is_vip = ?")
+				updatedFields = append(updatedFields, "`is_vip` = ?")
 				params = append(params, c.GetIsVip())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Country:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "country = ?")
+				updatedFields = append(updatedFields, "`country` = ?")
 				params = append(params, c.GetCountry())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreatedAt:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "created_at = ?")
+				updatedFields = append(updatedFields, "`created_at` = ?")
 				params = append(params, c.GetCreatedAt())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdatedAt:
 			if c.IsUpdated() {
-				updatedFields = append(updatedFields, "updated_at = ?")
+				updatedFields = append(updatedFields, "`updated_at` = ?")
 				params = append(params, c.GetUpdatedAt())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
@@ -742,8 +742,8 @@ func Update(obj withPK) (bool, error) {
 		return false, nil
 	}
 
-	sql := "UPDATE blogs SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE id = ?"
+	sql := "UPDATE `blogs` SET "
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
 	result, err := coredb.Exec(sql, _db, params...)
@@ -766,14 +766,14 @@ func Update(obj withPK) (bool, error) {
 }
 
 func (obj *Blog) Delete() error {
-	sql := `DELETE FROM blogs WHERE id = ?`
+	sql := "DELETE FROM `blogs` WHERE `id` = ?"
 
 	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
 }
 
 func Delete(obj withPK) error {
-	sql := `DELETE FROM blogs WHERE id = ?`
+	sql := "DELETE FROM `blogs` WHERE `id` = ?"
 
 	_, err := coredb.Exec(sql, _db, obj.GetId())
 	return err
