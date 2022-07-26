@@ -22,7 +22,7 @@ type Account struct {
 	UserId
 	// user account type enum('free','vip')
 	Type
-	// user country code int
+	// user country code mediumint unsigned
 	CountryCode
 	// Account money int
 	Money
@@ -38,12 +38,12 @@ var table *AccountTable
 
 type PK struct {
 	UserId      int
-	CountryCode int
+	CountryCode uint
 }
 
 type withPK interface {
 	GetUserId() int
-	GetCountryCode() int
+	GetCountryCode() uint
 }
 
 // FetchAccountByPKs returns a row from account table with given primary key value
@@ -171,10 +171,10 @@ func (c *Type) GetTableType() coredb.TableType {
 // CountryCode field
 // user country code
 type CountryCode struct {
-	val int
+	val uint
 }
 
-func (c *CountryCode) GetCountryCode() int {
+func (c *CountryCode) GetCountryCode() uint {
 	return c.val
 }
 
@@ -242,7 +242,7 @@ func NewAccountWithPK(val PK) *Account {
 	c := &Account{
 		UserId{},
 		Type{val: "free"},
-		CountryCode{val: int(0)},
+		CountryCode{val: uint(0)},
 		Money{val: int(0)},
 	}
 	c.UserId.val = val.UserId
