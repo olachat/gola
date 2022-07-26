@@ -24,6 +24,8 @@ const (
 	UserIdDesc
 	TypeAsc
 	TypeDesc
+	CountryCodeAsc
+	CountryCodeDesc
 	MoneyAsc
 	MoneyDesc
 )
@@ -40,6 +42,10 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 			q.orders[i] = "`type` asc"
 		case TypeDesc:
 			q.orders[i] = "`type` desc"
+		case CountryCodeAsc:
+			q.orders[i] = "`country_code` asc"
+		case CountryCodeDesc:
+			q.orders[i] = "`country_code` desc"
 		case MoneyAsc:
 			q.orders[i] = "`money` asc"
 		case MoneyDesc:
@@ -75,8 +81,8 @@ type iQuery[T any] interface {
 	orderReadQuery[T]
 }
 type iQuery1[T any] interface {
-	AndTypeEQ(val AccountType) orderReadQuery[T]
-	AndTypeIN(vals ...AccountType) orderReadQuery[T]
+	AndCountryCodeEQ(val int) orderReadQuery[T]
+	AndCountryCodeIN(vals ...int) orderReadQuery[T]
 	orderReadQuery[T]
 }
 
@@ -84,13 +90,13 @@ type idxQuery1[T any] struct {
 	*idxQuery[T]
 }
 
-func (q *idxQuery1[T]) AndTypeEQ(val AccountType) orderReadQuery[T] {
+func (q *idxQuery1[T]) AndCountryCodeEQ(val int) orderReadQuery[T] {
 	q.whereSql = " and `user_id` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
-func (q *idxQuery1[T]) AndTypeIN(vals ...AccountType) orderReadQuery[T] {
+func (q *idxQuery1[T]) AndCountryCodeIN(vals ...int) orderReadQuery[T] {
 	q.whereSql += " and `user_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)

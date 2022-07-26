@@ -22,6 +22,8 @@ type Account struct {
 	UserId
 	// user account type enum('free','vip')
 	Type
+	// user country code int
+	CountryCode
 	// Account money int
 	Money
 }
@@ -35,23 +37,23 @@ func (*AccountTable) GetTableName() string {
 var table *AccountTable
 
 type PK struct {
-	UserId int
-	Type   AccountType
+	UserId      int
+	CountryCode int
 }
 
 type withPK interface {
 	GetUserId() int
-	GetType() AccountType
+	GetCountryCode() int
 }
 
 // FetchAccountByPKs returns a row from account table with given primary key value
 func FetchAccountByPK(val PK) *Account {
-	return coredb.FetchByPK[Account](_db, []string{"user_id", "type"}, val.UserId, val.Type)
+	return coredb.FetchByPK[Account](_db, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
 }
 
 // FetchByPKs returns a row with selected fields from account table with given primary key value
 func FetchByPK[T any](val PK) *T {
-	return coredb.FetchByPK[T](_db, []string{"user_id", "type"}, val.UserId, val.Type)
+	return coredb.FetchByPK[T](_db, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
 }
 
 // FindOneAccount returns a row from account table with arbitary where query
@@ -125,11 +127,29 @@ func (c *UserId) GetTableType() coredb.TableType {
 // Type field
 // user account type
 type Type struct {
-	val AccountType
+	_updated bool
+	val      AccountType
 }
 
 func (c *Type) GetType() AccountType {
 	return c.val
+}
+
+func (c *Type) SetType(val AccountType) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
+	c.val = val
+	return true
+}
+
+func (c *Type) IsUpdated() bool {
+	return c._updated
+}
+
+func (c *Type) resetUpdated() {
+	c._updated = false
 }
 
 func (c *Type) GetColumnName() string {
@@ -137,7 +157,7 @@ func (c *Type) GetColumnName() string {
 }
 
 func (c *Type) IsPrimaryKey() bool {
-	return true
+	return false
 }
 
 func (c *Type) GetValPointer() any {
@@ -145,6 +165,32 @@ func (c *Type) GetValPointer() any {
 }
 
 func (c *Type) GetTableType() coredb.TableType {
+	return table
+}
+
+// CountryCode field
+// user country code
+type CountryCode struct {
+	val int
+}
+
+func (c *CountryCode) GetCountryCode() int {
+	return c.val
+}
+
+func (c *CountryCode) GetColumnName() string {
+	return "country_code"
+}
+
+func (c *CountryCode) IsPrimaryKey() bool {
+	return true
+}
+
+func (c *CountryCode) GetValPointer() any {
+	return &c.val
+}
+
+func (c *CountryCode) GetTableType() coredb.TableType {
 	return table
 }
 
@@ -196,17 +242,18 @@ func NewAccountWithPK(val PK) *Account {
 	c := &Account{
 		UserId{},
 		Type{val: "free"},
+		CountryCode{val: int(0)},
 		Money{val: int(0)},
 	}
 	c.UserId.val = val.UserId
-	c.Type.val = val.Type
+	c.CountryCode.val = val.CountryCode
 	return c
 }
 
 func (c *Account) Insert() error {
-	sql := "INSERT IGNORE INTO `account` (`user_id`, `type`, `money`) values (?, ?, ?)"
+	sql := "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetType(), c.GetMoney())
+	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
 
 	if err != nil {
 		return err
@@ -225,12 +272,17 @@ func (c *Account) Insert() error {
 }
 
 func (c *Account) resetUpdated() {
+	c.Type.resetUpdated()
 	c.Money.resetUpdated()
 }
 
 func (obj *Account) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
+	if obj.Type.IsUpdated() {
+		updatedFields = append(updatedFields, "`type` = ?")
+		params = append(params, obj.GetType())
+	}
 	if obj.Money.IsUpdated() {
 		updatedFields = append(updatedFields, "`money` = ?")
 		params = append(params, obj.GetMoney())
@@ -241,8 +293,8 @@ func (obj *Account) Update() (bool, error) {
 	}
 
 	sql := "UPDATE `account` SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `type` = ?"
-	params = append(params, obj.GetUserId(), obj.GetType())
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `country_code` = ?"
+	params = append(params, obj.GetUserId(), obj.GetCountryCode())
 
 	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
@@ -274,6 +326,12 @@ func Update(obj withPK) (bool, error) {
 		col := val.Field(i).Addr().Interface()
 
 		switch c := col.(type) {
+		case *Type:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "`type` = ?")
+				params = append(params, c.GetType())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
 		case *Money:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`money` = ?")
@@ -288,8 +346,8 @@ func Update(obj withPK) (bool, error) {
 	}
 
 	sql := "UPDATE `account` SET "
-	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `type` = ?"
-	params = append(params, obj.GetUserId(), obj.GetType())
+	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `country_code` = ?"
+	params = append(params, obj.GetUserId(), obj.GetCountryCode())
 
 	result, err := coredb.Exec(sql, _db, params...)
 	if err != nil {
@@ -311,15 +369,15 @@ func Update(obj withPK) (bool, error) {
 }
 
 func (obj *Account) Delete() error {
-	sql := "DELETE FROM `account` WHERE `user_id` = ? and `type` = ?"
+	sql := "DELETE FROM `account` WHERE `user_id` = ? and `country_code` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetType())
+	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetCountryCode())
 	return err
 }
 
 func Delete(obj withPK) error {
-	sql := "DELETE FROM `account` WHERE `user_id` = ? and `type` = ?"
+	sql := "DELETE FROM `account` WHERE `user_id` = ? and `country_code` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetType())
+	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetCountryCode())
 	return err
 }

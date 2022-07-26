@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/olachat/gola/golalib/testdata/account"
 	"github.com/olachat/gola/golalib/testdata/profile"
 )
 
@@ -35,5 +36,34 @@ func TestProfile(t *testing.T) {
 	p2 = profile.FetchProfileByPK(8)
 	if p2.GetNickName() != "tom" {
 		t.Error("profile re-fetch error")
+	}
+}
+
+func TestAccount(t *testing.T) {
+	pk := account.PK{
+		UserId:      8,
+		CountryCode: 4,
+	}
+	a := account.NewAccountWithPK(pk)
+	a.SetMoney(47)
+	err := a.Insert()
+	if err != nil {
+		t.Error(err)
+	}
+
+	a2 := account.FetchAccountByPK(pk)
+	if a2.GetMoney() != a.GetMoney() || a2.GetType() != a.GetType() || a2.GetUserId() != a.GetUserId() {
+		t.Error("account re-fetch error")
+	}
+	a.SetMoney(84)
+	a.SetType(account.AccountTypeVip)
+	ok, err := a.Update()
+	if err != nil || !ok {
+		t.Error("account update error")
+	}
+
+	a2 = account.FetchAccountByPK(pk)
+	if a2.GetMoney() != a.GetMoney() || a2.GetType() != a.GetType() || a2.GetUserId() != a.GetUserId() {
+		t.Error("account re-fetch error")
 	}
 }
