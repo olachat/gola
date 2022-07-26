@@ -30,9 +30,9 @@ func getDB(db *sql.DB) *sql.DB {
 
 // FetchByPK returns a row of T type with given primary key value
 func FetchByPK[T any](db *sql.DB, pkName []string, val ...any) *T {
-	sql := "WHERE " + pkName[0] + "=?"
+	sql := "WHERE `" + pkName[0] + "` = ?"
 	for _, name := range pkName[1:] {
-		sql += " AND " + name + "=?"
+		sql += " AND `" + name + "` = ?"
 	}
 	w := NewWhere(sql, val...)
 	return FindOne[T](w, db)
@@ -44,7 +44,7 @@ func FetchByPKs[T any](vals []any, pkName string, db *sql.DB) []*T {
 		return make([]*T, 0)
 	}
 
-	query := fmt.Sprintf("WHERE %s IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
+	query := fmt.Sprintf("WHERE `%s` IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
 	w := NewWhere(query, vals...)
 
 	result, _ := Find[T](w, db)
@@ -63,9 +63,10 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 	whereSQL, params := where.GetWhere()
-	query := fmt.Sprintf("SELECT %s FROM %s %s", columnsNames,
+	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
 		tableName, whereSQL)
-
+	fmt.Printf("query: %v\n", query)
+	fmt.Printf("params: %v\n", params)
 	mydb := getDB(db)
 	err2 := mydb.QueryRow(query, params...).Scan(data...)
 
@@ -86,7 +87,7 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 func Find[T any](where WhereQuery, db *sql.DB) ([]*T, error) {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	whereSQL, params := where.GetWhere()
-	query := fmt.Sprintf("SELECT %s FROM %s %s", columnsNames,
+	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
 		tableName, whereSQL)
 
 	return Query[T](query, db, params...)
@@ -137,7 +138,7 @@ func GetTableAndColumnsNames[T any]() (tableName string, joinedColumnNames strin
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
 		if f, ok := valueField.Addr().Interface().(ColumnType); ok {
-			columnNames = append(columnNames, f.GetColumnName())
+			columnNames = append(columnNames, "`"+f.GetColumnName()+"`")
 			if tableName == "" {
 				tableName = f.GetTableType().GetTableName()
 			}

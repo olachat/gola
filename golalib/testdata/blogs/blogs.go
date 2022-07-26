@@ -65,13 +65,13 @@ func FetchByPK[T any](val int) *T {
 // FetchBlogByPKs returns rows with from blogs table with given primary key values
 func FetchBlogByPKs(vals ...int) []*Blog {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Blog](pks, "`id`", _db)
+	return coredb.FetchByPKs[Blog](pks, "id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from blogs table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "`id`", _db)
+	return coredb.FetchByPKs[T](pks, "id", _db)
 }
 
 // FindOneBlog returns a row from blogs table with arbitary where query

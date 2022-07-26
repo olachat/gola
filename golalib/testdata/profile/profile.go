@@ -49,13 +49,13 @@ func FetchByPK[T any](val int) *T {
 // FetchProfileByPKs returns rows with from profile table with given primary key values
 func FetchProfileByPKs(vals ...int) []*Profile {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Profile](pks, "`user_id`", _db)
+	return coredb.FetchByPKs[Profile](pks, "user_id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from profile table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "`user_id`", _db)
+	return coredb.FetchByPKs[T](pks, "user_id", _db)
 }
 
 // FindOneProfile returns a row from profile table with arbitary where query
