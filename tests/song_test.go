@@ -10,13 +10,22 @@ import (
 )
 
 func TestSong(t *testing.T) {
-	songs.FetchSongByPK(1)
-
 	s := songs.NewSong()
+	s.SetRank(5)
 	s.SetHash("hash")
 	err := s.Insert()
 	if err != nil {
 		t.Error(err)
+	}
+
+	id := s.GetId()
+	if id != 1 {
+		t.Error("Insert song error")
+	}
+
+	s = songs.FetchSongByPK(id)
+	if s.GetRank() != 5 || s.GetHash() != "hash" {
+		t.Error("Re-fetch song error")
 	}
 
 	pk := song_user_favourites.PK{

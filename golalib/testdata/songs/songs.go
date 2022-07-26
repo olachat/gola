@@ -22,6 +22,8 @@ type Song struct {
 	Id
 	// Song title varchar
 	Title
+	// Song Ranking mediumint
+	Rank
 	// Song file hash checksum varchar
 	Hash
 }
@@ -166,6 +168,50 @@ func (c *Title) GetTableType() coredb.TableType {
 	return table
 }
 
+// Rank field
+// Song Ranking
+type Rank struct {
+	_updated bool
+	val      int
+}
+
+func (c *Rank) GetRank() int {
+	return c.val
+}
+
+func (c *Rank) SetRank(val int) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
+	c.val = val
+	return true
+}
+
+func (c *Rank) IsUpdated() bool {
+	return c._updated
+}
+
+func (c *Rank) resetUpdated() {
+	c._updated = false
+}
+
+func (c *Rank) GetColumnName() string {
+	return "rank"
+}
+
+func (c *Rank) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Rank) GetValPointer() any {
+	return &c.val
+}
+
+func (c *Rank) GetTableType() coredb.TableType {
+	return table
+}
+
 // Hash field
 // Song file hash checksum
 type Hash struct {
@@ -214,6 +260,7 @@ func NewSong() *Song {
 	return &Song{
 		Id{},
 		Title{},
+		Rank{val: int(0)},
 		Hash{},
 	}
 }
@@ -222,6 +269,7 @@ func NewSongWithPK(val uint) *Song {
 	c := &Song{
 		Id{},
 		Title{},
+		Rank{val: int(0)},
 		Hash{},
 	}
 	c.Id.val = val
@@ -229,9 +277,9 @@ func NewSongWithPK(val uint) *Song {
 }
 
 func (c *Song) Insert() error {
-	sql := `INSERT IGNORE INTO songs (title, hash) values (?, ?)`
+	sql := `INSERT IGNORE INTO songs (title, rank, hash) values (?, ?, ?)`
 
-	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetHash())
+	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetRank(), c.GetHash())
 
 	if err != nil {
 		return err
@@ -257,6 +305,7 @@ func (c *Song) Insert() error {
 
 func (c *Song) resetUpdated() {
 	c.Title.resetUpdated()
+	c.Rank.resetUpdated()
 	c.Hash.resetUpdated()
 }
 
@@ -266,6 +315,10 @@ func (obj *Song) Update() (bool, error) {
 	if obj.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "title = ?")
 		params = append(params, obj.GetTitle())
+	}
+	if obj.Rank.IsUpdated() {
+		updatedFields = append(updatedFields, "rank = ?")
+		params = append(params, obj.GetRank())
 	}
 	if obj.Hash.IsUpdated() {
 		updatedFields = append(updatedFields, "hash = ?")
@@ -314,6 +367,12 @@ func Update(obj withPK) (bool, error) {
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "title = ?")
 				params = append(params, c.GetTitle())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Rank:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "rank = ?")
+				params = append(params, c.GetRank())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Hash:

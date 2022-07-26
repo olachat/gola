@@ -24,6 +24,8 @@ const (
 	IdDesc
 	TitleAsc
 	TitleDesc
+	RankAsc
+	RankDesc
 	HashAsc
 	HashDesc
 )
@@ -40,6 +42,10 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 			q.orders[i] = "title asc"
 		case TitleDesc:
 			q.orders[i] = "title desc"
+		case RankAsc:
+			q.orders[i] = "rank asc"
+		case RankDesc:
+			q.orders[i] = "rank desc"
 		case HashAsc:
 			q.orders[i] = "hash asc"
 		case HashDesc:
