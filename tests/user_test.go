@@ -22,7 +22,7 @@ const (
 	testDBName string = "testdb"
 )
 
-var tableNames = []string{"users", "blogs", "songs", "song_user_favourites"}
+var tableNames = []string{"users", "blogs", "songs", "song_user_favourites", "profile", "account"}
 
 func init() {
 	engine := sqle.NewDefault(gsql.NewDatabaseProvider(

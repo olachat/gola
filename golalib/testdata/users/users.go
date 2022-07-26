@@ -69,13 +69,13 @@ func FetchByPK[T any](val int) *T {
 // FetchUserByPKs returns rows with from users table with given primary key values
 func FetchUserByPKs(vals ...int) []*User {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[User](pks, "`id`", _db)
+	return coredb.FetchByPKs[User](pks, "id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from users table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "`id`", _db)
+	return coredb.FetchByPKs[T](pks, "id", _db)
 }
 
 // FindOneUser returns a row from users table with arbitary where query

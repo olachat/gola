@@ -10,7 +10,7 @@ import (
 func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 	for _, t := range tables {
 		var tableDesc []*structs.RowDesc
-		rows, err := m.conn.Query("desc " + t.Name)
+		rows, err := m.conn.Query("desc `" + t.Name + "`")
 		if err != nil {
 			return err
 		}
@@ -34,7 +34,7 @@ func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 		}
 
 		var indexDesc []*structs.IndexDesc
-		rows, err = m.conn.Query("show index from " + t.Name)
+		rows, err = m.conn.Query("show index from `" + t.Name + "`")
 		if err != nil {
 			return err
 		}
@@ -45,6 +45,36 @@ func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 			indexDesc = append(indexDesc, id)
 		}
 		t.Indexes = groupIndex(indexDesc)
+
+		// Hack to handle table without primary key, but has only one unique key
+		// Just consider that unique key as primary
+		if t.PKey == nil {
+			uniqueIdxCount := 0
+			var uniqueIdx []*structs.IndexDesc
+			var uniqueIdxName string
+			for idxName, idx := range t.Indexes {
+				isUnique := true
+				for _, node := range idx {
+					if node.NonUnique > 0 {
+						isUnique = false
+					}
+				}
+				if isUnique {
+					uniqueIdxCount += 1
+					uniqueIdx = idx
+					uniqueIdxName = idxName
+				}
+			}
+
+			if uniqueIdxCount == 1 {
+				t.PKey = &structs.PrimaryKey{}
+				t.PKey.Name = uniqueIdxName
+				t.PKey.Columns = make([]string, len(uniqueIdx))
+				for i, node := range uniqueIdx {
+					t.PKey.Columns[i] = node.ColumnName
+				}
+			}
+		}
 	}
 
 	return nil

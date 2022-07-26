@@ -55,13 +55,13 @@ func FetchByPK[T any](val uint) *T {
 // FetchSongByPKs returns rows with from songs table with given primary key values
 func FetchSongByPKs(vals ...uint) []*Song {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Song](pks, "`id`", _db)
+	return coredb.FetchByPKs[Song](pks, "id", _db)
 }
 
 // FetchByPKs returns rows with selected fields from songs table with given primary key values
 func FetchByPKs[T any](vals ...uint) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "`id`", _db)
+	return coredb.FetchByPKs[T](pks, "id", _db)
 }
 
 // FindOneSong returns a row from songs table with arbitary where query
