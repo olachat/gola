@@ -93,6 +93,8 @@ type iQuery[T any] interface {
 	orderReadQuery[T]
 }
 type iQuery1[T any] interface {
+	AndSongIdEQ(val uint) orderReadQuery[T]
+	AndSongIdIN(vals ...uint) orderReadQuery[T]
 	AndIsFavouriteEQ(val bool) orderReadQuery[T]
 	AndIsFavouriteIN(vals ...bool) orderReadQuery[T]
 	orderReadQuery[T]
@@ -102,14 +104,28 @@ type idxQuery1[T any] struct {
 	*idxQuery[T]
 }
 
+func (q *idxQuery1[T]) AndSongIdEQ(val uint) orderReadQuery[T] {
+	q.whereSql = " and `song_id` = ?"
+	q.whereParams = append(q.whereParams, val)
+	return q.idxQuery
+}
+
+func (q *idxQuery1[T]) AndSongIdIN(vals ...uint) orderReadQuery[T] {
+	q.whereSql += " and `song_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	for _, val := range vals {
+		q.whereParams = append(q.whereParams, val)
+	}
+	return q.idxQuery
+}
+
 func (q *idxQuery1[T]) AndIsFavouriteEQ(val bool) orderReadQuery[T] {
-	q.whereSql = " and `user_id` = ?"
+	q.whereSql = " and `is_favourite` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
 func (q *idxQuery1[T]) AndIsFavouriteIN(vals ...bool) orderReadQuery[T] {
-	q.whereSql += " and `user_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `is_favourite` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
