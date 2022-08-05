@@ -167,13 +167,13 @@ type idxQuery1[T any] struct {
 }
 
 func (q *idxQuery1[T]) AndIsPinnedEQ(val bool) iQuery2[T] {
-	q.whereSql = " and `category_id` = ?"
+	q.whereSql = " and `is_pinned` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return &idxQuery2[T]{q.idxQuery}
 }
 
 func (q *idxQuery1[T]) AndIsPinnedIN(vals ...bool) iQuery2[T] {
-	q.whereSql += " and `category_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `is_pinned` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -185,13 +185,13 @@ type idxQuery2[T any] struct {
 }
 
 func (q *idxQuery2[T]) AndIsVipEQ(val bool) orderReadQuery[T] {
-	q.whereSql = " and `is_pinned` = ?"
+	q.whereSql = " and `is_vip` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
 func (q *idxQuery2[T]) AndIsVipIN(vals ...bool) orderReadQuery[T] {
-	q.whereSql += " and `is_pinned` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `is_vip` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -203,13 +203,13 @@ type idxQuery4[T any] struct {
 }
 
 func (q *idxQuery4[T]) AndCategoryIdEQ(val int) iQuery5[T] {
-	q.whereSql = " and `country` = ?"
+	q.whereSql = " and `category_id` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return &idxQuery5[T]{q.idxQuery}
 }
 
 func (q *idxQuery4[T]) AndCategoryIdIN(vals ...int) iQuery5[T] {
-	q.whereSql += " and `country` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `category_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -217,13 +217,13 @@ func (q *idxQuery4[T]) AndCategoryIdIN(vals ...int) iQuery5[T] {
 }
 
 func (q *idxQuery4[T]) AndIsVipEQ(val bool) orderReadQuery[T] {
-	q.whereSql = " and `country` = ?"
+	q.whereSql = " and `is_vip` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
 func (q *idxQuery4[T]) AndIsVipIN(vals ...bool) orderReadQuery[T] {
-	q.whereSql += " and `country` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `is_vip` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -235,13 +235,13 @@ type idxQuery5[T any] struct {
 }
 
 func (q *idxQuery5[T]) AndIsVipEQ(val bool) orderReadQuery[T] {
-	q.whereSql = " and `category_id` = ?"
+	q.whereSql = " and `is_vip` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
 func (q *idxQuery5[T]) AndIsVipIN(vals ...bool) orderReadQuery[T] {
-	q.whereSql += " and `category_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `is_vip` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -253,13 +253,13 @@ type idxQuery9[T any] struct {
 }
 
 func (q *idxQuery9[T]) AndIsPinnedEQ(val bool) iQuery10[T] {
-	q.whereSql = " and `user_id` = ?"
+	q.whereSql = " and `is_pinned` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return &idxQuery10[T]{q.idxQuery}
 }
 
 func (q *idxQuery9[T]) AndIsPinnedIN(vals ...bool) iQuery10[T] {
-	q.whereSql += " and `user_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `is_pinned` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -267,13 +267,13 @@ func (q *idxQuery9[T]) AndIsPinnedIN(vals ...bool) iQuery10[T] {
 }
 
 func (q *idxQuery9[T]) AndIsVipEQ(val bool) orderReadQuery[T] {
-	q.whereSql = " and `user_id` = ?"
+	q.whereSql = " and `is_vip` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
 func (q *idxQuery9[T]) AndIsVipIN(vals ...bool) orderReadQuery[T] {
-	q.whereSql += " and `user_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `is_vip` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
@@ -285,13 +285,13 @@ type idxQuery10[T any] struct {
 }
 
 func (q *idxQuery10[T]) AndCategoryIdEQ(val int) orderReadQuery[T] {
-	q.whereSql = " and `is_pinned` = ?"
+	q.whereSql = " and `category_id` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
 func (q *idxQuery10[T]) AndCategoryIdIN(vals ...int) orderReadQuery[T] {
-	q.whereSql += " and `is_pinned` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	q.whereSql += " and `category_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
