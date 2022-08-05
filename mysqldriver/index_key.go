@@ -38,12 +38,34 @@ func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 		if err != nil {
 			return err
 		}
+
+		hasKeyInShowIndex := false
 		for rows.Next() {
 			id := new(structs.IndexDesc)
 			rows.Scan(&id.Table, &id.NonUnique, &id.KeyName, &id.SeqInIndex, &id.ColumnName, &id.Collation, &id.Cardinality,
 				&id.SubPart, &id.Packed, &id.Null, &id.IndexType, &id.Comment, &id.IndexComment, &id.Visible, &id.Expression)
+
 			indexDesc = append(indexDesc, id)
+
+			if id.KeyName == "PRIMARY" {
+				hasKeyInShowIndex = true
+			}
 		}
+
+		// Work around for bug in github.com/dolthub/go-mysql-server v0.12.0
+		// Which doesn't return PRIMARY info in show index from XXX query
+		if !hasKeyInShowIndex && t.PKey != nil && len(t.PKey.Columns) > 1 {
+			for i, col := range t.PKey.Columns {
+				id := new(structs.IndexDesc)
+				id.Table = t.Name
+				id.NonUnique = 1
+				id.KeyName = "PRIMARY"
+				id.ColumnName = col
+				id.SeqInIndex = i + 1
+				indexDesc = append(indexDesc, id)
+			}
+		}
+
 		t.Indexes = groupIndex(indexDesc)
 
 		// Hack to handle table without primary key, but has only one unique key
