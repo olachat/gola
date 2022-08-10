@@ -21,14 +21,9 @@ import (
 /*
 	Run gola to perform code gen
 
-`output`: output file path
+`output`: output folder path
 */
 func Run(config mysqldriver.DBConfig, output string) {
-	wd, err := os.Getwd()
-	if err != nil {
-		wd = "."
-	}
-
 	m := &mysqldriver.MySQLDriver{}
 	db, err := m.Assemble(config)
 	if err != nil {
@@ -40,6 +35,11 @@ func Run(config mysqldriver.DBConfig, output string) {
 	}
 
 	if !strings.HasPrefix(output, "/") {
+		// output folder is relative path
+		wd, err := os.Getwd()
+		if err != nil {
+			wd = "."
+		}
 		output = wd + string(filepath.Separator) + output
 	}
 
