@@ -39,9 +39,8 @@ func (*cmd) Run(args []string) int {
 	var config mysqldriver.Config = viper.GetStringMap(driverName)
 	dbconfig := mysqldriver.NewDBConfig(config)
 	output := config.DefaultString("output", "temp")
-	gentype := config.DefaultString("gentype", "orm")
 
-	Run(dbconfig, output, gentype)
+	Run(dbconfig, output)
 
 	return 0
 }
