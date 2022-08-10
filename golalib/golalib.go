@@ -18,17 +18,12 @@ import (
 	"github.com/olachat/gola/structs"
 )
 
-/* Run gola to perform code gen
+/*
+	Run gola to perform code gen
 
-`output`: output file path
-`gentype`: currently must be 'orm'
+`output`: output folder path
 */
-func Run(config mysqldriver.DBConfig, output string, gentype string) {
-	wd, err := os.Getwd()
-	if err != nil {
-		wd = "."
-	}
-
+func Run(config mysqldriver.DBConfig, output string) {
 	m := &mysqldriver.MySQLDriver{}
 	db, err := m.Assemble(config)
 	if err != nil {
@@ -39,11 +34,12 @@ func Run(config mysqldriver.DBConfig, output string, gentype string) {
 		output = "temp"
 	}
 
-	if gentype == "" {
-		gentype = "orm"
-	}
-
 	if !strings.HasPrefix(output, "/") {
+		// output folder is relative path
+		wd, err := os.Getwd()
+		if err != nil {
+			wd = "."
+		}
 		output = wd + string(filepath.Separator) + output
 	}
 
@@ -52,25 +48,22 @@ func Run(config mysqldriver.DBConfig, output string, gentype string) {
 	}
 
 	for _, t := range db.Tables {
-		switch gentype {
-		case "orm":
-			if len(t.GetPKColumns()) == 0 {
-				println(t.Name + " doesn't have primay key")
-				continue
+		if len(t.GetPKColumns()) == 0 {
+			println(t.Name + " doesn't have primay key")
+			continue
+		}
+
+		files := genORM(t)
+		needMkdir := true
+		for path, data := range files {
+			if needMkdir {
+				pos := strings.LastIndex(path, string(filepath.Separator))
+				expectedFileFolder := output + path[0:pos]
+				os.Mkdir(expectedFileFolder, os.ModePerm)
+				needMkdir = false
 			}
 
-			files := genORM(t)
-			needMkdir := true
-			for path, data := range files {
-				if needMkdir {
-					pos := strings.LastIndex(path, string(filepath.Separator))
-					expectedFileFolder := output + path[0:pos]
-					os.Mkdir(expectedFileFolder, os.ModePerm)
-					needMkdir = false
-				}
-
-				ioutil.WriteFile(output+path, data, 0644)
-			}
+			ioutil.WriteFile(output+path, data, 0644)
 		}
 	}
 }

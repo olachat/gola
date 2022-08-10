@@ -1,33 +1,25 @@
 package main
 
 import (
+	"log"
 	"os"
 
+	"github.com/mitchellh/cli"
 	"github.com/olachat/gola/golalib"
-	"github.com/olachat/gola/mysqldriver"
-
-	"github.com/spf13/viper"
 )
 
 func main() {
-	viper.SetConfigName("gola")
-	wd, err := os.Getwd()
+	c := cli.NewCLI("gola", golalib.VERSION)
+	c.Args = os.Args[1:]
+
+	c.Commands = map[string]cli.CommandFactory{
+		"gen": golalib.GenCommandFactory,
+	}
+
+	exitStatus, err := c.Run()
 	if err != nil {
-		wd = "."
+		log.Println(err)
 	}
 
-	configPaths := []string{wd}
-	for _, p := range configPaths {
-		viper.AddConfigPath(p)
-	}
-	viper.ReadInConfig()
-	viper.AutomaticEnv()
-	driverName := "mysql"
-
-	var config mysqldriver.Config = viper.GetStringMap(driverName)
-	dbconfig := mysqldriver.NewDBConfig(config)
-	output := config.DefaultString("output", "temp")
-	gentype := config.DefaultString("gentype", "orm")
-
-	golalib.Run(dbconfig, output, gentype)
+	os.Exit(exitStatus)
 }
