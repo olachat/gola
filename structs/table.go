@@ -18,8 +18,23 @@ type Table struct {
 
 	IsJoinTable bool `json:"is_join_table"`
 	Indexes     map[string][]*IndexDesc
-	VERSION     string
+	version     string
 	idxRoot     *IdxNode
+}
+
+// SetVersion for code gen
+func (t *Table) SetVersion(version string) {
+	t.version = version
+}
+
+// GetVersion for code gen
+func (t *Table) GetVersion() string {
+	return t.version
+}
+
+// GetName for code gen
+func (t *Table) GetName() string {
+	return t.Name
 }
 
 // Package returns the package name for the table

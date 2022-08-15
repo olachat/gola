@@ -21,6 +21,7 @@ import (
 	gsql "github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	"github.com/olachat/gola/mysqldriver"
+	"github.com/olachat/gola/ormtpl"
 	"github.com/olachat/gola/structs"
 )
 
@@ -28,7 +29,7 @@ import (
 var fixtures embed.FS
 var s *server.Server
 var testDBPort int = 33066
-var testDBName string = "testdb"
+var testDBName string = "testdata"
 var testTables = []string{"blogs", "users", "songs", "song_user_favourites", "profile", "account"}
 var testDataPath = "testdata" + string(filepath.Separator)
 
@@ -89,16 +90,19 @@ func getDB() *structs.DBInfo {
 	return db
 }
 
-type genMethod func(t *structs.Table) map[string][]byte
+type genMethod func(t ormtpl.TplStruct) map[string][]byte
 
-func testGen(t *testing.T, wd string, gen genMethod, db *structs.DBInfo, table *structs.Table) {
-	resultFiles := gen(table)
+func testGen(t *testing.T, wd string, gen genMethod, data ormtpl.TplStruct) {
+	resultFiles := gen(data)
 
 	if *update {
 		for path, data := range resultFiles {
 			pos := strings.LastIndex(path, string(filepath.Separator))
-			expectedFileFolder := testDataPath + path[0:pos]
-			os.Mkdir(expectedFileFolder, os.ModePerm)
+			if pos > 0 {
+				expectedFileFolder := testDataPath + path[0:pos]
+				os.Mkdir(expectedFileFolder, os.ModePerm)
+			}
+
 			err := ioutil.WriteFile(testDataPath+path, data, 0644)
 			if err != nil {
 				panic(err)
@@ -125,8 +129,14 @@ func TestCodeGen(t *testing.T) {
 	}
 
 	for _, table := range db.Tables {
-		testGen(t, wd, genORM, db, table)
+		testGen(t, wd, func(t ormtpl.TplStruct) map[string][]byte {
+			return genORM(t.(*structs.Table))
+		}, table)
 	}
+
+	testGen(t, wd, func(t ormtpl.TplStruct) map[string][]byte {
+		return genPackage(t.(*structs.DBInfo))
+	}, db)
 }
 
 func getOne[T any](objs []T, filter func(obj T) bool) T {

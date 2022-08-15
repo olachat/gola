@@ -9,7 +9,7 @@ import (
 	"github.com/olachat/gola/coredb"
 )
 
-var DBName string = "testdb"
+var DBName string = "testdata"
 
 func Setup(dbname string) {
 	DBName = dbname

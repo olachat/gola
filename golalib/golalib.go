@@ -18,8 +18,7 @@ import (
 	"github.com/olachat/gola/structs"
 )
 
-/*
-	Run gola to perform code gen
+/*Run gola to perform code gen
 
 `output`: output folder path
 */
@@ -66,17 +65,40 @@ func Run(config mysqldriver.DBConfig, output string) {
 			ioutil.WriteFile(output+path, data, 0644)
 		}
 	}
+
+	files := genPackage(db)
+	for path, data := range files {
+		ioutil.WriteFile(output+path, data, 0644)
+	}
 }
 
-func genTPL(t *structs.Table, tplName string) []byte {
+func genTPL(t ormtpl.TplStruct, tplName string) []byte {
 	buf := bytes.NewBufferString("")
-	t.VERSION = VERSION
+	t.SetVersion(VERSION)
 	err := ormtpl.GetTpl(tplName).Execute(buf, t)
 	if err != nil {
-		panic(t.Name + " " + tplName +
+		panic(t.GetName() + " " + tplName +
 			" genTpl error:\n" + err.Error())
 	}
 	return buf.Bytes()
+}
+
+func genPackage(db *structs.DBInfo) map[string][]byte {
+	files := make(map[string][]byte)
+
+	genFiles := map[string]string{
+		"02_package.gogo": db.Schema + "_goladb.go",
+	}
+
+	for genTpl, genPath := range genFiles {
+		data, err := formatBuffer(genTPL(db, genTpl))
+		if err != nil {
+			panic(db.Schema + " db code error:\n" + err.Error())
+		}
+		files[genPath] = data
+	}
+
+	return files
 }
 
 func genORM(t *structs.Table) map[string][]byte {

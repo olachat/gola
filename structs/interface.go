@@ -23,12 +23,6 @@ const (
 	ConfigSSLMode = "sslmode"
 )
 
-// DBInfo represents information about a database
-type DBInfo struct {
-	Schema string   `json:"schema"`
-	Tables []*Table `json:"tables"`
-}
-
 // Constructor breaks down the functionality required to implement a driver
 // such that the drivers.Tables method can be used to reduce duplication in driver
 // implementations.
