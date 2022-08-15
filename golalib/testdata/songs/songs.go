@@ -311,6 +311,7 @@ func (c *Hash) GetTableType() coredb.TableType {
 	return table
 }
 
+// NewSong return new *Song with default values
 func NewSong() *Song {
 	return &Song{
 		Id{},
@@ -321,6 +322,8 @@ func NewSong() *Song {
 	}
 }
 
+// NewSongWithPK return new *Song with given PK
+// PK column: "id"
 func NewSongWithPK(val uint) *Song {
 	c := &Song{
 		Id{},

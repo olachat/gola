@@ -210,6 +210,8 @@ func (c *NickName) GetTableType() coredb.TableType {
 	return table
 }
 
+// NewProfileWithPK return new *Profile with given PK
+// PK column: "user_id"
 func NewProfileWithPK(val int) *Profile {
 	c := &Profile{
 		UserId{},

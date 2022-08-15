@@ -532,6 +532,7 @@ func (c *UpdatedAt) GetTableType() coredb.TableType {
 	return table
 }
 
+// NewBlog return new *Blog with default values
 func NewBlog() *Blog {
 	return &Blog{
 		Id{},
@@ -547,6 +548,8 @@ func NewBlog() *Blog {
 	}
 }
 
+// NewBlogWithPK return new *Blog with given PK
+// PK column: "id"
 func NewBlogWithPK(val int) *Blog {
 	c := &Blog{
 		Id{},

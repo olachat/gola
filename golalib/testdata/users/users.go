@@ -687,6 +687,7 @@ func (c *SportsNoDefault) GetTableType() coredb.TableType {
 	return table
 }
 
+// NewUser return new *User with default values
 func NewUser() *User {
 	return &User{
 		Id{},
@@ -704,6 +705,8 @@ func NewUser() *User {
 	}
 }
 
+// NewUserWithPK return new *User with given PK
+// PK column: "id"
 func NewUserWithPK(val int) *User {
 	c := &User{
 		Id{},

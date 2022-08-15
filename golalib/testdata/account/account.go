@@ -238,6 +238,8 @@ func (c *Money) GetTableType() coredb.TableType {
 	return table
 }
 
+// NewAccountWithPK return new *Account with given PK
+// PK column: "user_id","country_code"
 func NewAccountWithPK(val PK) *Account {
 	c := &Account{
 		UserId{},

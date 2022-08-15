@@ -326,6 +326,8 @@ func (c *UpdatedAt) GetTableType() coredb.TableType {
 	return table
 }
 
+// NewSongUserFavouriteWithPK return new *SongUserFavourite with given PK
+// PK column: "user_id","song_id"
 func NewSongUserFavouriteWithPK(val PK) *SongUserFavourite {
 	c := &SongUserFavourite{
 		UserId{},
