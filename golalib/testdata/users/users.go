@@ -3,17 +3,16 @@
 package users
 
 import (
-	"database/sql"
 	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
 )
 
-var _db *sql.DB
+var DBName string = "testdb"
 
-func Setup(db *sql.DB) {
-	_db = db
+func Setup(dbname string) {
+	DBName = dbname
 }
 
 // User represents users table
@@ -58,58 +57,58 @@ type withPK interface {
 
 // FetchUserByPKs returns a row from users table with given primary key value
 func FetchUserByPK(val int) *User {
-	return coredb.FetchByPK[User](_db, []string{"id"}, val)
+	return coredb.FetchByPK[User](DBName, []string{"id"}, val)
 }
 
 // FetchByPKs returns a row with selected fields from users table with given primary key value
 func FetchByPK[T any](val int) *T {
-	return coredb.FetchByPK[T](_db, []string{"id"}, val)
+	return coredb.FetchByPK[T](DBName, []string{"id"}, val)
 }
 
 // FetchUserByPKs returns rows with from users table with given primary key values
 func FetchUserByPKs(vals ...int) []*User {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[User](pks, "id", _db)
+	return coredb.FetchByPKs[User](pks, "id", DBName)
 }
 
 // FetchByPKs returns rows with selected fields from users table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "id", _db)
+	return coredb.FetchByPKs[T](pks, "id", DBName)
 }
 
 // FindOneUser returns a row from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneUser(whereSQL string, params ...any) *User {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[User](w, _db)
+	return coredb.FindOne[User](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `users` "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `users` "+whereSQL, DBName, params...)
 }
 
 // FindOne returns a row with selected fields from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, _db)
+	return coredb.FindOne[T](w, DBName)
 }
 
 // FindUser returns rows from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindUser(whereSQL string, params ...any) ([]*User, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[User](w, _db)
+	return coredb.Find[User](w, DBName)
 }
 
 // Find returns rows with selected fields from users table with arbitary where query
 // whereSQL must start with "where ..."
 func Find[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, _db)
+	return coredb.Find[T](w, DBName)
 }
 
 // Column types
@@ -687,6 +686,7 @@ func (c *SportsNoDefault) GetTableType() coredb.TableType {
 	return table
 }
 
+// NewUser return new *User with default values
 func NewUser() *User {
 	return &User{
 		Id{},
@@ -704,6 +704,8 @@ func NewUser() *User {
 	}
 }
 
+// NewUserWithPK return new *User with given PK
+// PK column: "id"
 func NewUserWithPK(val int) *User {
 	c := &User{
 		Id{},
@@ -726,7 +728,7 @@ func NewUserWithPK(val int) *User {
 func (c *User) Insert() error {
 	sql := "INSERT IGNORE INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, _db, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+	result, err := coredb.Exec(sql, DBName, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 
 	if err != nil {
 		return err
@@ -820,7 +822,7 @@ func (obj *User) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -927,7 +929,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -949,13 +951,13 @@ func Update(obj withPK) (bool, error) {
 func (obj *User) Delete() error {
 	sql := "DELETE FROM `users` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetId())
+	_, err := coredb.Exec(sql, DBName, obj.GetId())
 	return err
 }
 
 func Delete(obj withPK) error {
 	sql := "DELETE FROM `users` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetId())
+	_, err := coredb.Exec(sql, DBName, obj.GetId())
 	return err
 }

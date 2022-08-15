@@ -50,13 +50,13 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 }
 
 func (q *idxQuery[T]) All() []*T {
-	result, _ := coredb.Find[T](q, _db)
+	result, _ := coredb.Find[T](q, DBName)
 	return result
 }
 
 func (q *idxQuery[T]) Limit(offset, count int) []*T {
 	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, count)
-	result, _ := coredb.Find[T](q, _db)
+	result, _ := coredb.Find[T](q, DBName)
 	return result
 }
 
