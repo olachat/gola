@@ -20,6 +20,8 @@ func Setup(db *sql.DB) {
 type Profile struct {
 	//  int
 	UserId
+	//  tinyint(4)
+	Level
 	// Nick Name varchar
 	NickName
 }
@@ -120,6 +122,50 @@ func (c *UserId) GetTableType() coredb.TableType {
 	return table
 }
 
+// Level field
+//
+type Level struct {
+	_updated bool
+	val      int8
+}
+
+func (c *Level) GetLevel() int8 {
+	return c.val
+}
+
+func (c *Level) SetLevel(val int8) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
+	c.val = val
+	return true
+}
+
+func (c *Level) IsUpdated() bool {
+	return c._updated
+}
+
+func (c *Level) resetUpdated() {
+	c._updated = false
+}
+
+func (c *Level) GetColumnName() string {
+	return "level"
+}
+
+func (c *Level) IsPrimaryKey() bool {
+	return false
+}
+
+func (c *Level) GetValPointer() any {
+	return &c.val
+}
+
+func (c *Level) GetTableType() coredb.TableType {
+	return table
+}
+
 // NickName field
 // Nick Name
 type NickName struct {
@@ -167,6 +213,7 @@ func (c *NickName) GetTableType() coredb.TableType {
 func NewProfileWithPK(val int) *Profile {
 	c := &Profile{
 		UserId{},
+		Level{val: int8(1)},
 		NickName{},
 	}
 	c.UserId.val = val
@@ -174,9 +221,9 @@ func NewProfileWithPK(val int) *Profile {
 }
 
 func (c *Profile) Insert() error {
-	sql := "INSERT IGNORE INTO `profile` (`user_id`, `nick_name`) values (?, ?)"
+	sql := "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
 
-	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetNickName())
+	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetLevel(), c.GetNickName())
 
 	if err != nil {
 		return err
@@ -195,12 +242,17 @@ func (c *Profile) Insert() error {
 }
 
 func (c *Profile) resetUpdated() {
+	c.Level.resetUpdated()
 	c.NickName.resetUpdated()
 }
 
 func (obj *Profile) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
+	if obj.Level.IsUpdated() {
+		updatedFields = append(updatedFields, "`level` = ?")
+		params = append(params, obj.GetLevel())
+	}
 	if obj.NickName.IsUpdated() {
 		updatedFields = append(updatedFields, "`nick_name` = ?")
 		params = append(params, obj.GetNickName())
@@ -244,6 +296,12 @@ func Update(obj withPK) (bool, error) {
 		col := val.Field(i).Addr().Interface()
 
 		switch c := col.(type) {
+		case *Level:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "`level` = ?")
+				params = append(params, c.GetLevel())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
 		case *NickName:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`nick_name` = ?")

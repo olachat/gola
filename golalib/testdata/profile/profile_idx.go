@@ -22,6 +22,8 @@ type idxQuery[T any] struct {
 const (
 	UserIdAsc orderBy = iota
 	UserIdDesc
+	LevelAsc
+	LevelDesc
 	NickNameAsc
 	NickNameDesc
 )
@@ -34,6 +36,10 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 			q.orders[i] = "`user_id` asc"
 		case UserIdDesc:
 			q.orders[i] = "`user_id` desc"
+		case LevelAsc:
+			q.orders[i] = "`level` asc"
+		case LevelDesc:
+			q.orders[i] = "`level` desc"
 		case NickNameAsc:
 			q.orders[i] = "`nick_name` asc"
 		case NickNameDesc:

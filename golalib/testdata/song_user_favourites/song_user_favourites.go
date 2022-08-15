@@ -26,7 +26,7 @@ type SongUserFavourite struct {
 	SongId
 	// favourite remark varchar
 	Remark
-	// Is favourite tinyint
+	// Is favourite tinyint(1)
 	IsFavourite
 	// Create Time timestamp
 	CreatedAt
