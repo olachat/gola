@@ -29,7 +29,7 @@ import (
 var fixtures embed.FS
 var s *server.Server
 var testDBPort int = 33066
-var testDBName string = "testdb"
+var testDBName string = "testdata"
 var testTables = []string{"blogs", "users", "songs", "song_user_favourites", "profile", "account"}
 var testDataPath = "testdata" + string(filepath.Separator)
 
