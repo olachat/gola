@@ -2,6 +2,8 @@ module github.com/olachat/gola
 
 go 1.18
 
+replace github.com/dolthub/go-mysql-server v0.12.0 => github.com/Wuvist/go-mysql-server v0.10.1-0.20220815042140-eac9e0ba16d8
+
 require (
 	github.com/dolthub/go-mysql-server v0.12.0
 	github.com/dolthub/vitess v0.0.0-20220603212614-514e62ec66cd
