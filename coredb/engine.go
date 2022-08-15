@@ -65,8 +65,7 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 	whereSQL, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
 		tableName, whereSQL)
-	fmt.Printf("query: %v\n", query)
-	fmt.Printf("params: %v\n", params)
+	mydb := getDB(dbname, db)
 	mydb := getDB(db)
 	err2 := mydb.QueryRow(query, params...).Scan(data...)
 
