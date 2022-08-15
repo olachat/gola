@@ -11,6 +11,7 @@ import (
 type cmd struct {
 }
 
+// GenCommandFactory wrap genCmd to be used in cli
 func GenCommandFactory() (cli.Command, error) {
 	return genCmd, nil
 }
