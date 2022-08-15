@@ -2,8 +2,13 @@
 
 package {{.Package}}
 
-import "github.com/olachat/gola/coredb"
+import (
+	"database/sql"
+	"github.com/olachat/gola/coredb"
+)
 
-func Setup(db *sql.db) {
-	coredb.SetupDB("{{ .Schema }}", db *sql.DB)
+// Setup default db conn for `{{ .Schema }}` database
+// If not set, it will fallback to gola's default db conn
+func Setup(db *sql.DB) {
+	coredb.SetupDB("{{ .Schema }}", db)
 }

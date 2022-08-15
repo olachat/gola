@@ -2,8 +2,13 @@
 
 package testdata
 
-import "github.com/olachat/gola/coredb"
+import (
+	"database/sql"
+	"github.com/olachat/gola/coredb"
+)
 
-func Setup(db *sql.db) {
-	coredb.SetupDB("testdata", db*sql.DB)
+// Setup default db conn for `testdata` database
+// If not set, it will fallback to gola's default db conn
+func Setup(db *sql.DB) {
+	coredb.SetupDB("testdata", db)
 }
