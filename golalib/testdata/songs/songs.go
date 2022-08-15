@@ -3,17 +3,16 @@
 package songs
 
 import (
-	"database/sql"
 	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
 )
 
-var _db *sql.DB
+var DBName string = "testdb"
 
-func Setup(db *sql.DB) {
-	_db = db
+func Setup(dbname string) {
+	DBName = dbname
 }
 
 // Song represents songs table
@@ -44,58 +43,58 @@ type withPK interface {
 
 // FetchSongByPKs returns a row from songs table with given primary key value
 func FetchSongByPK(val uint) *Song {
-	return coredb.FetchByPK[Song](_db, []string{"id"}, val)
+	return coredb.FetchByPK[Song](DBName, []string{"id"}, val)
 }
 
 // FetchByPKs returns a row with selected fields from songs table with given primary key value
 func FetchByPK[T any](val uint) *T {
-	return coredb.FetchByPK[T](_db, []string{"id"}, val)
+	return coredb.FetchByPK[T](DBName, []string{"id"}, val)
 }
 
 // FetchSongByPKs returns rows with from songs table with given primary key values
 func FetchSongByPKs(vals ...uint) []*Song {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Song](pks, "id", _db)
+	return coredb.FetchByPKs[Song](pks, "id", DBName)
 }
 
 // FetchByPKs returns rows with selected fields from songs table with given primary key values
 func FetchByPKs[T any](vals ...uint) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "id", _db)
+	return coredb.FetchByPKs[T](pks, "id", DBName)
 }
 
 // FindOneSong returns a row from songs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneSong(whereSQL string, params ...any) *Song {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[Song](w, _db)
+	return coredb.FindOne[Song](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `songs` "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `songs` "+whereSQL, DBName, params...)
 }
 
 // FindOne returns a row with selected fields from songs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, _db)
+	return coredb.FindOne[T](w, DBName)
 }
 
 // FindSong returns rows from songs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindSong(whereSQL string, params ...any) ([]*Song, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Song](w, _db)
+	return coredb.Find[Song](w, DBName)
 }
 
 // Find returns rows with selected fields from songs table with arbitary where query
 // whereSQL must start with "where ..."
 func Find[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, _db)
+	return coredb.Find[T](w, DBName)
 }
 
 // Column types
@@ -339,7 +338,7 @@ func NewSongWithPK(val uint) *Song {
 func (c *Song) Insert() error {
 	sql := "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`) values (?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, _db, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
+	result, err := coredb.Exec(sql, DBName, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
 
 	if err != nil {
 		return err
@@ -398,7 +397,7 @@ func (obj *Song) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -463,7 +462,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -485,13 +484,13 @@ func Update(obj withPK) (bool, error) {
 func (obj *Song) Delete() error {
 	sql := "DELETE FROM `songs` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetId())
+	_, err := coredb.Exec(sql, DBName, obj.GetId())
 	return err
 }
 
 func Delete(obj withPK) error {
 	sql := "DELETE FROM `songs` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetId())
+	_, err := coredb.Exec(sql, DBName, obj.GetId())
 	return err
 }

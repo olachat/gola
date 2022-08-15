@@ -9,17 +9,23 @@ import (
 )
 
 var _db *sql.DB
+var _dbs map[string]*sql.DB = make(map[string]*sql.DB)
 
-// Setup the default db instance
+// Setup default db instance for all db ops
 func Setup(db *sql.DB) {
 	_db = db
+}
+
+// SetupDB db instance for given dbname
+func SetupDB(dbname string, db *sql.DB) {
+	_dbs[dbname] = db
 }
 
 var typeColumnNames = make(map[reflect.Type]string)
 var typeTableNames = make(map[reflect.Type]string)
 
-func getDB(db *sql.DB) *sql.DB {
-	if db != nil {
+func getDB(dbname string) *sql.DB {
+	if db, ok := _dbs[dbname]; ok {
 		return db
 	}
 	if _db != nil {
@@ -29,17 +35,17 @@ func getDB(db *sql.DB) *sql.DB {
 }
 
 // FetchByPK returns a row of T type with given primary key value
-func FetchByPK[T any](db *sql.DB, pkName []string, val ...any) *T {
+func FetchByPK[T any](dbname string, pkName []string, val ...any) *T {
 	sql := "WHERE `" + pkName[0] + "` = ?"
 	for _, name := range pkName[1:] {
 		sql += " AND `" + name + "` = ?"
 	}
 	w := NewWhere(sql, val...)
-	return FindOne[T](w, db)
+	return FindOne[T](w, dbname)
 }
 
 // FetchByPKs returns rows of T type with given primary key values
-func FetchByPKs[T any](vals []any, pkName string, db *sql.DB) []*T {
+func FetchByPKs[T any](vals []any, pkName string, dbname string) []*T {
 	if len(vals) == 0 {
 		return make([]*T, 0)
 	}
@@ -47,26 +53,25 @@ func FetchByPKs[T any](vals []any, pkName string, db *sql.DB) []*T {
 	query := fmt.Sprintf("WHERE `%s` IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
 	w := NewWhere(query, vals...)
 
-	result, _ := Find[T](w, db)
+	result, _ := Find[T](w, dbname)
 	return result
 }
 
-// Exec given query with given db instances or default
-func Exec(query string, db *sql.DB, params ...any) (sql.Result, error) {
-	mydb := getDB(db)
+// Exec given query with given db info & params
+func Exec(query string, dbname string, params ...any) (sql.Result, error) {
+	mydb := getDB(dbname)
 	return mydb.Exec(query, params...)
 }
 
 // FindOne returns a row from given table type with where query
-func FindOne[T any](where WhereQuery, db *sql.DB) *T {
+func FindOne[T any](where WhereQuery, dbname string) *T {
 	u := new(T)
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	data := StrutForScan(u)
 	whereSQL, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
 		tableName, whereSQL)
-	mydb := getDB(dbname, db)
-	mydb := getDB(db)
+	mydb := getDB(dbname)
 	err2 := mydb.QueryRow(query, params...).Scan(data...)
 
 	if err2 != nil {
@@ -83,25 +88,25 @@ func FindOne[T any](where WhereQuery, db *sql.DB) *T {
 }
 
 // Find returns rows from given table type with where query
-func Find[T any](where WhereQuery, db *sql.DB) ([]*T, error) {
+func Find[T any](where WhereQuery, dbname string) ([]*T, error) {
 	tableName, columnsNames := GetTableAndColumnsNames[T]()
 	whereSQL, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
 		tableName, whereSQL)
 
-	return Query[T](query, db, params...)
+	return Query[T](query, dbname, params...)
 }
 
 // QueryInt single int result by query, handy for count(*) querys
-func QueryInt(query string, db *sql.DB, params ...any) (result int, err error) {
-	mydb := getDB(db)
+func QueryInt(query string, dbname string, params ...any) (result int, err error) {
+	mydb := getDB(dbname)
 	mydb.QueryRow(query, params...).Scan(&result)
 	return
 }
 
 // Query rows from given table type with where query & params
-func Query[T any](query string, db *sql.DB, params ...any) (result []*T, err error) {
-	mydb := getDB(db)
+func Query[T any](query string, dbname string, params ...any) (result []*T, err error) {
+	mydb := getDB(dbname)
 	rows, err := mydb.Query(query, params...)
 	if err != nil {
 		return

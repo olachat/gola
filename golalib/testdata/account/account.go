@@ -3,17 +3,16 @@
 package account
 
 import (
-	"database/sql"
 	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
 )
 
-var _db *sql.DB
+var DBName string = "testdb"
 
-func Setup(db *sql.DB) {
-	_db = db
+func Setup(dbname string) {
+	DBName = dbname
 }
 
 // Account represents account table
@@ -48,46 +47,46 @@ type withPK interface {
 
 // FetchAccountByPKs returns a row from account table with given primary key value
 func FetchAccountByPK(val PK) *Account {
-	return coredb.FetchByPK[Account](_db, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
+	return coredb.FetchByPK[Account](DBName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
 }
 
 // FetchByPKs returns a row with selected fields from account table with given primary key value
 func FetchByPK[T any](val PK) *T {
-	return coredb.FetchByPK[T](_db, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
+	return coredb.FetchByPK[T](DBName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
 }
 
 // FindOneAccount returns a row from account table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneAccount(whereSQL string, params ...any) *Account {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[Account](w, _db)
+	return coredb.FindOne[Account](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `account` "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `account` "+whereSQL, DBName, params...)
 }
 
 // FindOne returns a row with selected fields from account table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, _db)
+	return coredb.FindOne[T](w, DBName)
 }
 
 // FindAccount returns rows from account table with arbitary where query
 // whereSQL must start with "where ..."
 func FindAccount(whereSQL string, params ...any) ([]*Account, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Account](w, _db)
+	return coredb.Find[Account](w, DBName)
 }
 
 // Find returns rows with selected fields from account table with arbitary where query
 // whereSQL must start with "where ..."
 func Find[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, _db)
+	return coredb.Find[T](w, DBName)
 }
 
 // Column types
@@ -255,7 +254,7 @@ func NewAccountWithPK(val PK) *Account {
 func (c *Account) Insert() error {
 	sql := "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
+	result, err := coredb.Exec(sql, DBName, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
 
 	if err != nil {
 		return err
@@ -298,7 +297,7 @@ func (obj *Account) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `country_code` = ?"
 	params = append(params, obj.GetUserId(), obj.GetCountryCode())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -351,7 +350,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `country_code` = ?"
 	params = append(params, obj.GetUserId(), obj.GetCountryCode())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -373,13 +372,13 @@ func Update(obj withPK) (bool, error) {
 func (obj *Account) Delete() error {
 	sql := "DELETE FROM `account` WHERE `user_id` = ? and `country_code` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetCountryCode())
+	_, err := coredb.Exec(sql, DBName, obj.GetUserId(), obj.GetCountryCode())
 	return err
 }
 
 func Delete(obj withPK) error {
 	sql := "DELETE FROM `account` WHERE `user_id` = ? and `country_code` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetCountryCode())
+	_, err := coredb.Exec(sql, DBName, obj.GetUserId(), obj.GetCountryCode())
 	return err
 }

@@ -3,7 +3,6 @@
 package song_user_favourites
 
 import (
-	"database/sql"
 	"reflect"
 	"strings"
 
@@ -12,10 +11,10 @@ import (
 	"time"
 )
 
-var _db *sql.DB
+var DBName string = "testdb"
 
-func Setup(db *sql.DB) {
-	_db = db
+func Setup(dbname string) {
+	DBName = dbname
 }
 
 // SongUserFavourite represents song_user_favourites table
@@ -54,46 +53,46 @@ type withPK interface {
 
 // FetchSongUserFavouriteByPKs returns a row from song_user_favourites table with given primary key value
 func FetchSongUserFavouriteByPK(val PK) *SongUserFavourite {
-	return coredb.FetchByPK[SongUserFavourite](_db, []string{"user_id", "song_id"}, val.UserId, val.SongId)
+	return coredb.FetchByPK[SongUserFavourite](DBName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FetchByPKs returns a row with selected fields from song_user_favourites table with given primary key value
 func FetchByPK[T any](val PK) *T {
-	return coredb.FetchByPK[T](_db, []string{"user_id", "song_id"}, val.UserId, val.SongId)
+	return coredb.FetchByPK[T](DBName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FindOneSongUserFavourite returns a row from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneSongUserFavourite(whereSQL string, params ...any) *SongUserFavourite {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[SongUserFavourite](w, _db)
+	return coredb.FindOne[SongUserFavourite](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `song_user_favourites` "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `song_user_favourites` "+whereSQL, DBName, params...)
 }
 
 // FindOne returns a row with selected fields from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, _db)
+	return coredb.FindOne[T](w, DBName)
 }
 
 // FindSongUserFavourite returns rows from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
 func FindSongUserFavourite(whereSQL string, params ...any) ([]*SongUserFavourite, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[SongUserFavourite](w, _db)
+	return coredb.Find[SongUserFavourite](w, DBName)
 }
 
 // Find returns rows with selected fields from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
 func Find[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, _db)
+	return coredb.Find[T](w, DBName)
 }
 
 // Column types
@@ -345,7 +344,7 @@ func NewSongUserFavouriteWithPK(val PK) *SongUserFavourite {
 func (c *SongUserFavourite) Insert() error {
 	sql := "INSERT IGNORE INTO `song_user_favourites` (`user_id`, `song_id`, `remark`, `is_favourite`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err := coredb.Exec(sql, DBName, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
@@ -398,7 +397,7 @@ func (obj *SongUserFavourite) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `song_id` = ?"
 	params = append(params, obj.GetUserId(), obj.GetSongId())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -463,7 +462,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `song_id` = ?"
 	params = append(params, obj.GetUserId(), obj.GetSongId())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -485,13 +484,13 @@ func Update(obj withPK) (bool, error) {
 func (obj *SongUserFavourite) Delete() error {
 	sql := "DELETE FROM `song_user_favourites` WHERE `user_id` = ? and `song_id` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetSongId())
+	_, err := coredb.Exec(sql, DBName, obj.GetUserId(), obj.GetSongId())
 	return err
 }
 
 func Delete(obj withPK) error {
 	sql := "DELETE FROM `song_user_favourites` WHERE `user_id` = ? and `song_id` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetUserId(), obj.GetSongId())
+	_, err := coredb.Exec(sql, DBName, obj.GetUserId(), obj.GetSongId())
 	return err
 }

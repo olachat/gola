@@ -3,17 +3,16 @@
 package blogs
 
 import (
-	"database/sql"
 	"reflect"
 	"strings"
 
 	"github.com/olachat/gola/coredb"
 )
 
-var _db *sql.DB
+var DBName string = "testdb"
 
-func Setup(db *sql.DB) {
-	_db = db
+func Setup(dbname string) {
+	DBName = dbname
 }
 
 // Blog represents blogs table
@@ -54,58 +53,58 @@ type withPK interface {
 
 // FetchBlogByPKs returns a row from blogs table with given primary key value
 func FetchBlogByPK(val int) *Blog {
-	return coredb.FetchByPK[Blog](_db, []string{"id"}, val)
+	return coredb.FetchByPK[Blog](DBName, []string{"id"}, val)
 }
 
 // FetchByPKs returns a row with selected fields from blogs table with given primary key value
 func FetchByPK[T any](val int) *T {
-	return coredb.FetchByPK[T](_db, []string{"id"}, val)
+	return coredb.FetchByPK[T](DBName, []string{"id"}, val)
 }
 
 // FetchBlogByPKs returns rows with from blogs table with given primary key values
 func FetchBlogByPKs(vals ...int) []*Blog {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Blog](pks, "id", _db)
+	return coredb.FetchByPKs[Blog](pks, "id", DBName)
 }
 
 // FetchByPKs returns rows with selected fields from blogs table with given primary key values
 func FetchByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "id", _db)
+	return coredb.FetchByPKs[T](pks, "id", DBName)
 }
 
 // FindOneBlog returns a row from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneBlog(whereSQL string, params ...any) *Blog {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[Blog](w, _db)
+	return coredb.FindOne[Blog](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `blogs` "+whereSQL, _db, params...)
+	return coredb.QueryInt("SELECT COUNT(*) FROM `blogs` "+whereSQL, DBName, params...)
 }
 
 // FindOne returns a row with selected fields from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, _db)
+	return coredb.FindOne[T](w, DBName)
 }
 
 // FindBlog returns rows from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindBlog(whereSQL string, params ...any) ([]*Blog, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Blog](w, _db)
+	return coredb.Find[Blog](w, DBName)
 }
 
 // Find returns rows with selected fields from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func Find[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, _db)
+	return coredb.Find[T](w, DBName)
 }
 
 // Column types
@@ -570,7 +569,7 @@ func NewBlogWithPK(val int) *Blog {
 func (c *Blog) Insert() error {
 	sql := "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, _db, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err := coredb.Exec(sql, DBName, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
@@ -654,7 +653,7 @@ func (obj *Blog) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -749,7 +748,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, _db, params...)
+	result, err := coredb.Exec(sql, DBName, params...)
 	if err != nil {
 		return false, err
 	}
@@ -771,13 +770,13 @@ func Update(obj withPK) (bool, error) {
 func (obj *Blog) Delete() error {
 	sql := "DELETE FROM `blogs` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetId())
+	_, err := coredb.Exec(sql, DBName, obj.GetId())
 	return err
 }
 
 func Delete(obj withPK) error {
 	sql := "DELETE FROM `blogs` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, _db, obj.GetId())
+	_, err := coredb.Exec(sql, DBName, obj.GetId())
 	return err
 }
