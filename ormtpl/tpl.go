@@ -19,3 +19,10 @@ func GetTpl(path string) *template.Template {
 	}
 	return result
 }
+
+// TplStruct define object used for tpl code generation
+type TplStruct interface {
+	SetVersion(version string)
+	GetVersion() string
+	GetName() string
+}
