@@ -155,8 +155,10 @@ func (c Column) GoType() string {
 		return "bool"
 	}
 
-	if goType, ok := dbTypeToGoTypes[c.DBType]; ok {
-		return goType
+	for dbType, goType := range dbTypeToGoTypes {
+		if c.DBType == dbType || strings.HasPrefix(c.DBType, dbType+"(") {
+			return goType
+		}
 	}
 
 	if strings.HasPrefix(c.DBType, "varchar") || strings.HasPrefix(c.DBType, "char") {
