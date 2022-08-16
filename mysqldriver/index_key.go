@@ -54,6 +54,7 @@ func (m *MySQLDriver) SetIndexAndKey(tables []*structs.Table) (err error) {
 
 		// Work around for bug in github.com/dolthub/go-mysql-server v0.12.0
 		// Which doesn't return PRIMARY info in show index from XXX query
+		// https://github.com/dolthub/go-mysql-server/issues/1157
 		if !hasKeyInShowIndex && t.PKey != nil && len(t.PKey.Columns) > 1 {
 			for i, col := range t.PKey.Columns {
 				id := new(structs.IndexDesc)
