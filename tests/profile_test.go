@@ -15,7 +15,7 @@ func TestProfile(t *testing.T) {
 		t.Error(err)
 	}
 
-	p2 := profile.FetchProfileByPK(8)
+	p2 := profile.FetchByPK(8)
 	if p2.GetNickName() != "tom" {
 		t.Error("profile re-fetch error")
 	}
@@ -33,7 +33,7 @@ func TestProfile(t *testing.T) {
 		t.Error(err)
 	}
 
-	p2 = profile.FetchProfileByPK(8)
+	p2 = profile.FetchByPK(8)
 	if p2.GetNickName() != "tom" {
 		t.Error("profile re-fetch error")
 	}
@@ -51,7 +51,7 @@ func TestAccount(t *testing.T) {
 		t.Error(err)
 	}
 
-	a2 := account.FetchAccountByPK(pk)
+	a2 := account.FetchByPK(pk)
 	if a2.GetMoney() != a.GetMoney() || a2.GetType() != a.GetType() || a2.GetUserId() != a.GetUserId() {
 		t.Error("account re-fetch error")
 	}
@@ -62,7 +62,7 @@ func TestAccount(t *testing.T) {
 		t.Error("account update error")
 	}
 
-	a2 = account.FetchAccountByPK(pk)
+	a2 = account.FetchByPK(pk)
 	if a2.GetMoney() != a.GetMoney() || a2.GetType() != a.GetType() || a2.GetUserId() != a.GetUserId() {
 		t.Error("account re-fetch error")
 	}

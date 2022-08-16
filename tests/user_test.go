@@ -82,7 +82,7 @@ func TestUserInsert(t *testing.T) {
 }
 
 func TestUserDouble(t *testing.T) {
-	u1 := users.FetchUserByPK(1)
+	u1 := users.FetchByPK(1)
 	if u1.GetDoubleType() != 1.8729 {
 		t.Errorf("FetchUserByPK GetDoubleType returns unexpected value: %f", u1.GetDoubleType())
 	}
@@ -90,7 +90,7 @@ func TestUserDouble(t *testing.T) {
 		t.Errorf("FetchUserByPK GetFloatType returns unexpected value: %f", u1.GetFloatType())
 	}
 
-	u2 := users.FetchUserByPK(2)
+	u2 := users.FetchByPK(2)
 	if u2.GetDoubleType() != 2.8239 {
 		t.Errorf("FetchUserByPK GetDoubleType returns unexpected value: %f", u2.GetDoubleType())
 	}
@@ -98,7 +98,7 @@ func TestUserDouble(t *testing.T) {
 		t.Errorf("FetchUserByPK GetFloatType returns unexpected value: %f", u2.GetFloatType())
 	}
 
-	u3 := users.FetchUserByPK(3)
+	u3 := users.FetchByPK(3)
 	if u3.GetDoubleType() != 334.8593 {
 		t.Errorf("FetchUserByPK GetDoubleType returns unexpected value: %f", u3.GetDoubleType())
 	}
@@ -106,7 +106,7 @@ func TestUserDouble(t *testing.T) {
 		t.Errorf("FetchUserByPK GetFloatType returns unexpected value: %f", u3.GetFloatType())
 	}
 
-	u4 := users.FetchUserByPK(4)
+	u4 := users.FetchByPK(4)
 	if u4.GetDoubleType() != 42234.83 {
 		t.Errorf("FetchUserByPK GetDoubleType returns unexpected value: %f", u4.GetDoubleType())
 	}
@@ -118,7 +118,7 @@ func TestUserDouble(t *testing.T) {
 	u4.SetFloatType(4.0)
 	u4.Update()
 
-	u5 := users.FetchUserByPK(4)
+	u5 := users.FetchByPK(4)
 	if u5.GetDoubleType() != 5.1 {
 		t.Errorf("FetchUserByPK GetDoubleType returns unexpected value: %f", u4.GetDoubleType())
 	}
@@ -128,7 +128,7 @@ func TestUserDouble(t *testing.T) {
 }
 
 func TestUserHobby(t *testing.T) {
-	u1 := users.FetchUserByPK(1)
+	u1 := users.FetchByPK(1)
 	if u1.GetHobby() != users.UserHobbyRunning {
 		t.Errorf("FetchUserByPK GetHobby returns unexpected value: %v", u1.GetHobby())
 	}
@@ -138,12 +138,12 @@ func TestUserHobby(t *testing.T) {
 
 	u1.SetHobby(users.UserHobbySinging)
 	u1.Update()
-	u1 = users.FetchUserByPK(1)
+	u1 = users.FetchByPK(1)
 	if u1.GetHobby() != users.UserHobbySinging {
 		t.Errorf("FetchUserByPK GetHobby returns unexpected value: %v", u1.GetHobby())
 	}
 
-	u2 := users.FetchUserByPK(2)
+	u2 := users.FetchByPK(2)
 	if u2.GetHobby() != users.UserHobbySwimming {
 		t.Errorf("FetchUserByPK GetHobby returns unexpected value: %v", u2.GetHobby())
 	}
@@ -151,7 +151,7 @@ func TestUserHobby(t *testing.T) {
 		t.Errorf("FetchUserByPK GetHobbyNoDefault returns unexpected value: %v", u2.GetHobbyNoDefault())
 	}
 
-	u3 := users.FetchUserByPK(3)
+	u3 := users.FetchByPK(3)
 	if u3.GetHobby() != users.UserHobbySinging {
 		t.Errorf("FetchUserByPK GetHobby returns unexpected value: %v", u3.GetHobby())
 	}
@@ -159,7 +159,7 @@ func TestUserHobby(t *testing.T) {
 		t.Errorf("FetchUserByPK GetHobbyNoDefault returns unexpected value: %v", u3.GetHobbyNoDefault())
 	}
 
-	u4 := users.FetchUserByPK(4)
+	u4 := users.FetchByPK(4)
 	if u4.GetHobby() != users.UserHobbySinging {
 		t.Errorf("FetchUserByPK GetHobby returns unexpected value: %v", u4.GetHobby())
 	}
@@ -169,7 +169,7 @@ func TestUserHobby(t *testing.T) {
 }
 
 func TestUserSports(t *testing.T) {
-	u1 := users.FetchUserByPK(1)
+	u1 := users.FetchByPK(1)
 	if len(u1.GetSports()) != 1 {
 		t.Errorf("FetchUserByPK GetSports returns unexpected value: %v", u1.GetSports())
 	}
@@ -187,7 +187,7 @@ func TestUserSports(t *testing.T) {
 		t.Errorf("FetchUserByPK GetSportsNoDefault should contain tennis. Actual: %v", u1.GetSportsNoDefault())
 	}
 
-	u2 := users.FetchUserByPK(2)
+	u2 := users.FetchByPK(2)
 	if len(u2.GetSports()) != 1 {
 		t.Errorf("FetchUserByPK GetSports returns unexpected value: %v", u2.GetSports())
 	}
@@ -204,7 +204,7 @@ func TestUserSports(t *testing.T) {
 }
 
 func TestUserSports2(t *testing.T) {
-	u3 := users.FetchUserByPK(3)
+	u3 := users.FetchByPK(3)
 	if len(u3.GetSports()) != 2 {
 		t.Errorf("FetchUserByPK GetSports returns unexpected value: %v", u3.GetSports())
 	}
@@ -225,7 +225,7 @@ func TestUserSports2(t *testing.T) {
 		t.Errorf("FetchUserByPK GetSportsNoDefault should contain squash. Actual: %v", u3.GetSportsNoDefault())
 	}
 
-	u4 := users.FetchUserByPK(4)
+	u4 := users.FetchByPK(4)
 	if len(u4.GetSports()) != 2 {
 		t.Errorf("FetchUserByPK GetSports returns unexpected value: %v", u4.GetSports())
 	}
@@ -254,14 +254,14 @@ func contains[T comparable](slice []T, item T) bool {
 }
 
 func TestUserMethods(t *testing.T) {
-	u := users.FetchByPK[struct {
+	u := users.FetchFieldsByPK[struct {
 		users.Email
 	}](1)
 	if u.GetEmail() != "john@doe.com" {
 		t.Error("Failed to FetchByPK with email using id 1")
 	}
 
-	u2 := users.FetchByPK[users.User](1)
+	u2 := users.FetchFieldsByPK[users.User](1)
 	if u2.GetEmail() != "john@doe.com" && u2.GetName() != "John Doe" {
 		t.Error("Failed to FetchByPK with User using id 1")
 	}
@@ -269,7 +269,7 @@ func TestUserMethods(t *testing.T) {
 	u2.SetName("Joe Doe")
 	u2.Update()
 
-	u2 = users.FetchByPK[users.User](1)
+	u2 = users.FetchFieldsByPK[users.User](1)
 	if u2.GetEmail() != "joe@doe.com" && u2.GetName() != "JOe Doe" {
 		t.Error("Failed to FetchByPK with User using id 1 after update")
 	}
@@ -277,17 +277,17 @@ func TestUserMethods(t *testing.T) {
 	u2.SetName("John Doe")
 	u2.Update()
 
-	u3 := users.FetchUserByPK(1)
+	u3 := users.FetchByPK(1)
 	if u2.GetEmail() != u3.GetEmail() && u2.GetName() != u3.GetName() {
 		t.Error("FetchUserByPK and FetchByPK[User] returns different result")
 	}
 
-	u4 := users.FetchUserByPK(0)
+	u4 := users.FetchByPK(0)
 	if u4 != nil {
 		t.Error("FetchUserByPK must return nil for id 0")
 	}
 
-	objs := users.FetchByPKs[SimpleUser](1, 2)
+	objs := users.FetchFieldsByPKs[SimpleUser](1, 2)
 	if len(objs) != 2 {
 		t.Error("FetchByPKs[SimpleUser]([]int{1, 2}) failed")
 	}
@@ -295,7 +295,7 @@ func TestUserMethods(t *testing.T) {
 		t.Error("FetchByPK and FetchByPKs[SimpleUser] returns different result")
 	}
 
-	objs2 := users.FetchUserByPKs(3, 4)
+	objs2 := users.FetchByPKs(3, 4)
 	if len(objs2) != 2 {
 		t.Error("FetchUserByPKs([]int{3, 4}) failed")
 	}

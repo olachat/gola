@@ -41,60 +41,60 @@ type withPK interface {
 	GetId() uint
 }
 
-// FetchSongByPKs returns a row from songs table with given primary key value
-func FetchSongByPK(val uint) *Song {
+// FetchByPK returns a row from songs table with given primary key value
+func FetchByPK(val uint) *Song {
 	return coredb.FetchByPK[Song](DBName, []string{"id"}, val)
 }
 
-// FetchByPKs returns a row with selected fields from songs table with given primary key value
-func FetchByPK[T any](val uint) *T {
+// FetchFieldsByPK returns a row with selected fields from songs table with given primary key value
+func FetchFieldsByPK[T any](val uint) *T {
 	return coredb.FetchByPK[T](DBName, []string{"id"}, val)
 }
 
-// FetchSongByPKs returns rows with from songs table with given primary key values
-func FetchSongByPKs(vals ...uint) []*Song {
+// FetchByPKs returns rows with from songs table with given primary key values
+func FetchByPKs(vals ...uint) []*Song {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[Song](pks, "id", DBName)
 }
 
-// FetchByPKs returns rows with selected fields from songs table with given primary key values
-func FetchByPKs[T any](vals ...uint) []*T {
+// FetchFieldsByPKs returns rows with selected fields from songs table with given primary key values
+func FetchFieldsByPKs[T any](vals ...uint) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](pks, "id", DBName)
 }
 
-// FindOneSong returns a row from songs table with arbitary where query
+// FindOne returns a row from songs table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneSong(whereSQL string, params ...any) *Song {
+func FindOne(whereSQL string, params ...any) *Song {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[Song](w, DBName)
+}
+
+// FindOneFields returns a row with selected fields from songs table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFields[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[T](w, DBName)
+}
+
+// Find returns rows from songs table with arbitary where query
+// whereSQL must start with "where ..."
+func Find(whereSQL string, params ...any) ([]*Song, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[Song](w, DBName)
+}
+
+// FindFields returns rows with selected fields from songs table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[T](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt("SELECT COUNT(*) FROM `songs` "+whereSQL, DBName, params...)
-}
-
-// FindOne returns a row with selected fields from songs table with arbitary where query
-// whereSQL must start with "where ..."
-func FindOne[T any](whereSQL string, params ...any) *T {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
-}
-
-// FindSong returns rows from songs table with arbitary where query
-// whereSQL must start with "where ..."
-func FindSong(whereSQL string, params ...any) ([]*Song, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Song](w, DBName)
-}
-
-// Find returns rows with selected fields from songs table with arbitary where query
-// whereSQL must start with "where ..."
-func Find[T any](whereSQL string, params ...any) ([]*T, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
 }
 
 // Column types

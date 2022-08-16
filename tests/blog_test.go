@@ -22,7 +22,7 @@ func TestBlogMethods(t *testing.T) {
 	if e != nil {
 		t.Error(e)
 	}
-	blog = blogs.FetchBlogByPK(1)
+	blog = blogs.FetchByPK(1)
 	if blog != nil {
 		t.Error("blog 1 delete failed")
 	}
@@ -59,12 +59,12 @@ func TestBlogMethods(t *testing.T) {
 }
 
 func TestBlogFind(t *testing.T) {
-	obj := blogs.FindOneBlog("where title = ?", "bar")
+	obj := blogs.FindOne("where title = ?", "bar")
 	if obj.GetId() != 3 {
 		t.Error("Find blog with title bar failed")
 	}
 
-	objs, err := blogs.FindBlog("where title = ?", "bar")
+	objs, err := blogs.Find("where title = ?", "bar")
 	if err != nil || len(objs) != 1 {
 		t.Error("Find blogs with title bar failed: ")
 	}
@@ -72,21 +72,21 @@ func TestBlogFind(t *testing.T) {
 		t.Error("Find blogs with title bar failed")
 	}
 
-	objs, err = blogs.FindBlog("where title = ?", "barbar")
+	objs, err = blogs.Find("where title = ?", "barbar")
 	if err != nil || len(objs) != 0 {
 		t.Error("Find blogs with non-exist title bar failed: ")
 	}
 }
 
 func TestBlogFindT(t *testing.T) {
-	obj := blogs.FindOne[struct {
+	obj := blogs.FindOneFields[struct {
 		blogs.Id
 	}]("where title = ?", "bar")
 	if obj.GetId() != 3 {
 		t.Error("Find blog with title bar failed")
 	}
 
-	objs, err := blogs.Find[struct {
+	objs, err := blogs.FindFields[struct {
 		blogs.Id
 	}]("where title = ?", "bar")
 	if err != nil || len(objs) != 1 {
@@ -96,7 +96,7 @@ func TestBlogFindT(t *testing.T) {
 		t.Error("Find blogs with title bar failed")
 	}
 
-	data, err := blogs.Find[struct {
+	data, err := blogs.FindFields[struct {
 		blogs.Title
 	}]("where title = ?", "barbar")
 	if err != nil || len(data) != 0 {
@@ -139,7 +139,7 @@ func TestBlogSelect(t *testing.T) {
 		t.Error("Read blog 2 failed")
 	}
 
-	data := blogs.FetchBlogByPKs(2, 3)
+	data := blogs.FetchByPKs(2, 3)
 	if len(data) != 2 {
 		t.Error("Read all blog failed")
 	}
