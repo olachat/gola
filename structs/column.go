@@ -2,9 +2,6 @@ package structs
 
 import (
 	"strings"
-
-	"github.com/dolthub/go-mysql-server/sql"
-	"github.com/dolthub/vitess/go/vt/sqlparser"
 )
 
 // modified from: /home/wuvist/go/pkg/mod/github.com/volatiletech/sqlboiler/v4@v4.6.0/drivers/column.go
@@ -56,6 +53,8 @@ var dbTypeToGoTypes = map[string]string{
 	"mediumint unsigned": "uint",
 	"int unsigned":       "uint",
 	"bigint unsigned":    "uint64",
+	"float":              "float32",
+	"double":             "float64",
 }
 
 // GoType returns type in go of the column
@@ -98,16 +97,7 @@ func (c Column) GoType() string {
 		return "time.Time"
 	}
 
-	ct := &sqlparser.ColumnType{
-		Type: c.DBType,
-	}
-	res, err := sql.ColumnTypeToType(ct)
-	if err != nil {
-		panic(err)
-	}
-
-	baseType := strings.ToLower(res.Type().String())
-	return baseType
+	panic("Unsupported db type: " + c.DBType)
 }
 
 // GoName returns the variable name for go of the column

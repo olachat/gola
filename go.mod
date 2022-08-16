@@ -6,9 +6,7 @@ replace github.com/dolthub/go-mysql-server v0.12.0 => github.com/Wuvist/go-mysql
 
 require (
 	github.com/dolthub/go-mysql-server v0.12.0
-	github.com/dolthub/vitess v0.0.0-20220603212614-514e62ec66cd
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/google/go-cmp v0.5.5
 	github.com/mitchellh/cli v1.1.4
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.6.3
@@ -23,6 +21,7 @@ require (
 	github.com/bgentry/speakeasy v0.1.0 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dolthub/vitess v0.0.0-20220603212614-514e62ec66cd // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
 	github.com/go-kit/kit v0.10.0 // indirect
@@ -71,3 +70,5 @@ require (
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
+
+require github.com/google/go-cmp v0.5.5 // test
