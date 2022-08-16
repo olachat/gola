@@ -5,7 +5,6 @@ go 1.18
 replace github.com/dolthub/go-mysql-server v0.12.0 => github.com/Wuvist/go-mysql-server v0.10.1-0.20220815042140-eac9e0ba16d8
 
 require (
-	github.com/dolthub/go-mysql-server v0.12.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/mitchellh/cli v1.1.4
 	github.com/pkg/errors v0.9.1
@@ -71,4 +70,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
 
-require github.com/google/go-cmp v0.5.5 // test
+require (
+	github.com/dolthub/go-mysql-server v0.12.0 // test
+	github.com/google/go-cmp v0.5.5 // test
+)
