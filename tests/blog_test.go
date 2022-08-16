@@ -7,7 +7,7 @@ import (
 )
 
 func TestBlogMethods(t *testing.T) {
-	blog := blogs.NewBlog()
+	blog := blogs.New()
 	blog.SetTitle("foo")
 	e := blog.Insert()
 	if e != nil {
@@ -27,11 +27,11 @@ func TestBlogMethods(t *testing.T) {
 		t.Error("blog 1 delete failed")
 	}
 
-	blog = blogs.NewBlog()
+	blog = blogs.New()
 	blog.SetTitle("foo")
 	blog.Insert()
 
-	blog = blogs.NewBlog()
+	blog = blogs.New()
 	blog.SetTitle("bar")
 	e = blog.Insert()
 	if e != nil {

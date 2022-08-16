@@ -10,7 +10,7 @@ import (
 )
 
 func TestSong(t *testing.T) {
-	s := songs.NewSong()
+	s := songs.New()
 	s.SetRank(5)
 	s.SetType(songs.SongType1x2B9)
 	s.SetHash("hash")
@@ -40,7 +40,7 @@ func TestSong(t *testing.T) {
 		UserId: 3,
 		SongId: 99,
 	}
-	f := song_user_favourites.NewSongUserFavouriteWithPK(pk)
+	f := song_user_favourites.NewWithPK(pk)
 	err = f.Insert()
 	if err != nil {
 		t.Error(err)
@@ -50,7 +50,7 @@ func TestSong(t *testing.T) {
 		t.Error("Insert non auto-increment PK failed")
 	}
 
-	f2 := song_user_favourites.NewSongUserFavouriteWithPK(pk)
+	f2 := song_user_favourites.NewWithPK(pk)
 	err = f2.Insert()
 	if err != coredb.ErrAvoidInsert {
 		t.Error("Repeat insert must fail")
@@ -142,7 +142,7 @@ func TestSongDelete(t *testing.T) {
 		t.Error("SongUserFavourite delete failed")
 	}
 
-	obj = song_user_favourites.NewSongUserFavouriteWithPK(pk)
+	obj = song_user_favourites.NewWithPK(pk)
 	obj.SetRemark("remark")
 	err = obj.Insert()
 	if err != nil {
@@ -173,7 +173,7 @@ func TestSongDelete(t *testing.T) {
 }
 
 func TestSongUpdate(t *testing.T) {
-	s := songs.NewSong()
+	s := songs.New()
 	s.SetHash("hashhash")
 	err := s.Insert()
 	if err != nil {

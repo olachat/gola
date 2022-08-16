@@ -73,7 +73,7 @@ type SimpleUser struct {
 }
 
 func TestUserInsert(t *testing.T) {
-	u := users.NewUserWithPK(11)
+	u := users.NewWithPK(11)
 	u.SetEmail("hello")
 	u.SetName("maou sheng")
 	u.SetCreatedAt(111)
