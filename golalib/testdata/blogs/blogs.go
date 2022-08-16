@@ -51,60 +51,60 @@ type withPK interface {
 	GetId() int
 }
 
-// FetchBlogByPKs returns a row from blogs table with given primary key value
-func FetchBlogByPK(val int) *Blog {
+// FetchByPK returns a row from blogs table with given primary key value
+func FetchByPK(val int) *Blog {
 	return coredb.FetchByPK[Blog](DBName, []string{"id"}, val)
 }
 
-// FetchByPKs returns a row with selected fields from blogs table with given primary key value
-func FetchByPK[T any](val int) *T {
+// FetchFieldsByPK returns a row with selected fields from blogs table with given primary key value
+func FetchFieldsByPK[T any](val int) *T {
 	return coredb.FetchByPK[T](DBName, []string{"id"}, val)
 }
 
-// FetchBlogByPKs returns rows with from blogs table with given primary key values
-func FetchBlogByPKs(vals ...int) []*Blog {
+// FetchByPKs returns rows with from blogs table with given primary key values
+func FetchByPKs(vals ...int) []*Blog {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[Blog](pks, "id", DBName)
 }
 
-// FetchByPKs returns rows with selected fields from blogs table with given primary key values
-func FetchByPKs[T any](vals ...int) []*T {
+// FetchFieldsByPKs returns rows with selected fields from blogs table with given primary key values
+func FetchFieldsByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](pks, "id", DBName)
 }
 
-// FindOneBlog returns a row from blogs table with arbitary where query
+// FindOne returns a row from blogs table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneBlog(whereSQL string, params ...any) *Blog {
+func FindOne(whereSQL string, params ...any) *Blog {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[Blog](w, DBName)
+}
+
+// FindOneFields returns a row with selected fields from blogs table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFields[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[T](w, DBName)
+}
+
+// Find returns rows from blogs table with arbitary where query
+// whereSQL must start with "where ..."
+func Find(whereSQL string, params ...any) ([]*Blog, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[Blog](w, DBName)
+}
+
+// FindFields returns rows with selected fields from blogs table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[T](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt("SELECT COUNT(*) FROM `blogs` "+whereSQL, DBName, params...)
-}
-
-// FindOne returns a row with selected fields from blogs table with arbitary where query
-// whereSQL must start with "where ..."
-func FindOne[T any](whereSQL string, params ...any) *T {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
-}
-
-// FindBlog returns rows from blogs table with arbitary where query
-// whereSQL must start with "where ..."
-func FindBlog(whereSQL string, params ...any) ([]*Blog, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Blog](w, DBName)
-}
-
-// Find returns rows with selected fields from blogs table with arbitary where query
-// whereSQL must start with "where ..."
-func Find[T any](whereSQL string, params ...any) ([]*T, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
 }
 
 // Column types

@@ -51,48 +51,48 @@ type withPK interface {
 	GetSongId() uint
 }
 
-// FetchSongUserFavouriteByPKs returns a row from song_user_favourites table with given primary key value
-func FetchSongUserFavouriteByPK(val PK) *SongUserFavourite {
+// FetchByPK returns a row from song_user_favourites table with given primary key value
+func FetchByPK(val PK) *SongUserFavourite {
 	return coredb.FetchByPK[SongUserFavourite](DBName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
-// FetchByPKs returns a row with selected fields from song_user_favourites table with given primary key value
-func FetchByPK[T any](val PK) *T {
+// FetchFieldsByPK returns a row with selected fields from song_user_favourites table with given primary key value
+func FetchFieldsByPK[T any](val PK) *T {
 	return coredb.FetchByPK[T](DBName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
-// FindOneSongUserFavourite returns a row from song_user_favourites table with arbitary where query
+// FindOne returns a row from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneSongUserFavourite(whereSQL string, params ...any) *SongUserFavourite {
+func FindOne(whereSQL string, params ...any) *SongUserFavourite {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[SongUserFavourite](w, DBName)
+}
+
+// FindOneFields returns a row with selected fields from song_user_favourites table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFields[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[T](w, DBName)
+}
+
+// Find returns rows from song_user_favourites table with arbitary where query
+// whereSQL must start with "where ..."
+func Find(whereSQL string, params ...any) ([]*SongUserFavourite, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[SongUserFavourite](w, DBName)
+}
+
+// FindFields returns rows with selected fields from song_user_favourites table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[T](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt("SELECT COUNT(*) FROM `song_user_favourites` "+whereSQL, DBName, params...)
-}
-
-// FindOne returns a row with selected fields from song_user_favourites table with arbitary where query
-// whereSQL must start with "where ..."
-func FindOne[T any](whereSQL string, params ...any) *T {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
-}
-
-// FindSongUserFavourite returns rows from song_user_favourites table with arbitary where query
-// whereSQL must start with "where ..."
-func FindSongUserFavourite(whereSQL string, params ...any) ([]*SongUserFavourite, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[SongUserFavourite](w, DBName)
-}
-
-// Find returns rows with selected fields from song_user_favourites table with arbitary where query
-// whereSQL must start with "where ..."
-func Find[T any](whereSQL string, params ...any) ([]*T, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
 }
 
 // Column types

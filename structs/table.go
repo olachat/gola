@@ -244,7 +244,7 @@ func (t *Table) FirstIdxColumns() []*IdxNode {
 func (t *Table) Imports() string {
 	packages := make(map[string]bool)
 	for _, c := range t.Columns {
-		if strings.Contains(c.SQLType(), "Time") {
+		if c.GoType() == "time.Time" {
 			packages[`"time"`] = true
 		}
 	}

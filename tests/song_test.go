@@ -24,14 +24,14 @@ func TestSong(t *testing.T) {
 		t.Error("Insert song error")
 	}
 
-	s = songs.FetchSongByPK(id)
+	s = songs.FetchByPK(id)
 	if s.GetRank() != 5 || s.GetHash() != "hash" || s.GetType() != songs.SongType1x2B9 {
 		t.Error("Re-fetch song error")
 	}
 
 	s.SetType(songs.SongTypeEmpty)
 	s.Update()
-	s = songs.FetchSongByPK(id)
+	s = songs.FetchByPK(id)
 	if s.GetType() != songs.SongTypeEmpty {
 		t.Error("Song update error")
 	}
@@ -63,7 +63,7 @@ func TestSong(t *testing.T) {
 	if updated != false {
 		t.Error("Avoid update failed")
 	}
-	obj := song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj := song_user_favourites.FetchByPK(pk)
 	if obj == nil || obj.GetSongId() != 99 {
 		t.Error("SongUserFavourite insert failed")
 	}
@@ -73,7 +73,7 @@ func TestSong(t *testing.T) {
 	if !ok || err != nil {
 		t.Error("SongUserFavourite update failed")
 	}
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj = song_user_favourites.FetchByPK(pk)
 	if obj.GetRemark() != "bingo" {
 		t.Error("SongUserFavourite update failed")
 	}
@@ -84,7 +84,7 @@ func TestSongBoolUpdate(t *testing.T) {
 		UserId: 3,
 		SongId: 99,
 	}
-	obj := song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj := song_user_favourites.FetchByPK(pk)
 	if obj.GetRemark() != "bingo" {
 		t.Error("SongUserFavourite update failed")
 	}
@@ -93,19 +93,19 @@ func TestSongBoolUpdate(t *testing.T) {
 	}
 	obj.SetIsFavourite(false)
 	obj.Update()
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj = song_user_favourites.FetchByPK(pk)
 	if obj.GetIsFavourite() != false {
 		t.Error("SongUserFavourite GetIsFavourite update false failed")
 	}
 
 	obj.SetIsFavourite(true)
 	obj.Update()
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj = song_user_favourites.FetchByPK(pk)
 	if obj.GetIsFavourite() != true {
 		t.Error("SongUserFavourite GetIsFavourite update true failed")
 	}
 
-	pb := song_user_favourites.FetchByPK[struct {
+	pb := song_user_favourites.FetchFieldsByPK[struct {
 		song_user_favourites.SongId
 		song_user_favourites.UserId
 		song_user_favourites.IsFavourite
@@ -121,7 +121,7 @@ func TestSongBoolUpdate(t *testing.T) {
 	if !ok || err != nil {
 		t.Error("pb update failed")
 	}
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj = song_user_favourites.FetchByPK(pk)
 	if obj.GetIsFavourite() != false {
 		t.Error("SongUserFavourite GetIsFavourite update failed")
 	}
@@ -132,12 +132,12 @@ func TestSongDelete(t *testing.T) {
 		UserId: 3,
 		SongId: 99,
 	}
-	obj := song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj := song_user_favourites.FetchByPK(pk)
 	err := obj.Delete()
 	if err != nil {
 		t.Error("SongUserFavourite delete fail")
 	}
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj = song_user_favourites.FetchByPK(pk)
 	if obj != nil {
 		t.Error("SongUserFavourite delete failed")
 	}
@@ -148,12 +148,12 @@ func TestSongDelete(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj = song_user_favourites.FetchByPK(pk)
 	if obj.GetRemark() != "remark" {
 		t.Error("SongUserFavourite reinsert failed")
 	}
 
-	partialObj := song_user_favourites.FetchByPK[struct {
+	partialObj := song_user_favourites.FetchFieldsByPK[struct {
 		song_user_favourites.SongId
 		song_user_favourites.UserId
 		song_user_favourites.Remark
@@ -166,7 +166,7 @@ func TestSongDelete(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	obj = song_user_favourites.FetchSongUserFavouriteByPK(pk)
+	obj = song_user_favourites.FetchByPK(pk)
 	if obj != nil {
 		t.Error("SongUserFavourite partial delete failed")
 	}
@@ -182,7 +182,7 @@ func TestSongUpdate(t *testing.T) {
 
 	id := s.GetId()
 
-	obj := songs.FetchByPK[struct {
+	obj := songs.FetchFieldsByPK[struct {
 		songs.Id
 		songs.Hash
 	}](id)
@@ -192,7 +192,7 @@ func TestSongUpdate(t *testing.T) {
 		t.Error("Partail update failed")
 	}
 
-	s = songs.FetchSongByPK(id)
+	s = songs.FetchByPK(id)
 	if s.GetHash() != "bingo" {
 		t.Error("Partail update failed")
 	}

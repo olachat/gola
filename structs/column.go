@@ -1,11 +1,7 @@
 package structs
 
 import (
-	"fmt"
 	"strings"
-
-	"github.com/dolthub/go-mysql-server/sql"
-	"github.com/dolthub/vitess/go/vt/sqlparser"
 )
 
 // modified from: /home/wuvist/go/pkg/mod/github.com/volatiletech/sqlboiler/v4@v4.6.0/drivers/column.go
@@ -46,19 +42,6 @@ type Column struct {
 	Table *Table
 }
 
-var dbTypeToSQLTypes = map[string]string{
-	"tinyint":            "sql.Int8",
-	"smallint":           "sql.Int16",
-	"mediumint":          "sql.Int32",
-	"int":                "sql.Int32",
-	"bigint":             "sql.Int64",
-	"tinyint unsigned":   "sql.Uint8",
-	"smallint unsigned":  "sql.Uint16",
-	"mediumint unsigned": "sql.Uint32",
-	"int unsigned":       "sql.Uint32",
-	"bigint unsigned":    "sql.Uint64",
-}
-
 var dbTypeToGoTypes = map[string]string{
 	"tinyint":            "int8",
 	"smallint":           "int16",
@@ -70,83 +53,8 @@ var dbTypeToGoTypes = map[string]string{
 	"mediumint unsigned": "uint",
 	"int unsigned":       "uint",
 	"bigint unsigned":    "uint64",
-}
-
-// SQLType returns data type in mysql of the column
-func (c Column) SQLType() string {
-	if sqlType, ok := dbTypeToSQLTypes[c.FullDBType]; ok {
-		return sqlType
-	}
-
-	unsignedString := ""
-	if strings.HasSuffix(c.FullDBType, "unsigned") {
-		unsignedString = " unsigned"
-	}
-
-	intTypes := []string{"tinyint", "smallint", "mediumint", "bigint", "int"}
-	for _, intType := range intTypes {
-		if strings.HasPrefix(c.DBType, intType) {
-			if sqlType, ok := dbTypeToSQLTypes[intType+unsignedString]; ok {
-				return sqlType
-			}
-		}
-	}
-
-	if strings.HasPrefix(c.DBType, "varchar") {
-		size := getValue(c.FullDBType)
-
-		return fmt.Sprintf("sql.MustCreateStringWithDefaults(sqltypes.VarChar, %s)", size)
-	}
-
-	simpleTypes := map[string]string{
-		"decimal":   "sql.Float32",
-		"float":     "sql.Float32",
-		"double":    "sql.Float64",
-		"timestamp": "sql.Timestamp",
-	}
-
-	for sqlType, goSqlType := range simpleTypes {
-		if strings.HasPrefix(c.DBType, sqlType) {
-			return goSqlType
-		}
-	}
-
-	if strings.HasPrefix(c.DBType, "enum") {
-		enums := strings.ReplaceAll(getValue(c.FullDBType), "'", "\"")
-
-		return fmt.Sprintf("sql.MustCreateEnumType([]string{%s}, sql.Collation_Default)", enums)
-	}
-
-	if strings.HasPrefix(c.DBType, "set") {
-		vals := strings.ReplaceAll(getValue(c.FullDBType), "'", "\"")
-
-		return fmt.Sprintf("sql.MustCreateSetType([]string{%s}, sql.Collation_Default)", vals)
-	}
-
-	if strings.HasPrefix(c.DBType, "char") {
-		size := getValue(c.FullDBType)
-
-		return fmt.Sprintf("sql.MustCreateStringWithDefaults(sqltypes.Char, %s)", size)
-	}
-
-	if strings.Contains(c.DBType, "text") {
-		return "sql.Text"
-	}
-
-	if strings.Contains(c.DBType, "blob") {
-		return "sql.Blob"
-	}
-
-	ct := &sqlparser.ColumnType{
-		Type: c.DBType,
-	}
-	res, err := sql.ColumnTypeToType(ct)
-	if err != nil {
-		panic(err)
-	}
-
-	baseType := strings.ToLower(res.Type().String())
-	return baseType
+	"float":              "float32",
+	"double":             "float64",
 }
 
 // GoType returns type in go of the column
@@ -189,16 +97,7 @@ func (c Column) GoType() string {
 		return "time.Time"
 	}
 
-	ct := &sqlparser.ColumnType{
-		Type: c.DBType,
-	}
-	res, err := sql.ColumnTypeToType(ct)
-	if err != nil {
-		panic(err)
-	}
-
-	baseType := strings.ToLower(res.Type().String())
-	return baseType
+	panic("Unsupported db type: " + c.DBType)
 }
 
 // GoName returns the variable name for go of the column

@@ -47,60 +47,60 @@ type withPK interface {
 	{{- end }}
 }
 
-// Fetch{{.ClassName}}ByPKs returns a row from {{.Name}} table with given primary key value
-func Fetch{{.ClassName}}ByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
+// FetchByPK returns a row from {{.Name}} table with given primary key value
+func FetchByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 	return coredb.FetchByPK[{{.ClassName}}](DBName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
-// FetchByPKs returns a row with selected fields from {{.Name}} table with given primary key value
-func FetchByPK[T any](val {{.GetPrimaryKeyType}}) *T {
+// FetchFieldsByPK returns a row with selected fields from {{.Name}} table with given primary key value
+func FetchFieldsByPK[T any](val {{.GetPrimaryKeyType}}) *T {
 	return coredb.FetchByPK[T](DBName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 {{- if not .HasCompositePrimaryKey }}
-// Fetch{{.ClassName}}ByPKs returns rows with from {{.Name}} table with given primary key values
-func Fetch{{.ClassName}}ByPKs(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
+// FetchByPKs returns rows with from {{.Name}} table with given primary key values
+func FetchByPKs(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[{{.ClassName}}](pks, "{{.GetPrimaryKeyName}}", DBName)
 }
 
-// FetchByPKs returns rows with selected fields from {{.Name}} table with given primary key values
-func FetchByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
+// FetchFieldsByPKs returns rows with selected fields from {{.Name}} table with given primary key values
+func FetchFieldsByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](pks, "{{.GetPrimaryKeyName}}", DBName)
 }
 {{- end}}
 
-// FindOne{{.ClassName}} returns a row from {{.Name}} table with arbitary where query
+// FindOne returns a row from {{.Name}} table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOne{{.ClassName}}(whereSQL string, params ...any) *{{.ClassName}} {
+func FindOne(whereSQL string, params ...any) *{{.ClassName}} {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[{{.ClassName}}](w, DBName)
+}
+
+// FindOneFields returns a row with selected fields from {{.Name}} table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFields[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[T](w, DBName)
+}
+
+// Find returns rows from {{.Name}} table with arbitary where query
+// whereSQL must start with "where ..."
+func Find(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[{{.ClassName}}](w, DBName)
+}
+
+// FindFields returns rows with selected fields from {{.Name}} table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[T](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt("SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, DBName, params...)
-}
-
-// FindOne returns a row with selected fields from {{.Name}} table with arbitary where query
-// whereSQL must start with "where ..."
-func FindOne[T any](whereSQL string, params ...any) *T {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
-}
-
-// Find{{.ClassName}} returns rows from {{.Name}} table with arbitary where query
-// whereSQL must start with "where ..."
-func Find{{.ClassName}}(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[{{.ClassName}}](w, DBName)
-}
-
-// Find returns rows with selected fields from {{.Name}} table with arbitary where query
-// whereSQL must start with "where ..."
-func Find[T any](whereSQL string, params ...any) ([]*T, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
 }
 
 // Column types

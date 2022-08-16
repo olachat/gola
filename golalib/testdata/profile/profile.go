@@ -37,60 +37,60 @@ type withPK interface {
 	GetUserId() int
 }
 
-// FetchProfileByPKs returns a row from profile table with given primary key value
-func FetchProfileByPK(val int) *Profile {
+// FetchByPK returns a row from profile table with given primary key value
+func FetchByPK(val int) *Profile {
 	return coredb.FetchByPK[Profile](DBName, []string{"user_id"}, val)
 }
 
-// FetchByPKs returns a row with selected fields from profile table with given primary key value
-func FetchByPK[T any](val int) *T {
+// FetchFieldsByPK returns a row with selected fields from profile table with given primary key value
+func FetchFieldsByPK[T any](val int) *T {
 	return coredb.FetchByPK[T](DBName, []string{"user_id"}, val)
 }
 
-// FetchProfileByPKs returns rows with from profile table with given primary key values
-func FetchProfileByPKs(vals ...int) []*Profile {
+// FetchByPKs returns rows with from profile table with given primary key values
+func FetchByPKs(vals ...int) []*Profile {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[Profile](pks, "user_id", DBName)
 }
 
-// FetchByPKs returns rows with selected fields from profile table with given primary key values
-func FetchByPKs[T any](vals ...int) []*T {
+// FetchFieldsByPKs returns rows with selected fields from profile table with given primary key values
+func FetchFieldsByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](pks, "user_id", DBName)
 }
 
-// FindOneProfile returns a row from profile table with arbitary where query
+// FindOne returns a row from profile table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneProfile(whereSQL string, params ...any) *Profile {
+func FindOne(whereSQL string, params ...any) *Profile {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[Profile](w, DBName)
+}
+
+// FindOneFields returns a row with selected fields from profile table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFields[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOne[T](w, DBName)
+}
+
+// Find returns rows from profile table with arbitary where query
+// whereSQL must start with "where ..."
+func Find(whereSQL string, params ...any) ([]*Profile, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[Profile](w, DBName)
+}
+
+// FindFields returns rows with selected fields from profile table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.Find[T](w, DBName)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt("SELECT COUNT(*) FROM `profile` "+whereSQL, DBName, params...)
-}
-
-// FindOne returns a row with selected fields from profile table with arbitary where query
-// whereSQL must start with "where ..."
-func FindOne[T any](whereSQL string, params ...any) *T {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
-}
-
-// FindProfile returns rows from profile table with arbitary where query
-// whereSQL must start with "where ..."
-func FindProfile(whereSQL string, params ...any) ([]*Profile, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Profile](w, DBName)
-}
-
-// Find returns rows with selected fields from profile table with arbitary where query
-// whereSQL must start with "where ..."
-func Find[T any](whereSQL string, params ...any) ([]*T, error) {
-	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
 }
 
 // Column types
