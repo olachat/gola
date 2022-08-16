@@ -321,8 +321,8 @@ func NewSong() *Song {
 	}
 }
 
-// NewSongWithPK return new *Song with given PK
-// PK column: "id"
+// NewSongWithPK takes "id"
+// and returns new *Song with given PK
 func NewSongWithPK(val uint) *Song {
 	c := &Song{
 		Id{},

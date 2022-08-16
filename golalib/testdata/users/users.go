@@ -704,8 +704,8 @@ func NewUser() *User {
 	}
 }
 
-// NewUserWithPK return new *User with given PK
-// PK column: "id"
+// NewUserWithPK takes "id"
+// and returns new *User with given PK
 func NewUserWithPK(val int) *User {
 	c := &User{
 		Id{},

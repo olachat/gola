@@ -547,8 +547,8 @@ func NewBlog() *Blog {
 	}
 }
 
-// NewBlogWithPK return new *Blog with given PK
-// PK column: "id"
+// NewBlogWithPK takes "id"
+// and returns new *Blog with given PK
 func NewBlogWithPK(val int) *Blog {
 	c := &Blog{
 		Id{},

@@ -212,8 +212,8 @@ func New{{.ClassName}}() *{{.ClassName}} {
 }
 {{- end }}
 
-// New{{.ClassName}}WithPK return new *{{.ClassName}} with given PK
-// PK column: {{.GetPrimaryKeyNames}}
+// New{{.ClassName}}WithPK takes {{.GetPrimaryKeyNames}}
+// and returns new *{{.ClassName}} with given PK
 func New{{.ClassName}}WithPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 	c := &{{.ClassName}}{
 	{{- range .Columns }}
