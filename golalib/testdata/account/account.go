@@ -237,9 +237,9 @@ func (c *Money) GetTableType() coredb.TableType {
 	return table
 }
 
-// NewAccountWithPK takes "user_id","country_code"
+// NewWithPK takes "user_id","country_code"
 // and returns new *Account with given PK
-func NewAccountWithPK(val PK) *Account {
+func NewWithPK(val PK) *Account {
 	c := &Account{
 		UserId{},
 		Type{val: "free"},

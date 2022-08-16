@@ -209,9 +209,9 @@ func (c *NickName) GetTableType() coredb.TableType {
 	return table
 }
 
-// NewProfileWithPK takes "user_id"
+// NewWithPK takes "user_id"
 // and returns new *Profile with given PK
-func NewProfileWithPK(val int) *Profile {
+func NewWithPK(val int) *Profile {
 	c := &Profile{
 		UserId{},
 		Level{val: int8(1)},

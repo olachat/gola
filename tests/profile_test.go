@@ -8,7 +8,7 @@ import (
 )
 
 func TestProfile(t *testing.T) {
-	p := profile.NewProfileWithPK(8)
+	p := profile.NewWithPK(8)
 	p.SetNickName("tom")
 	err := p.Insert()
 	if err != nil {
@@ -20,7 +20,7 @@ func TestProfile(t *testing.T) {
 		t.Error("profile re-fetch error")
 	}
 
-	p3 := profile.NewProfileWithPK(8)
+	p3 := profile.NewWithPK(8)
 	p3.SetNickName("jerry")
 	err = p3.Insert()
 
@@ -44,7 +44,7 @@ func TestAccount(t *testing.T) {
 		UserId:      8,
 		CountryCode: 4,
 	}
-	a := account.NewAccountWithPK(pk)
+	a := account.NewWithPK(pk)
 	a.SetMoney(47)
 	err := a.Insert()
 	if err != nil {

@@ -310,8 +310,8 @@ func (c *Hash) GetTableType() coredb.TableType {
 	return table
 }
 
-// NewSong return new *Song with default values
-func NewSong() *Song {
+// New return new *Song with default values
+func New() *Song {
 	return &Song{
 		Id{},
 		Title{},
@@ -321,9 +321,9 @@ func NewSong() *Song {
 	}
 }
 
-// NewSongWithPK takes "id"
+// NewWithPK takes "id"
 // and returns new *Song with given PK
-func NewSongWithPK(val uint) *Song {
+func NewWithPK(val uint) *Song {
 	c := &Song{
 		Id{},
 		Title{},

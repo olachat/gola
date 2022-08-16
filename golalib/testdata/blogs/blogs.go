@@ -531,8 +531,8 @@ func (c *UpdatedAt) GetTableType() coredb.TableType {
 	return table
 }
 
-// NewBlog return new *Blog with default values
-func NewBlog() *Blog {
+// New return new *Blog with default values
+func New() *Blog {
 	return &Blog{
 		Id{},
 		UserId{val: int(0)},
@@ -547,9 +547,9 @@ func NewBlog() *Blog {
 	}
 }
 
-// NewBlogWithPK takes "id"
+// NewWithPK takes "id"
 // and returns new *Blog with given PK
-func NewBlogWithPK(val int) *Blog {
+func NewWithPK(val int) *Blog {
 	c := &Blog{
 		Id{},
 		UserId{val: int(0)},
