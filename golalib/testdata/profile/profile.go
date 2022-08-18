@@ -17,7 +17,7 @@ func Setup(dbname string) {
 	DBName = dbname
 }
 
-// Profile represents profile table
+// Profile represents `profile` table
 type Profile struct {
 	//  int
 	UserId
@@ -31,7 +31,7 @@ type withPK interface {
 	GetUserId() int
 }
 
-// FetchByPK returns a row from profile table with given primary key value
+// FetchByPK returns a row from `profile` table with given primary key value
 func FetchByPK(val int) *Profile {
 	return coredb.FetchByPK[Profile](DBName, TableName, []string{"user_id"}, val)
 }
@@ -41,40 +41,40 @@ func FetchFieldsByPK[T any](val int) *T {
 	return coredb.FetchByPK[T](DBName, TableName, []string{"user_id"}, val)
 }
 
-// FetchByPKs returns rows with from profile table with given primary key values
+// FetchByPKs returns rows with from `profile` table with given primary key values
 func FetchByPKs(vals ...int) []*Profile {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[Profile](DBName, TableName, "user_id", pks)
 }
 
-// FetchFieldsByPKs returns rows with selected fields from profile table with given primary key values
+// FetchFieldsByPKs returns rows with selected fields from `profile` table with given primary key values
 func FetchFieldsByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](DBName, TableName, "user_id", pks)
 }
 
-// FindOne returns a row from profile table with arbitary where query
+// FindOne returns a row from `profile` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *Profile {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[Profile](DBName, TableName, w)
 }
 
-// FindOneFields returns a row with selected fields from profile table with arbitary where query
+// FindOneFields returns a row with selected fields from `profile` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[T](DBName, TableName, w)
 }
 
-// Find returns rows from profile table with arbitary where query
+// Find returns rows from `profile` table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*Profile, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[Profile](DBName, TableName, w)
 }
 
-// FindFields returns rows with selected fields from profile table with arbitary where query
+// FindFields returns rows with selected fields from `profile` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
@@ -191,6 +191,7 @@ func NewWithPK(val int) *Profile {
 	return c
 }
 
+// Insert Profile struct to `profile` table
 func (c *Profile) Insert() error {
 	sql := "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
 
@@ -217,6 +218,7 @@ func (c *Profile) resetUpdated() {
 	c.NickName.resetUpdated()
 }
 
+// Update Profile struct in `profile` table
 func (obj *Profile) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -254,6 +256,7 @@ func (obj *Profile) Update() (bool, error) {
 	return true, nil
 }
 
+// Update Profile struct with given fields in `profile` table
 func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any

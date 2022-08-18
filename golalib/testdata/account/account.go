@@ -17,7 +17,7 @@ func Setup(dbname string) {
 	DBName = dbname
 }
 
-// Account represents account table
+// Account represents `account` table
 type Account struct {
 	//  int
 	UserId
@@ -38,7 +38,7 @@ type withPK interface {
 	GetCountryCode() uint
 }
 
-// FetchByPK returns a row from account table with given primary key value
+// FetchByPK returns a row from `account` table with given primary key value
 func FetchByPK(val PK) *Account {
 	return coredb.FetchByPK[Account](DBName, TableName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
 }
@@ -48,28 +48,28 @@ func FetchFieldsByPK[T any](val PK) *T {
 	return coredb.FetchByPK[T](DBName, TableName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
 }
 
-// FindOne returns a row from account table with arbitary where query
+// FindOne returns a row from `account` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *Account {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[Account](DBName, TableName, w)
 }
 
-// FindOneFields returns a row with selected fields from account table with arbitary where query
+// FindOneFields returns a row with selected fields from `account` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[T](DBName, TableName, w)
 }
 
-// Find returns rows from account table with arbitary where query
+// Find returns rows from `account` table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*Account, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[Account](DBName, TableName, w)
 }
 
-// FindFields returns rows with selected fields from account table with arbitary where query
+// FindFields returns rows with selected fields from `account` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
@@ -212,6 +212,7 @@ func NewWithPK(val PK) *Account {
 	return c
 }
 
+// Insert Account struct to `account` table
 func (c *Account) Insert() error {
 	sql := "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
 
@@ -238,6 +239,7 @@ func (c *Account) resetUpdated() {
 	c.Money.resetUpdated()
 }
 
+// Update Account struct in `account` table
 func (obj *Account) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -275,6 +277,7 @@ func (obj *Account) Update() (bool, error) {
 	return true, nil
 }
 
+// Update Account struct with given fields in `account` table
 func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any

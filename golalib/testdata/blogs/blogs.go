@@ -17,7 +17,7 @@ func Setup(dbname string) {
 	DBName = dbname
 }
 
-// Blog represents blogs table
+// Blog represents `blogs` table
 type Blog struct {
 	//  int
 	Id
@@ -45,7 +45,7 @@ type withPK interface {
 	GetId() int
 }
 
-// FetchByPK returns a row from blogs table with given primary key value
+// FetchByPK returns a row from `blogs` table with given primary key value
 func FetchByPK(val int) *Blog {
 	return coredb.FetchByPK[Blog](DBName, TableName, []string{"id"}, val)
 }
@@ -55,40 +55,40 @@ func FetchFieldsByPK[T any](val int) *T {
 	return coredb.FetchByPK[T](DBName, TableName, []string{"id"}, val)
 }
 
-// FetchByPKs returns rows with from blogs table with given primary key values
+// FetchByPKs returns rows with from `blogs` table with given primary key values
 func FetchByPKs(vals ...int) []*Blog {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[Blog](DBName, TableName, "id", pks)
 }
 
-// FetchFieldsByPKs returns rows with selected fields from blogs table with given primary key values
+// FetchFieldsByPKs returns rows with selected fields from `blogs` table with given primary key values
 func FetchFieldsByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](DBName, TableName, "id", pks)
 }
 
-// FindOne returns a row from blogs table with arbitary where query
+// FindOne returns a row from `blogs` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *Blog {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[Blog](DBName, TableName, w)
 }
 
-// FindOneFields returns a row with selected fields from blogs table with arbitary where query
+// FindOneFields returns a row with selected fields from `blogs` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[T](DBName, TableName, w)
 }
 
-// Find returns rows from blogs table with arbitary where query
+// Find returns rows from `blogs` table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*Blog, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[Blog](DBName, TableName, w)
 }
 
-// FindFields returns rows with selected fields from blogs table with arbitary where query
+// FindFields returns rows with selected fields from `blogs` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
@@ -480,6 +480,7 @@ func NewWithPK(val int) *Blog {
 	return c
 }
 
+// Insert Blog struct to `blogs` table
 func (c *Blog) Insert() error {
 	sql := "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
@@ -519,6 +520,7 @@ func (c *Blog) resetUpdated() {
 	c.UpdatedAt.resetUpdated()
 }
 
+// Update Blog struct in `blogs` table
 func (obj *Blog) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -584,6 +586,7 @@ func (obj *Blog) Update() (bool, error) {
 	return true, nil
 }
 
+// Update Blog struct with given fields in `blogs` table
 func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any

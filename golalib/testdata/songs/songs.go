@@ -17,7 +17,7 @@ func Setup(dbname string) {
 	DBName = dbname
 }
 
-// Song represents songs table
+// Song represents `songs` table
 type Song struct {
 	//  int unsigned
 	Id
@@ -35,7 +35,7 @@ type withPK interface {
 	GetId() uint
 }
 
-// FetchByPK returns a row from songs table with given primary key value
+// FetchByPK returns a row from `songs` table with given primary key value
 func FetchByPK(val uint) *Song {
 	return coredb.FetchByPK[Song](DBName, TableName, []string{"id"}, val)
 }
@@ -45,40 +45,40 @@ func FetchFieldsByPK[T any](val uint) *T {
 	return coredb.FetchByPK[T](DBName, TableName, []string{"id"}, val)
 }
 
-// FetchByPKs returns rows with from songs table with given primary key values
+// FetchByPKs returns rows with from `songs` table with given primary key values
 func FetchByPKs(vals ...uint) []*Song {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[Song](DBName, TableName, "id", pks)
 }
 
-// FetchFieldsByPKs returns rows with selected fields from songs table with given primary key values
+// FetchFieldsByPKs returns rows with selected fields from `songs` table with given primary key values
 func FetchFieldsByPKs[T any](vals ...uint) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](DBName, TableName, "id", pks)
 }
 
-// FindOne returns a row from songs table with arbitary where query
+// FindOne returns a row from `songs` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *Song {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[Song](DBName, TableName, w)
 }
 
-// FindOneFields returns a row with selected fields from songs table with arbitary where query
+// FindOneFields returns a row with selected fields from `songs` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[T](DBName, TableName, w)
 }
 
-// Find returns rows from songs table with arbitary where query
+// Find returns rows from `songs` table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*Song, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[Song](DBName, TableName, w)
 }
 
-// FindFields returns rows with selected fields from songs table with arbitary where query
+// FindFields returns rows with selected fields from `songs` table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
@@ -289,6 +289,7 @@ func NewWithPK(val uint) *Song {
 	return c
 }
 
+// Insert Song struct to `songs` table
 func (c *Song) Insert() error {
 	sql := "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`) values (?, ?, ?, ?)"
 
@@ -323,6 +324,7 @@ func (c *Song) resetUpdated() {
 	c.Hash.resetUpdated()
 }
 
+// Update Song struct in `songs` table
 func (obj *Song) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -368,6 +370,7 @@ func (obj *Song) Update() (bool, error) {
 	return true, nil
 }
 
+// Update Song struct with given fields in `songs` table
 func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
