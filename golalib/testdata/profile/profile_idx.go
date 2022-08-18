@@ -76,11 +76,14 @@ type iQuery[T any] interface {
 }
 
 // Find methods
-func SelectProfile() iQuery[Profile] {
+
+// Select returns rows from `profile` table with index awared query
+func Select() iQuery[Profile] {
 	return new(idxQuery[Profile])
 }
 
-func Select[T any]() iQuery[T] {
+// SelectFields returns rows with selected fields from `profile` table with index awared query
+func SelectFields[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 

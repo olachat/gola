@@ -133,11 +133,14 @@ func (q *idxQuery1[T]) AndIsFavouriteIN(vals ...bool) orderReadQuery[T] {
 }
 
 // Find methods
-func SelectSongUserFavourite() iQuery[SongUserFavourite] {
+
+// Select returns rows from `song_user_favourites` table with index awared query
+func Select() iQuery[SongUserFavourite] {
 	return new(idxQuery[SongUserFavourite])
 }
 
-func Select[T any]() iQuery[T] {
+// SelectFields returns rows with selected fields from `song_user_favourites` table with index awared query
+func SelectFields[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 

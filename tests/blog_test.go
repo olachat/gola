@@ -105,7 +105,7 @@ func TestBlogFindT(t *testing.T) {
 }
 
 func TestBlogSelect(t *testing.T) {
-	objs := blogs.Select[struct {
+	objs := blogs.SelectFields[struct {
 		blogs.Id
 		blogs.Title
 	}]().OrderBy(blogs.IdAsc).All()
@@ -122,7 +122,7 @@ func TestBlogSelect(t *testing.T) {
 		t.Error("Read blog 2 failed")
 	}
 
-	objs = blogs.Select[struct {
+	objs = blogs.SelectFields[struct {
 		blogs.Id
 		blogs.Title
 	}]().OrderBy(blogs.IdDesc).All()

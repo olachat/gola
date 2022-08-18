@@ -105,11 +105,14 @@ func (q *idxQuery1[T]) AndCountryCodeIN(vals ...uint) orderReadQuery[T] {
 }
 
 // Find methods
-func SelectAccount() iQuery[Account] {
+
+// Select returns rows from `account` table with index awared query
+func Select() iQuery[Account] {
 	return new(idxQuery[Account])
 }
 
-func Select[T any]() iQuery[T] {
+// SelectFields returns rows with selected fields from `account` table with index awared query
+func SelectFields[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 
