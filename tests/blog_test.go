@@ -18,7 +18,7 @@ func TestBlogMethods(t *testing.T) {
 		t.Error("Insert blog 1 failed")
 	}
 
-	e = blog.Delete()
+	e = blogs.DeleteByPK(blog.GetId())
 	if e != nil {
 		t.Error(e)
 	}

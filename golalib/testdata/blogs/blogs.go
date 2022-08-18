@@ -767,16 +767,10 @@ func Update(obj withPK) (bool, error) {
 	return true, nil
 }
 
-func (obj *Blog) Delete() error {
+// DeleteByPK delete a row from blogs table with given primary key value
+func DeleteByPK(val int) error {
 	sql := "DELETE FROM `blogs` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, DBName, obj.GetId())
-	return err
-}
-
-func Delete(obj withPK) error {
-	sql := "DELETE FROM `blogs` WHERE `id` = ?"
-
-	_, err := coredb.Exec(sql, DBName, obj.GetId())
+	_, err := coredb.Exec(sql, DBName, val)
 	return err
 }

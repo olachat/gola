@@ -369,16 +369,10 @@ func Update(obj withPK) (bool, error) {
 	return true, nil
 }
 
-func (obj *Account) Delete() error {
+// DeleteByPK delete a row from account table with given primary key value
+func DeleteByPK(val PK) error {
 	sql := "DELETE FROM `account` WHERE `user_id` = ? and `country_code` = ?"
 
-	_, err := coredb.Exec(sql, DBName, obj.GetUserId(), obj.GetCountryCode())
-	return err
-}
-
-func Delete(obj withPK) error {
-	sql := "DELETE FROM `account` WHERE `user_id` = ? and `country_code` = ?"
-
-	_, err := coredb.Exec(sql, DBName, obj.GetUserId(), obj.GetCountryCode())
+	_, err := coredb.Exec(sql, DBName, val.UserId, val.CountryCode)
 	return err
 }

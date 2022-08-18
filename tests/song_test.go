@@ -133,7 +133,7 @@ func TestSongDelete(t *testing.T) {
 		SongId: 99,
 	}
 	obj := song_user_favourites.FetchByPK(pk)
-	err := obj.Delete()
+	err := song_user_favourites.DeleteByPK(pk)
 	if err != nil {
 		t.Error("SongUserFavourite delete fail")
 	}
@@ -162,7 +162,7 @@ func TestSongDelete(t *testing.T) {
 		t.Error("SongUserFavourite reinsert failed")
 	}
 
-	err = song_user_favourites.Delete(partialObj)
+	err = song_user_favourites.DeleteByPK(pk)
 	if err != nil {
 		t.Error(err)
 	}

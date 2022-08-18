@@ -481,16 +481,10 @@ func Update(obj withPK) (bool, error) {
 	return true, nil
 }
 
-func (obj *SongUserFavourite) Delete() error {
+// DeleteByPK delete a row from song_user_favourites table with given primary key value
+func DeleteByPK(val PK) error {
 	sql := "DELETE FROM `song_user_favourites` WHERE `user_id` = ? and `song_id` = ?"
 
-	_, err := coredb.Exec(sql, DBName, obj.GetUserId(), obj.GetSongId())
-	return err
-}
-
-func Delete(obj withPK) error {
-	sql := "DELETE FROM `song_user_favourites` WHERE `user_id` = ? and `song_id` = ?"
-
-	_, err := coredb.Exec(sql, DBName, obj.GetUserId(), obj.GetSongId())
+	_, err := coredb.Exec(sql, DBName, val.UserId, val.SongId)
 	return err
 }
