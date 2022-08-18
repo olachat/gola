@@ -299,11 +299,14 @@ func (q *idxQuery10[T]) AndCategoryIdIN(vals ...int) orderReadQuery[T] {
 }
 
 // Find methods
-func SelectBlog() iQuery[Blog] {
+
+// Select returns rows from `blogs` table with index awared query
+func Select() iQuery[Blog] {
 	return new(idxQuery[Blog])
 }
 
-func Select[T any]() iQuery[T] {
+// SelectFields returns rows with selected fields from `blogs` table with index awared query
+func SelectFields[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 

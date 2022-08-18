@@ -115,11 +115,14 @@ func (q *{{$col.StructName}}[T]) And{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .I
 {{ end }}
 
 // Find methods
-func Select{{.ClassName}}() iQuery[{{.ClassName}}] {
+
+// Select returns rows from `{{.Name}}` table with index awared query
+func Select() iQuery[{{.ClassName}}] {
 	return new(idxQuery[{{.ClassName}}])
 }
 
-func Select[T any]() iQuery[T] {
+// SelectFields returns rows with selected fields from `{{.Name}}` table with index awared query
+func SelectFields[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 

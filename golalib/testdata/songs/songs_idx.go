@@ -88,11 +88,14 @@ type iQuery[T any] interface {
 }
 
 // Find methods
-func SelectSong() iQuery[Song] {
+
+// Select returns rows from `songs` table with index awared query
+func Select() iQuery[Song] {
 	return new(idxQuery[Song])
 }
 
-func Select[T any]() iQuery[T] {
+// SelectFields returns rows with selected fields from `songs` table with index awared query
+func SelectFields[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 

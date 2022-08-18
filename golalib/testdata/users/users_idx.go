@@ -132,11 +132,14 @@ type iQuery[T any] interface {
 }
 
 // Find methods
-func SelectUser() iQuery[User] {
+
+// Select returns rows from `users` table with index awared query
+func Select() iQuery[User] {
 	return new(idxQuery[User])
 }
 
-func Select[T any]() iQuery[T] {
+// SelectFields returns rows with selected fields from `users` table with index awared query
+func SelectFields[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 
