@@ -12,6 +12,7 @@ import (
 )
 
 var DBName string = "{{.SchemaName}}"
+const TableName string = "{{.Name}}"
 
 func Setup(dbname string) {
 	DBName = dbname
@@ -24,14 +25,6 @@ type {{.ClassName}} struct {
 	{{.GoName}}
 	{{- end }}
 }
-
-type {{.ClassName}}Table struct{}
-
-func (*{{.ClassName}}Table) GetTableName() string {
-	return "{{.Name}}"
-}
-
-var table *{{.ClassName}}Table
 
 {{- if .HasCompositePrimaryKey }}
 type PK struct {
@@ -49,23 +42,23 @@ type withPK interface {
 
 // FetchByPK returns a row from {{.Name}} table with given primary key value
 func FetchByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
-	return coredb.FetchByPK[{{.ClassName}}](DBName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
+	return coredb.FetchByPK[{{.ClassName}}](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 // FetchFieldsByPK returns a row with selected fields from {{.Name}} table with given primary key value
 func FetchFieldsByPK[T any](val {{.GetPrimaryKeyType}}) *T {
-	return coredb.FetchByPK[T](DBName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
+	return coredb.FetchByPK[T](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 {{- if not .HasCompositePrimaryKey }}
 // FetchByPKs returns rows with from {{.Name}} table with given primary key values
 func FetchByPKs(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[{{.ClassName}}](pks, "{{.GetPrimaryKeyName}}", DBName)
+	return coredb.FetchByPKs[{{.ClassName}}](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from {{.Name}} table with given primary key values
 func FetchFieldsByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "{{.GetPrimaryKeyName}}", DBName)
+	return coredb.FetchByPKs[T](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
 }
 {{- end}}
 
@@ -73,34 +66,34 @@ func FetchFieldsByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *{{.ClassName}} {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[{{.ClassName}}](w, DBName)
+	return coredb.FindOne[{{.ClassName}}](DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from {{.Name}} table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
+	return coredb.FindOne[T](DBName, TableName, w)
 }
 
 // Find returns rows from {{.Name}} table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[{{.ClassName}}](w, DBName)
+	return coredb.Find[{{.ClassName}}](DBName, TableName, w)
 }
 
 // FindFields returns rows with selected fields from {{.Name}} table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
+	return coredb.Find[T](DBName, TableName, w)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, DBName, params...)
+	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, params...)
 }
 
 // Column types
@@ -184,16 +177,8 @@ func (c *{{.GoName}}) GetColumnName() string {
 	return "{{.Name}}"
 }
 
-func (c *{{.GoName}}) IsPrimaryKey() bool {
-	return {{.IsPrimaryKey}}
-}
-
 func (c *{{.GoName}}) GetValPointer() any {
 	return &c.val
-}
-
-func (c *{{.GoName}}) GetTableType() coredb.TableType {
-	return table
 }
 {{- end }}
 
@@ -245,7 +230,7 @@ func (c *{{.ClassName}}) Insert() error {
 		{{- if $i}}, {{end}}?
 		{{- end }})"
 
-	result, err := coredb.Exec(sql, DBName, {{- range $i, $c := .GetNonAutoIncrementColumns }}
+	result, err := coredb.Exec(DBName, sql, {{- range $i, $c := .GetNonAutoIncrementColumns }}
 	{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
 	{{- end }})
 
@@ -299,7 +284,7 @@ func (obj *{{.ClassName}}) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeySQL}}"
 	params = append(params, {{.GetPrimaryKeyParams}})
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -348,7 +333,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE {{.GetPrimaryKeySQL}}"
 	params = append(params, {{.GetPrimaryKeyParams}})
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -371,6 +356,6 @@ func Update(obj withPK) (bool, error) {
 func DeleteByPK(val {{.GetPrimaryKeyType}}) (error) {
 	sql := "DELETE FROM `{{.Name}}` WHERE {{.GetPrimaryKeySQL}}"
 
-	_, err := coredb.Exec(sql, DBName, {{.GetPrimaryKeyVals}})
+	_, err := coredb.Exec(DBName, sql, {{.GetPrimaryKeyVals}})
 	return err
 }

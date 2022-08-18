@@ -11,6 +11,8 @@ import (
 
 var DBName string = "testdata"
 
+const TableName string = "blogs"
+
 func Setup(dbname string) {
 	DBName = dbname
 }
@@ -39,72 +41,64 @@ type Blog struct {
 	UpdatedAt
 }
 
-type BlogTable struct{}
-
-func (*BlogTable) GetTableName() string {
-	return "blogs"
-}
-
-var table *BlogTable
-
 type withPK interface {
 	GetId() int
 }
 
 // FetchByPK returns a row from blogs table with given primary key value
 func FetchByPK(val int) *Blog {
-	return coredb.FetchByPK[Blog](DBName, []string{"id"}, val)
+	return coredb.FetchByPK[Blog](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from blogs table with given primary key value
 func FetchFieldsByPK[T any](val int) *T {
-	return coredb.FetchByPK[T](DBName, []string{"id"}, val)
+	return coredb.FetchByPK[T](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchByPKs returns rows with from blogs table with given primary key values
 func FetchByPKs(vals ...int) []*Blog {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Blog](pks, "id", DBName)
+	return coredb.FetchByPKs[Blog](DBName, TableName, "id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from blogs table with given primary key values
 func FetchFieldsByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "id", DBName)
+	return coredb.FetchByPKs[T](DBName, TableName, "id", pks)
 }
 
 // FindOne returns a row from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *Blog {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[Blog](w, DBName)
+	return coredb.FindOne[Blog](DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
+	return coredb.FindOne[T](DBName, TableName, w)
 }
 
 // Find returns rows from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*Blog, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Blog](w, DBName)
+	return coredb.Find[Blog](DBName, TableName, w)
 }
 
 // FindFields returns rows with selected fields from blogs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
+	return coredb.Find[T](DBName, TableName, w)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `blogs` "+whereSQL, DBName, params...)
+	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `blogs` "+whereSQL, params...)
 }
 
 // Column types
@@ -123,16 +117,8 @@ func (c *Id) GetColumnName() string {
 	return "id"
 }
 
-func (c *Id) IsPrimaryKey() bool {
-	return true
-}
-
 func (c *Id) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Id) GetTableType() coredb.TableType {
-	return table
 }
 
 // UserId field
@@ -167,16 +153,8 @@ func (c *UserId) GetColumnName() string {
 	return "user_id"
 }
 
-func (c *UserId) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *UserId) GetValPointer() any {
 	return &c.val
-}
-
-func (c *UserId) GetTableType() coredb.TableType {
-	return table
 }
 
 // Slug field
@@ -211,16 +189,8 @@ func (c *Slug) GetColumnName() string {
 	return "slug"
 }
 
-func (c *Slug) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Slug) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Slug) GetTableType() coredb.TableType {
-	return table
 }
 
 // Title field
@@ -255,16 +225,8 @@ func (c *Title) GetColumnName() string {
 	return "title"
 }
 
-func (c *Title) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Title) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Title) GetTableType() coredb.TableType {
-	return table
 }
 
 // CategoryId field
@@ -299,16 +261,8 @@ func (c *CategoryId) GetColumnName() string {
 	return "category_id"
 }
 
-func (c *CategoryId) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *CategoryId) GetValPointer() any {
 	return &c.val
-}
-
-func (c *CategoryId) GetTableType() coredb.TableType {
-	return table
 }
 
 // IsPinned field
@@ -343,16 +297,8 @@ func (c *IsPinned) GetColumnName() string {
 	return "is_pinned"
 }
 
-func (c *IsPinned) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *IsPinned) GetValPointer() any {
 	return &c.val
-}
-
-func (c *IsPinned) GetTableType() coredb.TableType {
-	return table
 }
 
 // IsVip field
@@ -387,16 +333,8 @@ func (c *IsVip) GetColumnName() string {
 	return "is_vip"
 }
 
-func (c *IsVip) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *IsVip) GetValPointer() any {
 	return &c.val
-}
-
-func (c *IsVip) GetTableType() coredb.TableType {
-	return table
 }
 
 // Country field
@@ -431,16 +369,8 @@ func (c *Country) GetColumnName() string {
 	return "country"
 }
 
-func (c *Country) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Country) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Country) GetTableType() coredb.TableType {
-	return table
 }
 
 // CreatedAt field
@@ -475,16 +405,8 @@ func (c *CreatedAt) GetColumnName() string {
 	return "created_at"
 }
 
-func (c *CreatedAt) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *CreatedAt) GetValPointer() any {
 	return &c.val
-}
-
-func (c *CreatedAt) GetTableType() coredb.TableType {
-	return table
 }
 
 // UpdatedAt field
@@ -519,16 +441,8 @@ func (c *UpdatedAt) GetColumnName() string {
 	return "updated_at"
 }
 
-func (c *UpdatedAt) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
-}
-
-func (c *UpdatedAt) GetTableType() coredb.TableType {
-	return table
 }
 
 // New return new *Blog with default values
@@ -569,7 +483,7 @@ func NewWithPK(val int) *Blog {
 func (c *Blog) Insert() error {
 	sql := "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, DBName, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err := coredb.Exec(DBName, sql, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
@@ -653,7 +567,7 @@ func (obj *Blog) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -748,7 +662,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -771,6 +685,6 @@ func Update(obj withPK) (bool, error) {
 func DeleteByPK(val int) error {
 	sql := "DELETE FROM `blogs` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, DBName, val)
+	_, err := coredb.Exec(DBName, sql, val)
 	return err
 }

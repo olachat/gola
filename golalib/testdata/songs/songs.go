@@ -11,6 +11,8 @@ import (
 
 var DBName string = "testdata"
 
+const TableName string = "songs"
+
 func Setup(dbname string) {
 	DBName = dbname
 }
@@ -29,72 +31,64 @@ type Song struct {
 	Hash
 }
 
-type SongTable struct{}
-
-func (*SongTable) GetTableName() string {
-	return "songs"
-}
-
-var table *SongTable
-
 type withPK interface {
 	GetId() uint
 }
 
 // FetchByPK returns a row from songs table with given primary key value
 func FetchByPK(val uint) *Song {
-	return coredb.FetchByPK[Song](DBName, []string{"id"}, val)
+	return coredb.FetchByPK[Song](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from songs table with given primary key value
 func FetchFieldsByPK[T any](val uint) *T {
-	return coredb.FetchByPK[T](DBName, []string{"id"}, val)
+	return coredb.FetchByPK[T](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchByPKs returns rows with from songs table with given primary key values
 func FetchByPKs(vals ...uint) []*Song {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Song](pks, "id", DBName)
+	return coredb.FetchByPKs[Song](DBName, TableName, "id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from songs table with given primary key values
 func FetchFieldsByPKs[T any](vals ...uint) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "id", DBName)
+	return coredb.FetchByPKs[T](DBName, TableName, "id", pks)
 }
 
 // FindOne returns a row from songs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *Song {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[Song](w, DBName)
+	return coredb.FindOne[Song](DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from songs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
+	return coredb.FindOne[T](DBName, TableName, w)
 }
 
 // Find returns rows from songs table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*Song, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Song](w, DBName)
+	return coredb.Find[Song](DBName, TableName, w)
 }
 
 // FindFields returns rows with selected fields from songs table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
+	return coredb.Find[T](DBName, TableName, w)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `songs` "+whereSQL, DBName, params...)
+	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `songs` "+whereSQL, params...)
 }
 
 // Column types
@@ -122,16 +116,8 @@ func (c *Id) GetColumnName() string {
 	return "id"
 }
 
-func (c *Id) IsPrimaryKey() bool {
-	return true
-}
-
 func (c *Id) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Id) GetTableType() coredb.TableType {
-	return table
 }
 
 // Title field
@@ -166,16 +152,8 @@ func (c *Title) GetColumnName() string {
 	return "title"
 }
 
-func (c *Title) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Title) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Title) GetTableType() coredb.TableType {
-	return table
 }
 
 // Rank field
@@ -210,16 +188,8 @@ func (c *Rank) GetColumnName() string {
 	return "rank"
 }
 
-func (c *Rank) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Rank) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Rank) GetTableType() coredb.TableType {
-	return table
 }
 
 // Type field
@@ -254,16 +224,8 @@ func (c *Type) GetColumnName() string {
 	return "type"
 }
 
-func (c *Type) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Type) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Type) GetTableType() coredb.TableType {
-	return table
 }
 
 // Hash field
@@ -298,16 +260,8 @@ func (c *Hash) GetColumnName() string {
 	return "hash"
 }
 
-func (c *Hash) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Hash) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Hash) GetTableType() coredb.TableType {
-	return table
 }
 
 // New return new *Song with default values
@@ -338,7 +292,7 @@ func NewWithPK(val uint) *Song {
 func (c *Song) Insert() error {
 	sql := "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`) values (?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, DBName, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
+	result, err := coredb.Exec(DBName, sql, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
 
 	if err != nil {
 		return err
@@ -397,7 +351,7 @@ func (obj *Song) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -462,7 +416,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -485,6 +439,6 @@ func Update(obj withPK) (bool, error) {
 func DeleteByPK(val uint) error {
 	sql := "DELETE FROM `songs` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, DBName, val)
+	_, err := coredb.Exec(DBName, sql, val)
 	return err
 }

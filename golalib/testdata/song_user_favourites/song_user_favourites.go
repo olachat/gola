@@ -13,6 +13,8 @@ import (
 
 var DBName string = "testdata"
 
+const TableName string = "song_user_favourites"
+
 func Setup(dbname string) {
 	DBName = dbname
 }
@@ -32,15 +34,6 @@ type SongUserFavourite struct {
 	// Last Update Time timestamp
 	UpdatedAt
 }
-
-type SongUserFavouriteTable struct{}
-
-func (*SongUserFavouriteTable) GetTableName() string {
-	return "song_user_favourites"
-}
-
-var table *SongUserFavouriteTable
-
 type PK struct {
 	UserId uint
 	SongId uint
@@ -53,46 +46,46 @@ type withPK interface {
 
 // FetchByPK returns a row from song_user_favourites table with given primary key value
 func FetchByPK(val PK) *SongUserFavourite {
-	return coredb.FetchByPK[SongUserFavourite](DBName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
+	return coredb.FetchByPK[SongUserFavourite](DBName, TableName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FetchFieldsByPK returns a row with selected fields from song_user_favourites table with given primary key value
 func FetchFieldsByPK[T any](val PK) *T {
-	return coredb.FetchByPK[T](DBName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
+	return coredb.FetchByPK[T](DBName, TableName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FindOne returns a row from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *SongUserFavourite {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[SongUserFavourite](w, DBName)
+	return coredb.FindOne[SongUserFavourite](DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
+	return coredb.FindOne[T](DBName, TableName, w)
 }
 
 // Find returns rows from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*SongUserFavourite, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[SongUserFavourite](w, DBName)
+	return coredb.Find[SongUserFavourite](DBName, TableName, w)
 }
 
 // FindFields returns rows with selected fields from song_user_favourites table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
+	return coredb.Find[T](DBName, TableName, w)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `song_user_favourites` "+whereSQL, DBName, params...)
+	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `song_user_favourites` "+whereSQL, params...)
 }
 
 // Column types
@@ -111,16 +104,8 @@ func (c *UserId) GetColumnName() string {
 	return "user_id"
 }
 
-func (c *UserId) IsPrimaryKey() bool {
-	return true
-}
-
 func (c *UserId) GetValPointer() any {
 	return &c.val
-}
-
-func (c *UserId) GetTableType() coredb.TableType {
-	return table
 }
 
 // SongId field
@@ -137,16 +122,8 @@ func (c *SongId) GetColumnName() string {
 	return "song_id"
 }
 
-func (c *SongId) IsPrimaryKey() bool {
-	return true
-}
-
 func (c *SongId) GetValPointer() any {
 	return &c.val
-}
-
-func (c *SongId) GetTableType() coredb.TableType {
-	return table
 }
 
 // Remark field
@@ -181,16 +158,8 @@ func (c *Remark) GetColumnName() string {
 	return "remark"
 }
 
-func (c *Remark) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Remark) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Remark) GetTableType() coredb.TableType {
-	return table
 }
 
 // IsFavourite field
@@ -225,16 +194,8 @@ func (c *IsFavourite) GetColumnName() string {
 	return "is_favourite"
 }
 
-func (c *IsFavourite) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *IsFavourite) GetValPointer() any {
 	return &c.val
-}
-
-func (c *IsFavourite) GetTableType() coredb.TableType {
-	return table
 }
 
 // CreatedAt field
@@ -269,16 +230,8 @@ func (c *CreatedAt) GetColumnName() string {
 	return "created_at"
 }
 
-func (c *CreatedAt) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *CreatedAt) GetValPointer() any {
 	return &c.val
-}
-
-func (c *CreatedAt) GetTableType() coredb.TableType {
-	return table
 }
 
 // UpdatedAt field
@@ -313,16 +266,8 @@ func (c *UpdatedAt) GetColumnName() string {
 	return "updated_at"
 }
 
-func (c *UpdatedAt) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
-}
-
-func (c *UpdatedAt) GetTableType() coredb.TableType {
-	return table
 }
 
 // NewWithPK takes "user_id","song_id"
@@ -344,7 +289,7 @@ func NewWithPK(val PK) *SongUserFavourite {
 func (c *SongUserFavourite) Insert() error {
 	sql := "INSERT IGNORE INTO `song_user_favourites` (`user_id`, `song_id`, `remark`, `is_favourite`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, DBName, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err := coredb.Exec(DBName, sql, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
@@ -397,7 +342,7 @@ func (obj *SongUserFavourite) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `song_id` = ?"
 	params = append(params, obj.GetUserId(), obj.GetSongId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -462,7 +407,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `song_id` = ?"
 	params = append(params, obj.GetUserId(), obj.GetSongId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -485,6 +430,6 @@ func Update(obj withPK) (bool, error) {
 func DeleteByPK(val PK) error {
 	sql := "DELETE FROM `song_user_favourites` WHERE `user_id` = ? and `song_id` = ?"
 
-	_, err := coredb.Exec(sql, DBName, val.UserId, val.SongId)
+	_, err := coredb.Exec(DBName, sql, val.UserId, val.SongId)
 	return err
 }

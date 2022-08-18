@@ -11,6 +11,8 @@ import (
 
 var DBName string = "testdata"
 
+const TableName string = "profile"
+
 func Setup(dbname string) {
 	DBName = dbname
 }
@@ -25,72 +27,64 @@ type Profile struct {
 	NickName
 }
 
-type ProfileTable struct{}
-
-func (*ProfileTable) GetTableName() string {
-	return "profile"
-}
-
-var table *ProfileTable
-
 type withPK interface {
 	GetUserId() int
 }
 
 // FetchByPK returns a row from profile table with given primary key value
 func FetchByPK(val int) *Profile {
-	return coredb.FetchByPK[Profile](DBName, []string{"user_id"}, val)
+	return coredb.FetchByPK[Profile](DBName, TableName, []string{"user_id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from profile table with given primary key value
 func FetchFieldsByPK[T any](val int) *T {
-	return coredb.FetchByPK[T](DBName, []string{"user_id"}, val)
+	return coredb.FetchByPK[T](DBName, TableName, []string{"user_id"}, val)
 }
 
 // FetchByPKs returns rows with from profile table with given primary key values
 func FetchByPKs(vals ...int) []*Profile {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[Profile](pks, "user_id", DBName)
+	return coredb.FetchByPKs[Profile](DBName, TableName, "user_id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from profile table with given primary key values
 func FetchFieldsByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "user_id", DBName)
+	return coredb.FetchByPKs[T](DBName, TableName, "user_id", pks)
 }
 
 // FindOne returns a row from profile table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *Profile {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[Profile](w, DBName)
+	return coredb.FindOne[Profile](DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from profile table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
+	return coredb.FindOne[T](DBName, TableName, w)
 }
 
 // Find returns rows from profile table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*Profile, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Profile](w, DBName)
+	return coredb.Find[Profile](DBName, TableName, w)
 }
 
 // FindFields returns rows with selected fields from profile table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
+	return coredb.Find[T](DBName, TableName, w)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `profile` "+whereSQL, DBName, params...)
+	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `profile` "+whereSQL, params...)
 }
 
 // Column types
@@ -109,16 +103,8 @@ func (c *UserId) GetColumnName() string {
 	return "user_id"
 }
 
-func (c *UserId) IsPrimaryKey() bool {
-	return true
-}
-
 func (c *UserId) GetValPointer() any {
 	return &c.val
-}
-
-func (c *UserId) GetTableType() coredb.TableType {
-	return table
 }
 
 // Level field
@@ -153,16 +139,8 @@ func (c *Level) GetColumnName() string {
 	return "level"
 }
 
-func (c *Level) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Level) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Level) GetTableType() coredb.TableType {
-	return table
 }
 
 // NickName field
@@ -197,16 +175,8 @@ func (c *NickName) GetColumnName() string {
 	return "nick_name"
 }
 
-func (c *NickName) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *NickName) GetValPointer() any {
 	return &c.val
-}
-
-func (c *NickName) GetTableType() coredb.TableType {
-	return table
 }
 
 // NewWithPK takes "user_id"
@@ -224,7 +194,7 @@ func NewWithPK(val int) *Profile {
 func (c *Profile) Insert() error {
 	sql := "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
 
-	result, err := coredb.Exec(sql, DBName, c.GetUserId(), c.GetLevel(), c.GetNickName())
+	result, err := coredb.Exec(DBName, sql, c.GetUserId(), c.GetLevel(), c.GetNickName())
 
 	if err != nil {
 		return err
@@ -267,7 +237,7 @@ func (obj *Profile) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ?"
 	params = append(params, obj.GetUserId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -320,7 +290,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ?"
 	params = append(params, obj.GetUserId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -343,6 +313,6 @@ func Update(obj withPK) (bool, error) {
 func DeleteByPK(val int) error {
 	sql := "DELETE FROM `profile` WHERE `user_id` = ?"
 
-	_, err := coredb.Exec(sql, DBName, val)
+	_, err := coredb.Exec(DBName, sql, val)
 	return err
 }

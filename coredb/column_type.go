@@ -4,6 +4,4 @@ package coredb
 type ColumnType interface {
 	GetColumnName() string
 	GetValPointer() any
-	IsPrimaryKey() bool
-	GetTableType() TableType
 }

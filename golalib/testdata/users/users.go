@@ -11,6 +11,8 @@ import (
 
 var DBName string = "testdata"
 
+const TableName string = "users"
+
 func Setup(dbname string) {
 	DBName = dbname
 }
@@ -43,72 +45,64 @@ type User struct {
 	SportsNoDefault
 }
 
-type UserTable struct{}
-
-func (*UserTable) GetTableName() string {
-	return "users"
-}
-
-var table *UserTable
-
 type withPK interface {
 	GetId() int
 }
 
 // FetchByPK returns a row from users table with given primary key value
 func FetchByPK(val int) *User {
-	return coredb.FetchByPK[User](DBName, []string{"id"}, val)
+	return coredb.FetchByPK[User](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from users table with given primary key value
 func FetchFieldsByPK[T any](val int) *T {
-	return coredb.FetchByPK[T](DBName, []string{"id"}, val)
+	return coredb.FetchByPK[T](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchByPKs returns rows with from users table with given primary key values
 func FetchByPKs(vals ...int) []*User {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[User](pks, "id", DBName)
+	return coredb.FetchByPKs[User](DBName, TableName, "id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from users table with given primary key values
 func FetchFieldsByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
-	return coredb.FetchByPKs[T](pks, "id", DBName)
+	return coredb.FetchByPKs[T](DBName, TableName, "id", pks)
 }
 
 // FindOne returns a row from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *User {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[User](w, DBName)
+	return coredb.FindOne[User](DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
+	return coredb.FindOne[T](DBName, TableName, w)
 }
 
 // Find returns rows from users table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*User, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[User](w, DBName)
+	return coredb.Find[User](DBName, TableName, w)
 }
 
 // FindFields returns rows with selected fields from users table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
+	return coredb.Find[T](DBName, TableName, w)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `users` "+whereSQL, DBName, params...)
+	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `users` "+whereSQL, params...)
 }
 
 // Column types
@@ -175,16 +169,8 @@ func (c *Id) GetColumnName() string {
 	return "id"
 }
 
-func (c *Id) IsPrimaryKey() bool {
-	return true
-}
-
 func (c *Id) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Id) GetTableType() coredb.TableType {
-	return table
 }
 
 // Name field
@@ -219,16 +205,8 @@ func (c *Name) GetColumnName() string {
 	return "name"
 }
 
-func (c *Name) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Name) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Name) GetTableType() coredb.TableType {
-	return table
 }
 
 // Email field
@@ -263,16 +241,8 @@ func (c *Email) GetColumnName() string {
 	return "email"
 }
 
-func (c *Email) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Email) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Email) GetTableType() coredb.TableType {
-	return table
 }
 
 // CreatedAt field
@@ -307,16 +277,8 @@ func (c *CreatedAt) GetColumnName() string {
 	return "created_at"
 }
 
-func (c *CreatedAt) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *CreatedAt) GetValPointer() any {
 	return &c.val
-}
-
-func (c *CreatedAt) GetTableType() coredb.TableType {
-	return table
 }
 
 // UpdatedAt field
@@ -351,16 +313,8 @@ func (c *UpdatedAt) GetColumnName() string {
 	return "updated_at"
 }
 
-func (c *UpdatedAt) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
-}
-
-func (c *UpdatedAt) GetTableType() coredb.TableType {
-	return table
 }
 
 // FloatType field
@@ -395,16 +349,8 @@ func (c *FloatType) GetColumnName() string {
 	return "float_type"
 }
 
-func (c *FloatType) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *FloatType) GetValPointer() any {
 	return &c.val
-}
-
-func (c *FloatType) GetTableType() coredb.TableType {
-	return table
 }
 
 // DoubleType field
@@ -439,16 +385,8 @@ func (c *DoubleType) GetColumnName() string {
 	return "double_type"
 }
 
-func (c *DoubleType) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *DoubleType) GetValPointer() any {
 	return &c.val
-}
-
-func (c *DoubleType) GetTableType() coredb.TableType {
-	return table
 }
 
 // Hobby field
@@ -483,16 +421,8 @@ func (c *Hobby) GetColumnName() string {
 	return "hobby"
 }
 
-func (c *Hobby) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Hobby) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Hobby) GetTableType() coredb.TableType {
-	return table
 }
 
 // HobbyNoDefault field
@@ -527,16 +457,8 @@ func (c *HobbyNoDefault) GetColumnName() string {
 	return "hobby_no_default"
 }
 
-func (c *HobbyNoDefault) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *HobbyNoDefault) GetValPointer() any {
 	return &c.val
-}
-
-func (c *HobbyNoDefault) GetTableType() coredb.TableType {
-	return table
 }
 
 // Sports field
@@ -576,16 +498,8 @@ func (c *Sports) GetColumnName() string {
 	return "sports"
 }
 
-func (c *Sports) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Sports) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Sports) GetTableType() coredb.TableType {
-	return table
 }
 
 // Sports2 field
@@ -625,16 +539,8 @@ func (c *Sports2) GetColumnName() string {
 	return "sports2"
 }
 
-func (c *Sports2) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Sports2) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Sports2) GetTableType() coredb.TableType {
-	return table
 }
 
 // SportsNoDefault field
@@ -674,16 +580,8 @@ func (c *SportsNoDefault) GetColumnName() string {
 	return "sports_no_default"
 }
 
-func (c *SportsNoDefault) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *SportsNoDefault) GetValPointer() any {
 	return &c.val
-}
-
-func (c *SportsNoDefault) GetTableType() coredb.TableType {
-	return table
 }
 
 // New return new *User with default values
@@ -728,7 +626,7 @@ func NewWithPK(val int) *User {
 func (c *User) Insert() error {
 	sql := "INSERT IGNORE INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, DBName, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+	result, err := coredb.Exec(DBName, sql, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 
 	if err != nil {
 		return err
@@ -822,7 +720,7 @@ func (obj *User) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -929,7 +827,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `id` = ?"
 	params = append(params, obj.GetId())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -952,6 +850,6 @@ func Update(obj withPK) (bool, error) {
 func DeleteByPK(val int) error {
 	sql := "DELETE FROM `users` WHERE `id` = ?"
 
-	_, err := coredb.Exec(sql, DBName, val)
+	_, err := coredb.Exec(DBName, sql, val)
 	return err
 }

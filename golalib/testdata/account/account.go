@@ -11,6 +11,8 @@ import (
 
 var DBName string = "testdata"
 
+const TableName string = "account"
+
 func Setup(dbname string) {
 	DBName = dbname
 }
@@ -26,15 +28,6 @@ type Account struct {
 	// Account money int
 	Money
 }
-
-type AccountTable struct{}
-
-func (*AccountTable) GetTableName() string {
-	return "account"
-}
-
-var table *AccountTable
-
 type PK struct {
 	UserId      int
 	CountryCode uint
@@ -47,46 +40,46 @@ type withPK interface {
 
 // FetchByPK returns a row from account table with given primary key value
 func FetchByPK(val PK) *Account {
-	return coredb.FetchByPK[Account](DBName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
+	return coredb.FetchByPK[Account](DBName, TableName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
 }
 
 // FetchFieldsByPK returns a row with selected fields from account table with given primary key value
 func FetchFieldsByPK[T any](val PK) *T {
-	return coredb.FetchByPK[T](DBName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
+	return coredb.FetchByPK[T](DBName, TableName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
 }
 
 // FindOne returns a row from account table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOne(whereSQL string, params ...any) *Account {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[Account](w, DBName)
+	return coredb.FindOne[Account](DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from account table with arbitary where query
 // whereSQL must start with "where ..."
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.FindOne[T](w, DBName)
+	return coredb.FindOne[T](DBName, TableName, w)
 }
 
 // Find returns rows from account table with arbitary where query
 // whereSQL must start with "where ..."
 func Find(whereSQL string, params ...any) ([]*Account, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[Account](w, DBName)
+	return coredb.Find[Account](DBName, TableName, w)
 }
 
 // FindFields returns rows with selected fields from account table with arbitary where query
 // whereSQL must start with "where ..."
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
-	return coredb.Find[T](w, DBName)
+	return coredb.Find[T](DBName, TableName, w)
 }
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
 func Count(whereSQL string, params ...any) (int, error) {
-	return coredb.QueryInt("SELECT COUNT(*) FROM `account` "+whereSQL, DBName, params...)
+	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `account` "+whereSQL, params...)
 }
 
 // Column types
@@ -111,16 +104,8 @@ func (c *UserId) GetColumnName() string {
 	return "user_id"
 }
 
-func (c *UserId) IsPrimaryKey() bool {
-	return true
-}
-
 func (c *UserId) GetValPointer() any {
 	return &c.val
-}
-
-func (c *UserId) GetTableType() coredb.TableType {
-	return table
 }
 
 // Type field
@@ -155,16 +140,8 @@ func (c *Type) GetColumnName() string {
 	return "type"
 }
 
-func (c *Type) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Type) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Type) GetTableType() coredb.TableType {
-	return table
 }
 
 // CountryCode field
@@ -181,16 +158,8 @@ func (c *CountryCode) GetColumnName() string {
 	return "country_code"
 }
 
-func (c *CountryCode) IsPrimaryKey() bool {
-	return true
-}
-
 func (c *CountryCode) GetValPointer() any {
 	return &c.val
-}
-
-func (c *CountryCode) GetTableType() coredb.TableType {
-	return table
 }
 
 // Money field
@@ -225,16 +194,8 @@ func (c *Money) GetColumnName() string {
 	return "money"
 }
 
-func (c *Money) IsPrimaryKey() bool {
-	return false
-}
-
 func (c *Money) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Money) GetTableType() coredb.TableType {
-	return table
 }
 
 // NewWithPK takes "user_id","country_code"
@@ -254,7 +215,7 @@ func NewWithPK(val PK) *Account {
 func (c *Account) Insert() error {
 	sql := "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
 
-	result, err := coredb.Exec(sql, DBName, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
+	result, err := coredb.Exec(DBName, sql, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
 
 	if err != nil {
 		return err
@@ -297,7 +258,7 @@ func (obj *Account) Update() (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `country_code` = ?"
 	params = append(params, obj.GetUserId(), obj.GetCountryCode())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -350,7 +311,7 @@ func Update(obj withPK) (bool, error) {
 	sql = sql + strings.Join(updatedFields, ",") + " WHERE `user_id` = ? and `country_code` = ?"
 	params = append(params, obj.GetUserId(), obj.GetCountryCode())
 
-	result, err := coredb.Exec(sql, DBName, params...)
+	result, err := coredb.Exec(DBName, sql, params...)
 	if err != nil {
 		return false, err
 	}
@@ -373,6 +334,6 @@ func Update(obj withPK) (bool, error) {
 func DeleteByPK(val PK) error {
 	sql := "DELETE FROM `account` WHERE `user_id` = ? and `country_code` = ?"
 
-	_, err := coredb.Exec(sql, DBName, val.UserId, val.CountryCode)
+	_, err := coredb.Exec(DBName, sql, val.UserId, val.CountryCode)
 	return err
 }
