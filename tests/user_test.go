@@ -48,7 +48,9 @@ func init() {
 		panic(err)
 	}
 
-	coredb.Setup(db)
+	coredb.Setup(func(dbname string, mode coredb.DBMode) *sql.DB {
+		return db
+	})
 
 	//create tables
 	for _, tableName := range tableNames {
