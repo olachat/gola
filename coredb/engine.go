@@ -8,29 +8,37 @@ import (
 	"strings"
 )
 
-var _db *sql.DB
-var _dbs map[string]*sql.DB = make(map[string]*sql.DB)
+var _dbp DBProvider
 
-// Setup default db instance for all db ops
-func Setup(db *sql.DB) {
-	_db = db
-}
+type DBMode int
 
-// SetupDB db instance for given dbname
-func SetupDB(dbname string, db *sql.DB) {
-	_dbs[dbname] = db
+const (
+	// DBModeRead allow read from slave db
+	DBModeRead DBMode = iota
+	// DBModeRead set write to master db
+	DBModeWrite
+	// DBModeReadFromWrite is aka force read from master db
+	DBModeReadFromWrite
+)
+
+type DBProvider func(dbname string, mode DBMode) *sql.DB
+
+// Setup default db provider for all db ops
+func Setup(dbp DBProvider) {
+	_dbp = dbp
 }
 
 var typeColumnNames = make(map[reflect.Type]string)
 
-func getDB(dbname string) *sql.DB {
-	if db, ok := _dbs[dbname]; ok {
+func getDB(dbname string, mode DBMode) *sql.DB {
+	if _dbp == nil {
+		panic("coredb DBProvider hasn't setup")
+	}
+	db := _dbp(dbname, mode)
+	if db != nil {
 		return db
 	}
-	if _db != nil {
-		return _db
-	}
-	panic("No db instance available")
+	panic(fmt.Sprintf("Can't get db for %s %v", dbname, mode))
 }
 
 // FetchByPK returns a row of T type with given primary key value
@@ -58,7 +66,7 @@ func FetchByPKs[T any](dbname string, tableName string, pkName string, vals []an
 
 // Exec given query with given db info & params
 func Exec(dbname string, query string, params ...any) (sql.Result, error) {
-	mydb := getDB(dbname)
+	mydb := getDB(dbname, DBModeWrite)
 	return mydb.Exec(query, params...)
 }
 
@@ -70,7 +78,7 @@ func FindOne[T any](dbname string, tableName string, where WhereQuery) *T {
 	whereSQL, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
 		tableName, whereSQL)
-	mydb := getDB(dbname)
+	mydb := getDB(dbname, DBModeRead)
 	err2 := mydb.QueryRow(query, params...).Scan(data...)
 
 	if err2 != nil {
@@ -98,14 +106,14 @@ func Find[T any](dbname string, tableName string, where WhereQuery) ([]*T, error
 
 // QueryInt single int result by query, handy for count(*) querys
 func QueryInt(dbname string, query string, params ...any) (result int, err error) {
-	mydb := getDB(dbname)
+	mydb := getDB(dbname, DBModeRead)
 	mydb.QueryRow(query, params...).Scan(&result)
 	return
 }
 
 // Query rows from given table type with where query & params
 func Query[T any](dbname string, query string, params ...any) (result []*T, err error) {
-	mydb := getDB(dbname)
+	mydb := getDB(dbname, DBModeRead)
 	rows, err := mydb.Query(query, params...)
 	if err != nil {
 		return

@@ -11,12 +11,8 @@ import (
 	{{.Imports}}
 )
 
-var DBName string = "{{.SchemaName}}"
+const DBName string = "{{.SchemaName}}"
 const TableName string = "{{.Name}}"
-
-func Setup(dbname string) {
-	DBName = dbname
-}
 
 // {{.ClassName}} represents `{{.Name}}` table
 type {{.ClassName}} struct {

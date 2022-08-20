@@ -9,13 +9,8 @@ import (
 	"github.com/olachat/gola/coredb"
 )
 
-var DBName string = "testdata"
-
+const DBName string = "testdata"
 const TableName string = "users"
-
-func Setup(dbname string) {
-	DBName = dbname
-}
 
 // User represents `users` table
 type User struct {
