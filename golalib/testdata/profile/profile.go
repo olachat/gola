@@ -3,6 +3,7 @@
 package profile
 
 import (
+	"database/sql"
 	"reflect"
 	"strings"
 
@@ -188,9 +189,11 @@ func NewWithPK(val int) *Profile {
 
 // Insert Profile struct to `profile` table
 func (c *Profile) Insert() error {
-	sql := "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
+	query := "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
 
-	result, err := coredb.Exec(DBName, sql, c.GetUserId(), c.GetLevel(), c.GetNickName())
+	var result sql.Result
+	var err error
+	result, err = coredb.Exec(DBName, query, c.GetUserId(), c.GetLevel(), c.GetNickName())
 
 	if err != nil {
 		return err

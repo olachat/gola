@@ -3,6 +3,7 @@
 package account
 
 import (
+	"database/sql"
 	"reflect"
 	"strings"
 
@@ -209,9 +210,11 @@ func NewWithPK(val PK) *Account {
 
 // Insert Account struct to `account` table
 func (c *Account) Insert() error {
-	sql := "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
+	query := "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
 
-	result, err := coredb.Exec(DBName, sql, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
+	var result sql.Result
+	var err error
+	result, err = coredb.Exec(DBName, query, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
 
 	if err != nil {
 		return err

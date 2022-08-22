@@ -3,6 +3,7 @@
 package blogs
 
 import (
+	"database/sql"
 	"reflect"
 	"strings"
 
@@ -101,7 +102,8 @@ func Count(whereSQL string, params ...any) (int, error) {
 // Id field
 //
 type Id struct {
-	val int
+	isAssigned bool
+	val        int
 }
 
 func (c *Id) GetId() int {
@@ -472,14 +474,23 @@ func NewWithPK(val int) *Blog {
 		UpdatedAt{val: uint(0)},
 	}
 	c.Id.val = val
+	c.Id.isAssigned = true
 	return c
 }
 
 // Insert Blog struct to `blogs` table
 func (c *Blog) Insert() error {
-	sql := "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	query := "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	result, err := coredb.Exec(DBName, sql, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+	var result sql.Result
+	var err error
+	if c.Id.isAssigned {
+		query = "INSERT IGNORE INTO `blogs` (`id`, `user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+		result, err = coredb.Exec(DBName, query, c.GetId(), c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+	} else {
+		result, err = coredb.Exec(DBName, query, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+	}
 
 	if err != nil {
 		return err

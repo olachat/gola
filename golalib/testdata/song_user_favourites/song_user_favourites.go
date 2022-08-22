@@ -3,6 +3,7 @@
 package song_user_favourites
 
 import (
+	"database/sql"
 	"reflect"
 	"strings"
 
@@ -283,9 +284,11 @@ func NewWithPK(val PK) *SongUserFavourite {
 
 // Insert SongUserFavourite struct to `song_user_favourites` table
 func (c *SongUserFavourite) Insert() error {
-	sql := "INSERT IGNORE INTO `song_user_favourites` (`user_id`, `song_id`, `remark`, `is_favourite`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)"
+	query := "INSERT IGNORE INTO `song_user_favourites` (`user_id`, `song_id`, `remark`, `is_favourite`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)"
 
-	result, err := coredb.Exec(DBName, sql, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
+	var result sql.Result
+	var err error
+	result, err = coredb.Exec(DBName, query, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
