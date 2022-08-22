@@ -187,13 +187,13 @@ func NewWithPK(val int) *Profile {
 	return c
 }
 
+const insertWithoutPK string = "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
+
 // Insert Profile struct to `profile` table
 func (c *Profile) Insert() error {
-	query := "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
-
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, query, c.GetUserId(), c.GetLevel(), c.GetNickName())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetLevel(), c.GetNickName())
 
 	if err != nil {
 		return err
@@ -310,10 +310,10 @@ func Update(obj withPK) (bool, error) {
 	return true, nil
 }
 
+const deleteSql string = "DELETE FROM `profile` WHERE `user_id` = ?"
+
 // DeleteByPK delete a row from profile table with given primary key value
 func DeleteByPK(val int) error {
-	sql := "DELETE FROM `profile` WHERE `user_id` = ?"
-
-	_, err := coredb.Exec(DBName, sql, val)
+	_, err := coredb.Exec(DBName, deleteSql, val)
 	return err
 }

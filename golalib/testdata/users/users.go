@@ -621,18 +621,17 @@ func NewWithPK(val int) *User {
 	return c
 }
 
+const insertWithoutPK string = "INSERT IGNORE INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT IGNORE INTO `users` (`id`, `name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
 // Insert User struct to `users` table
 func (c *User) Insert() error {
-	query := "INSERT IGNORE INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		query = "INSERT IGNORE INTO `users` (`id`, `name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
-		result, err = coredb.Exec(DBName, query, c.GetId(), c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 	} else {
-		result, err = coredb.Exec(DBName, query, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 	}
 
 	if err != nil {
@@ -855,10 +854,10 @@ func Update(obj withPK) (bool, error) {
 	return true, nil
 }
 
+const deleteSql string = "DELETE FROM `users` WHERE `id` = ?"
+
 // DeleteByPK delete a row from users table with given primary key value
 func DeleteByPK(val int) error {
-	sql := "DELETE FROM `users` WHERE `id` = ?"
-
-	_, err := coredb.Exec(DBName, sql, val)
+	_, err := coredb.Exec(DBName, deleteSql, val)
 	return err
 }
