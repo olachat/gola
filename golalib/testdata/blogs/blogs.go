@@ -478,18 +478,17 @@ func NewWithPK(val int) *Blog {
 	return c
 }
 
+const insertWithoutPK string = "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT IGNORE INTO `blogs` (`id`, `user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
 // Insert Blog struct to `blogs` table
 func (c *Blog) Insert() error {
-	query := "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		query = "INSERT IGNORE INTO `blogs` (`id`, `user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
-		result, err = coredb.Exec(DBName, query, c.GetId(), c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
 	} else {
-		result, err = coredb.Exec(DBName, query, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
 	}
 
 	if err != nil {
@@ -690,10 +689,10 @@ func Update(obj withPK) (bool, error) {
 	return true, nil
 }
 
+const deleteSql string = "DELETE FROM `blogs` WHERE `id` = ?"
+
 // DeleteByPK delete a row from blogs table with given primary key value
 func DeleteByPK(val int) error {
-	sql := "DELETE FROM `blogs` WHERE `id` = ?"
-
-	_, err := coredb.Exec(DBName, sql, val)
+	_, err := coredb.Exec(DBName, deleteSql, val)
 	return err
 }

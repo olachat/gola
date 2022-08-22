@@ -282,13 +282,13 @@ func NewWithPK(val PK) *SongUserFavourite {
 	return c
 }
 
+const insertWithoutPK string = "INSERT IGNORE INTO `song_user_favourites` (`user_id`, `song_id`, `remark`, `is_favourite`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)"
+
 // Insert SongUserFavourite struct to `song_user_favourites` table
 func (c *SongUserFavourite) Insert() error {
-	query := "INSERT IGNORE INTO `song_user_favourites` (`user_id`, `song_id`, `remark`, `is_favourite`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)"
-
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, query, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
 
 	if err != nil {
 		return err
@@ -427,10 +427,10 @@ func Update(obj withPK) (bool, error) {
 	return true, nil
 }
 
+const deleteSql string = "DELETE FROM `song_user_favourites` WHERE `user_id` = ? and `song_id` = ?"
+
 // DeleteByPK delete a row from song_user_favourites table with given primary key value
 func DeleteByPK(val PK) error {
-	sql := "DELETE FROM `song_user_favourites` WHERE `user_id` = ? and `song_id` = ?"
-
-	_, err := coredb.Exec(DBName, sql, val.UserId, val.SongId)
+	_, err := coredb.Exec(DBName, deleteSql, val.UserId, val.SongId)
 	return err
 }

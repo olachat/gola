@@ -287,18 +287,17 @@ func NewWithPK(val uint) *Song {
 	return c
 }
 
+const insertWithoutPK string = "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`) values (?, ?, ?, ?)"
+const insertWithPK string = "INSERT IGNORE INTO `songs` (`id`, `title`, `rank`, `type`, `hash`) values (?, ?, ?, ?, ?)"
+
 // Insert Song struct to `songs` table
 func (c *Song) Insert() error {
-	query := "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`) values (?, ?, ?, ?)"
-
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		query = "INSERT IGNORE INTO `songs` (`id`, `title`, `rank`, `type`, `hash`) values (?, ?, ?, ?, ?)"
-
-		result, err = coredb.Exec(DBName, query, c.GetId(), c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
+		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
 	} else {
-		result, err = coredb.Exec(DBName, query, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
 	}
 
 	if err != nil {
@@ -444,10 +443,10 @@ func Update(obj withPK) (bool, error) {
 	return true, nil
 }
 
+const deleteSql string = "DELETE FROM `songs` WHERE `id` = ?"
+
 // DeleteByPK delete a row from songs table with given primary key value
 func DeleteByPK(val uint) error {
-	sql := "DELETE FROM `songs` WHERE `id` = ?"
-
-	_, err := coredb.Exec(DBName, sql, val)
+	_, err := coredb.Exec(DBName, deleteSql, val)
 	return err
 }

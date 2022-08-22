@@ -208,13 +208,13 @@ func NewWithPK(val PK) *Account {
 	return c
 }
 
+const insertWithoutPK string = "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
+
 // Insert Account struct to `account` table
 func (c *Account) Insert() error {
-	query := "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
-
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, query, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
 
 	if err != nil {
 		return err
@@ -331,10 +331,10 @@ func Update(obj withPK) (bool, error) {
 	return true, nil
 }
 
+const deleteSql string = "DELETE FROM `account` WHERE `user_id` = ? and `country_code` = ?"
+
 // DeleteByPK delete a row from account table with given primary key value
 func DeleteByPK(val PK) error {
-	sql := "DELETE FROM `account` WHERE `user_id` = ? and `country_code` = ?"
-
-	_, err := coredb.Exec(DBName, sql, val.UserId, val.CountryCode)
+	_, err := coredb.Exec(DBName, deleteSql, val.UserId, val.CountryCode)
 	return err
 }
