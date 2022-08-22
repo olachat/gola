@@ -3,6 +3,7 @@
 package users
 
 import (
+	"database/sql"
 	"reflect"
 	"strings"
 
@@ -153,7 +154,8 @@ const (
 // Id field
 //
 type Id struct {
-	val int
+	isAssigned bool
+	val        int
 }
 
 func (c *Id) GetId() int {
@@ -615,14 +617,23 @@ func NewWithPK(val int) *User {
 		SportsNoDefault{},
 	}
 	c.Id.val = val
+	c.Id.isAssigned = true
 	return c
 }
 
 // Insert User struct to `users` table
 func (c *User) Insert() error {
-	sql := "INSERT IGNORE INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	query := "INSERT IGNORE INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	result, err := coredb.Exec(DBName, sql, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+	var result sql.Result
+	var err error
+	if c.Id.isAssigned {
+		query = "INSERT IGNORE INTO `users` (`id`, `name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+		result, err = coredb.Exec(DBName, query, c.GetId(), c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+	} else {
+		result, err = coredb.Exec(DBName, query, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+	}
 
 	if err != nil {
 		return err

@@ -3,6 +3,7 @@
 package songs
 
 import (
+	"database/sql"
 	"reflect"
 	"strings"
 
@@ -100,7 +101,8 @@ const (
 // Id field
 //
 type Id struct {
-	val uint
+	isAssigned bool
+	val        uint
 }
 
 func (c *Id) GetId() uint {
@@ -281,14 +283,23 @@ func NewWithPK(val uint) *Song {
 		Hash{},
 	}
 	c.Id.val = val
+	c.Id.isAssigned = true
 	return c
 }
 
 // Insert Song struct to `songs` table
 func (c *Song) Insert() error {
-	sql := "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`) values (?, ?, ?, ?)"
+	query := "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`) values (?, ?, ?, ?)"
 
-	result, err := coredb.Exec(DBName, sql, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
+	var result sql.Result
+	var err error
+	if c.Id.isAssigned {
+		query = "INSERT IGNORE INTO `songs` (`id`, `title`, `rank`, `type`, `hash`) values (?, ?, ?, ?, ?)"
+
+		result, err = coredb.Exec(DBName, query, c.GetId(), c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
+	} else {
+		result, err = coredb.Exec(DBName, query, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
+	}
 
 	if err != nil {
 		return err

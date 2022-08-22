@@ -204,3 +204,26 @@ func TestSongUpdate(t *testing.T) {
 		t.Error("Partail void update failed")
 	}
 }
+func TestSongInsertWithPK(t *testing.T) {
+	id := uint(100)
+	s := songs.NewWithPK(id)
+	s.SetHash("100")
+	err := s.Insert()
+	if err != nil {
+		t.Error(err)
+	}
+	s = songs.FetchByPK(id)
+
+	if s == nil {
+		t.Error("Insert with pk failed")
+	}
+	s = songs.New()
+	s.SetHash("hashhash")
+	err = s.Insert()
+	if err != nil {
+		t.Error(err)
+	}
+	if s.GetId() != id+1 {
+		t.Error("Insert without pk after pk failed")
+	}
+}
