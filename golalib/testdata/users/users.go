@@ -630,19 +630,19 @@ func (c *User) Insert() error {
 	var err error
 	if c.Id.isAssigned {
 		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+		if err != nil {
+			return err
+		}
 	} else {
 		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
-	}
-
-	if err != nil {
-		return err
-	}
-	if !c.Id.isAssigned {
-		id, err := result.LastInsertId()
 		if err != nil {
 			return err
 		}
 
+		id, err := result.LastInsertId()
+		if err != nil {
+			return err
+		}
 		c.Id.val = int(id)
 	}
 

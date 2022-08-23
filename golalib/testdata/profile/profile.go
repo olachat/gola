@@ -194,7 +194,6 @@ func (c *Profile) Insert() error {
 	var result sql.Result
 	var err error
 	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetLevel(), c.GetNickName())
-
 	if err != nil {
 		return err
 	}

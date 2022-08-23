@@ -289,7 +289,6 @@ func (c *SongUserFavourite) Insert() error {
 	var result sql.Result
 	var err error
 	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
-
 	if err != nil {
 		return err
 	}

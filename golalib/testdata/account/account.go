@@ -215,7 +215,6 @@ func (c *Account) Insert() error {
 	var result sql.Result
 	var err error
 	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
-
 	if err != nil {
 		return err
 	}

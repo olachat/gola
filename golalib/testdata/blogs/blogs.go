@@ -487,19 +487,19 @@ func (c *Blog) Insert() error {
 	var err error
 	if c.Id.isAssigned {
 		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+		if err != nil {
+			return err
+		}
 	} else {
 		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
-	}
-
-	if err != nil {
-		return err
-	}
-	if !c.Id.isAssigned {
-		id, err := result.LastInsertId()
 		if err != nil {
 			return err
 		}
 
+		id, err := result.LastInsertId()
+		if err != nil {
+			return err
+		}
 		c.Id.val = int(id)
 	}
 
