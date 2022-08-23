@@ -226,4 +226,26 @@ func TestSongInsertWithPK(t *testing.T) {
 	if s.GetId() != id+1 {
 		t.Error("Insert without pk after pk failed")
 	}
+
+	id = uint(99)
+	s = songs.NewWithPK(id)
+	s.SetHash("99")
+	err = s.Insert()
+	if err != nil {
+		t.Error(err)
+	}
+	s = songs.FetchByPK(id)
+
+	if s == nil {
+		t.Error("Reinsert with pk failed")
+	}
+	s = songs.New()
+	s.SetHash("hashhash")
+	err = s.Insert()
+	if err != nil {
+		t.Error(err)
+	}
+	if s.GetId() != 102 {
+		t.Error("Insert without pk after pk failed")
+	}
 }
