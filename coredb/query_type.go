@@ -27,7 +27,7 @@ func NewWhere(whereSQL string, params ...any) WhereQuery {
 // ReadQuery defines interface which support reading multiple objects
 type ReadQuery[T any] interface {
 	All() []*T
-	Limit(limit, offset int) []*T
+	Limit(offset, limit int) []*T
 }
 
 // ReadOneQuery defines interface which support reading one object

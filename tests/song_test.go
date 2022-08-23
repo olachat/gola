@@ -132,6 +132,11 @@ func TestSongBoolUpdate(t *testing.T) {
 	if len(objs) != 1 && objs[0].GetSongId() != pk.SongId {
 		t.Error("Song select failed")
 	}
+
+	objs = song_user_favourites.Select().WhereUserIdEQ(pk.UserId).AndIsFavouriteEQ(false).Limit(0, 1)
+	if len(objs) != 1 && objs[0].GetSongId() != pk.SongId {
+		t.Error("Song select with limit failed")
+	}
 }
 
 func TestSongDelete(t *testing.T) {
