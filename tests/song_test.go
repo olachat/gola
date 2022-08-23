@@ -127,6 +127,11 @@ func TestSongBoolUpdate(t *testing.T) {
 	if obj.GetIsFavourite() != false {
 		t.Error("SongUserFavourite GetIsFavourite update failed")
 	}
+
+	objs := song_user_favourites.Select().WhereUserIdEQ(pk.UserId).AndIsFavouriteEQ(false).All()
+	if len(objs) != 1 && objs[0].GetSongId() != pk.SongId {
+		t.Error("Song select failed")
+	}
 }
 
 func TestSongDelete(t *testing.T) {
