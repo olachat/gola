@@ -108,6 +108,14 @@ func (c *UserId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *UserId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Level field
 //
 type Level struct {
@@ -148,6 +156,14 @@ func (c *Level) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *Level) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // NickName field
 // Nick Name
 type NickName struct {
@@ -186,6 +202,14 @@ func (c *NickName) GetValPointer() any {
 
 func (c *NickName) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *NickName) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // NewWithPK takes "user_id"

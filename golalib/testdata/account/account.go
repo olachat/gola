@@ -109,6 +109,14 @@ func (c *UserId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *UserId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Type field
 // user account type
 type Type struct {
@@ -149,6 +157,14 @@ func (c *Type) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *Type) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CountryCode field
 // user country code
 type CountryCode struct {
@@ -169,6 +185,14 @@ func (c *CountryCode) GetValPointer() any {
 
 func (c *CountryCode) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *CountryCode) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Money field
@@ -209,6 +233,14 @@ func (c *Money) GetValPointer() any {
 
 func (c *Money) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *Money) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // NewWithPK takes "user_id","country_code"

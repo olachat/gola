@@ -184,7 +184,15 @@ func (c *{{.GoName}}) GetValPointer() any {
 }
 
 func (c *{{.GoName}}) MarshalJSON() ([]byte, error) {
-  return json.Marshal(&c.val)
+	return json.Marshal(&c.val)
+}
+
+func (c *{{.GoName}}) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 {{- end }}
 

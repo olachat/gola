@@ -123,6 +123,14 @@ func (c *Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *Id) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UserId field
 // User Id
 type UserId struct {
@@ -161,6 +169,14 @@ func (c *UserId) GetValPointer() any {
 
 func (c *UserId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *UserId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Slug field
@@ -203,6 +219,14 @@ func (c *Slug) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *Slug) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Title field
 // Title
 type Title struct {
@@ -241,6 +265,14 @@ func (c *Title) GetValPointer() any {
 
 func (c *Title) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *Title) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CategoryId field
@@ -283,6 +315,14 @@ func (c *CategoryId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *CategoryId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // IsPinned field
 // Is pinned to top
 type IsPinned struct {
@@ -321,6 +361,14 @@ func (c *IsPinned) GetValPointer() any {
 
 func (c *IsPinned) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *IsPinned) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // IsVip field
@@ -363,6 +411,14 @@ func (c *IsVip) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *IsVip) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Country field
 // Country of the blog user
 type Country struct {
@@ -401,6 +457,14 @@ func (c *Country) GetValPointer() any {
 
 func (c *Country) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *Country) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreatedAt field
@@ -443,6 +507,14 @@ func (c *CreatedAt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *CreatedAt) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UpdatedAt field
 // Updated Timestamp
 type UpdatedAt struct {
@@ -481,6 +553,14 @@ func (c *UpdatedAt) GetValPointer() any {
 
 func (c *UpdatedAt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *UpdatedAt) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // New return new *Blog with default values

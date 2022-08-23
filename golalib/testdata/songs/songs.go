@@ -122,6 +122,14 @@ func (c *Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *Id) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Title field
 // Song title
 type Title struct {
@@ -160,6 +168,14 @@ func (c *Title) GetValPointer() any {
 
 func (c *Title) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *Title) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Rank field
@@ -202,6 +218,14 @@ func (c *Rank) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *Rank) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Type field
 //
 type Type struct {
@@ -242,6 +266,14 @@ func (c *Type) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
 
+func (c *Type) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Hash field
 // Song file hash checksum
 type Hash struct {
@@ -280,6 +312,14 @@ func (c *Hash) GetValPointer() any {
 
 func (c *Hash) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
+}
+
+func (c *Hash) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // New return new *Song with default values
