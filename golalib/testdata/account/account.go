@@ -4,6 +4,7 @@ package account
 
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"strings"
 
@@ -16,13 +17,13 @@ const TableName string = "account"
 // Account represents `account` table
 type Account struct {
 	//  int
-	UserId
+	UserId `json:"user_id"`
 	// user account type enum('free','vip')
-	Type
+	Type `json:"type"`
 	// user country code mediumint unsigned
-	CountryCode
+	CountryCode `json:"country_code"`
 	// Account money int
-	Money
+	Money `json:"money"`
 }
 type PK struct {
 	UserId      int
@@ -104,6 +105,18 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UserId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *UserId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Type field
 // user account type
 type Type struct {
@@ -140,6 +153,18 @@ func (c *Type) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Type) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Type) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CountryCode field
 // user country code
 type CountryCode struct {
@@ -156,6 +181,18 @@ func (c *CountryCode) GetColumnName() string {
 
 func (c *CountryCode) GetValPointer() any {
 	return &c.val
+}
+
+func (c *CountryCode) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *CountryCode) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Money field
@@ -192,6 +229,18 @@ func (c *Money) GetColumnName() string {
 
 func (c *Money) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Money) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Money) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // NewWithPK takes "user_id","country_code"

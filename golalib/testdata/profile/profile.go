@@ -4,6 +4,7 @@ package profile
 
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"strings"
 
@@ -16,11 +17,11 @@ const TableName string = "profile"
 // Profile represents `profile` table
 type Profile struct {
 	//  int
-	UserId
+	UserId `json:"user_id"`
 	//  tinyint(4)
-	Level
+	Level `json:"level"`
 	// Nick Name varchar
-	NickName
+	NickName `json:"nick_name"`
 }
 
 type withPK interface {
@@ -103,6 +104,18 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UserId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *UserId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Level field
 //
 type Level struct {
@@ -139,6 +152,18 @@ func (c *Level) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Level) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Level) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // NickName field
 // Nick Name
 type NickName struct {
@@ -173,6 +198,18 @@ func (c *NickName) GetColumnName() string {
 
 func (c *NickName) GetValPointer() any {
 	return &c.val
+}
+
+func (c *NickName) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *NickName) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // NewWithPK takes "user_id"

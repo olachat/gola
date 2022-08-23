@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"encoding/json"
+
 	"github.com/olachat/gola/coredb"
 	"github.com/olachat/gola/golalib/testdata/song_user_favourites"
 	"github.com/olachat/gola/golalib/testdata/songs"
@@ -247,5 +249,33 @@ func TestSongInsertWithPK(t *testing.T) {
 	}
 	if s.GetId() != 102 {
 		t.Error("Insert without pk after pk failed")
+	}
+}
+
+func TestSongJSONEncode(t *testing.T) {
+	s := songs.New()
+	s.SetRank(5)
+	s.SetType(songs.SongType1x2B9)
+	s.SetHash("hash")
+
+	jsondata, err := json.Marshal(&s)
+	if err != nil {
+		t.Error(err)
+	}
+
+	str := string(jsondata)
+	if str != `{"id":0,"title":"","rank":5,"type":"1+9","hash":"hash"}` {
+		t.Error("Song json encode err: " + str)
+	}
+
+	var s2 *songs.Song
+	json.Unmarshal(jsondata, &s2)
+	jsondata, err = json.Marshal(&s2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if str != string(jsondata) {
+		t.Error("Song json re-encode err: " + string(jsondata))
 	}
 }

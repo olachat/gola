@@ -4,6 +4,7 @@ package users
 
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"strings"
 
@@ -16,29 +17,29 @@ const TableName string = "users"
 // User represents `users` table
 type User struct {
 	//  int
-	Id
+	Id `json:"id"`
 	// Name varchar
-	Name
+	Name `json:"name"`
 	// Email address varchar
-	Email
+	Email `json:"email"`
 	// Created Timestamp int unsigned
-	CreatedAt
+	CreatedAt `json:"created_at"`
 	// Updated Timestamp int unsigned
-	UpdatedAt
+	UpdatedAt `json:"updated_at"`
 	// float float
-	FloatType
+	FloatType `json:"float_type"`
 	// double double
-	DoubleType
+	DoubleType `json:"double_type"`
 	// user hobby enum('swimming','running','singing')
-	Hobby
+	Hobby `json:"hobby"`
 	// user hobby enum('swimming','running','singing')
-	HobbyNoDefault
+	HobbyNoDefault `json:"hobby_no_default"`
 	// user sports set('swim','tennis','basketball','football','squash','badminton')
-	Sports
+	Sports `json:"sports"`
 	// user sports set('swim','tennis','basketball','football','squash','badminton')
-	Sports2
+	Sports2 `json:"sports2"`
 	// user sports set('swim','tennis','basketball','football','squash','badminton')
-	SportsNoDefault
+	SportsNoDefault `json:"sports_no_default"`
 }
 
 type withPK interface {
@@ -170,6 +171,18 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Id) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Name field
 // Name
 type Name struct {
@@ -204,6 +217,18 @@ func (c *Name) GetColumnName() string {
 
 func (c *Name) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Name) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Name) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Email field
@@ -242,6 +267,18 @@ func (c *Email) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Email) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Email) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CreatedAt field
 // Created Timestamp
 type CreatedAt struct {
@@ -276,6 +313,18 @@ func (c *CreatedAt) GetColumnName() string {
 
 func (c *CreatedAt) GetValPointer() any {
 	return &c.val
+}
+
+func (c *CreatedAt) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *CreatedAt) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // UpdatedAt field
@@ -314,6 +363,18 @@ func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UpdatedAt) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *UpdatedAt) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // FloatType field
 // float
 type FloatType struct {
@@ -348,6 +409,18 @@ func (c *FloatType) GetColumnName() string {
 
 func (c *FloatType) GetValPointer() any {
 	return &c.val
+}
+
+func (c *FloatType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *FloatType) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // DoubleType field
@@ -386,6 +459,18 @@ func (c *DoubleType) GetValPointer() any {
 	return &c.val
 }
 
+func (c *DoubleType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *DoubleType) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Hobby field
 // user hobby
 type Hobby struct {
@@ -422,6 +507,18 @@ func (c *Hobby) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Hobby) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Hobby) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // HobbyNoDefault field
 // user hobby
 type HobbyNoDefault struct {
@@ -456,6 +553,18 @@ func (c *HobbyNoDefault) GetColumnName() string {
 
 func (c *HobbyNoDefault) GetValPointer() any {
 	return &c.val
+}
+
+func (c *HobbyNoDefault) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *HobbyNoDefault) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Sports field
@@ -499,6 +608,18 @@ func (c *Sports) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Sports) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Sports) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Sports2 field
 // user sports
 type Sports2 struct {
@@ -540,6 +661,18 @@ func (c *Sports2) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Sports2) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Sports2) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // SportsNoDefault field
 // user sports
 type SportsNoDefault struct {
@@ -579,6 +712,18 @@ func (c *SportsNoDefault) GetColumnName() string {
 
 func (c *SportsNoDefault) GetValPointer() any {
 	return &c.val
+}
+
+func (c *SportsNoDefault) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *SportsNoDefault) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // New return new *User with default values

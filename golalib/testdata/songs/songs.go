@@ -4,6 +4,7 @@ package songs
 
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"strings"
 
@@ -16,15 +17,15 @@ const TableName string = "songs"
 // Song represents `songs` table
 type Song struct {
 	//  int unsigned
-	Id
+	Id `json:"id"`
 	// Song title varchar
-	Title
+	Title `json:"title"`
 	// Song Ranking mediumint
-	Rank
+	Rank `json:"rank"`
 	//  enum('','101','1+9','%1','0.9')
-	Type
+	Type `json:"type"`
 	// Song file hash checksum varchar
-	Hash
+	Hash `json:"hash"`
 }
 
 type withPK interface {
@@ -117,6 +118,18 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Id) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Title field
 // Song title
 type Title struct {
@@ -151,6 +164,18 @@ func (c *Title) GetColumnName() string {
 
 func (c *Title) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Title) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Title) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Rank field
@@ -189,6 +214,18 @@ func (c *Rank) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Rank) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Rank) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Type field
 //
 type Type struct {
@@ -225,6 +262,18 @@ func (c *Type) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Type) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Type) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Hash field
 // Song file hash checksum
 type Hash struct {
@@ -259,6 +308,18 @@ func (c *Hash) GetColumnName() string {
 
 func (c *Hash) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Hash) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Hash) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // New return new *Song with default values

@@ -4,6 +4,7 @@ package {{.Package}}
 {{$table := .}}
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"strings"
 
@@ -19,7 +20,7 @@ const TableName string = "{{.Name}}"
 type {{.ClassName}} struct {
 	{{- range .Columns }}
 	// {{.Comment}} {{.DBType}}
-	{{.GoName}}
+	{{.GoName}} `json:"{{.Name}}"`
 	{{- end }}
 }
 
@@ -180,6 +181,18 @@ func (c *{{.GoName}}) GetColumnName() string {
 
 func (c *{{.GoName}}) GetValPointer() any {
 	return &c.val
+}
+
+func (c *{{.GoName}}) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *{{.GoName}}) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 {{- end }}
 

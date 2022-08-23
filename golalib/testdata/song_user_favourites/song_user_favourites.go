@@ -4,6 +4,7 @@ package song_user_favourites
 
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"strings"
 
@@ -18,17 +19,17 @@ const TableName string = "song_user_favourites"
 // SongUserFavourite represents `song_user_favourites` table
 type SongUserFavourite struct {
 	// User ID int unsigned
-	UserId
+	UserId `json:"user_id"`
 	// Song ID int unsigned
-	SongId
+	SongId `json:"song_id"`
 	// favourite remark varchar
-	Remark
+	Remark `json:"remark"`
 	// Is favourite tinyint(1)
-	IsFavourite
+	IsFavourite `json:"is_favourite"`
 	// Create Time timestamp
-	CreatedAt
+	CreatedAt `json:"created_at"`
 	// Last Update Time timestamp
-	UpdatedAt
+	UpdatedAt `json:"updated_at"`
 }
 type PK struct {
 	UserId uint
@@ -104,6 +105,18 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UserId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *UserId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // SongId field
 // Song ID
 type SongId struct {
@@ -120,6 +133,18 @@ func (c *SongId) GetColumnName() string {
 
 func (c *SongId) GetValPointer() any {
 	return &c.val
+}
+
+func (c *SongId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *SongId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Remark field
@@ -158,6 +183,18 @@ func (c *Remark) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Remark) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Remark) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // IsFavourite field
 // Is favourite
 type IsFavourite struct {
@@ -192,6 +229,18 @@ func (c *IsFavourite) GetColumnName() string {
 
 func (c *IsFavourite) GetValPointer() any {
 	return &c.val
+}
+
+func (c *IsFavourite) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *IsFavourite) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreatedAt field
@@ -230,6 +279,18 @@ func (c *CreatedAt) GetValPointer() any {
 	return &c.val
 }
 
+func (c *CreatedAt) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *CreatedAt) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UpdatedAt field
 // Last Update Time
 type UpdatedAt struct {
@@ -264,6 +325,18 @@ func (c *UpdatedAt) GetColumnName() string {
 
 func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
+}
+
+func (c *UpdatedAt) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *UpdatedAt) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // NewWithPK takes "user_id","song_id"

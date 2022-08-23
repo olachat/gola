@@ -4,6 +4,7 @@ package blogs
 
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"strings"
 
@@ -16,25 +17,25 @@ const TableName string = "blogs"
 // Blog represents `blogs` table
 type Blog struct {
 	//  int
-	Id
+	Id `json:"id"`
 	// User Id int
-	UserId
+	UserId `json:"user_id"`
 	// Slug varchar
-	Slug
+	Slug `json:"slug"`
 	// Title varchar
-	Title
+	Title `json:"title"`
 	// Category Id int
-	CategoryId
+	CategoryId `json:"category_id"`
 	// Is pinned to top tinyint
-	IsPinned
+	IsPinned `json:"is_pinned"`
 	// Is VIP reader only tinyint
-	IsVip
+	IsVip `json:"is_vip"`
 	// Country of the blog user varchar
-	Country
+	Country `json:"country"`
 	// Created Timestamp int unsigned
-	CreatedAt
+	CreatedAt `json:"created_at"`
 	// Updated Timestamp int unsigned
-	UpdatedAt
+	UpdatedAt `json:"updated_at"`
 }
 
 type withPK interface {
@@ -118,6 +119,18 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Id) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UserId field
 // User Id
 type UserId struct {
@@ -152,6 +165,18 @@ func (c *UserId) GetColumnName() string {
 
 func (c *UserId) GetValPointer() any {
 	return &c.val
+}
+
+func (c *UserId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *UserId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Slug field
@@ -190,6 +215,18 @@ func (c *Slug) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Slug) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Slug) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Title field
 // Title
 type Title struct {
@@ -224,6 +261,18 @@ func (c *Title) GetColumnName() string {
 
 func (c *Title) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Title) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Title) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CategoryId field
@@ -262,6 +311,18 @@ func (c *CategoryId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *CategoryId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *CategoryId) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // IsPinned field
 // Is pinned to top
 type IsPinned struct {
@@ -296,6 +357,18 @@ func (c *IsPinned) GetColumnName() string {
 
 func (c *IsPinned) GetValPointer() any {
 	return &c.val
+}
+
+func (c *IsPinned) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *IsPinned) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // IsVip field
@@ -334,6 +407,18 @@ func (c *IsVip) GetValPointer() any {
 	return &c.val
 }
 
+func (c *IsVip) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *IsVip) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Country field
 // Country of the blog user
 type Country struct {
@@ -368,6 +453,18 @@ func (c *Country) GetColumnName() string {
 
 func (c *Country) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Country) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Country) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreatedAt field
@@ -406,6 +503,18 @@ func (c *CreatedAt) GetValPointer() any {
 	return &c.val
 }
 
+func (c *CreatedAt) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *CreatedAt) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UpdatedAt field
 // Updated Timestamp
 type UpdatedAt struct {
@@ -440,6 +549,18 @@ func (c *UpdatedAt) GetColumnName() string {
 
 func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
+}
+
+func (c *UpdatedAt) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *UpdatedAt) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // New return new *Blog with default values
