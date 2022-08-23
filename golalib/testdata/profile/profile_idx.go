@@ -54,8 +54,8 @@ func (q *idxQuery[T]) All() []*T {
 	return result
 }
 
-func (q *idxQuery[T]) Limit(offset, count int) []*T {
-	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, count)
+func (q *idxQuery[T]) Limit(offset, limit int) []*T {
+	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, limit)
 	result, _ := coredb.Find[T](DBName, TableName, q)
 	return result
 }
