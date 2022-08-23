@@ -4,6 +4,7 @@ package songs
 
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"strings"
 
@@ -16,15 +17,15 @@ const TableName string = "songs"
 // Song represents `songs` table
 type Song struct {
 	//  int unsigned
-	Id
+	Id `json:"id"`
 	// Song title varchar
-	Title
+	Title `json:"title"`
 	// Song Ranking mediumint
-	Rank
+	Rank `json:"rank"`
 	//  enum('','101','1+9','%1','0.9')
-	Type
+	Type `json:"type"`
 	// Song file hash checksum varchar
-	Hash
+	Hash `json:"hash"`
 }
 
 type withPK interface {
@@ -117,6 +118,10 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
 // Title field
 // Song title
 type Title struct {
@@ -151,6 +156,10 @@ func (c *Title) GetColumnName() string {
 
 func (c *Title) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Title) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
 }
 
 // Rank field
@@ -189,6 +198,10 @@ func (c *Rank) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Rank) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
 // Type field
 //
 type Type struct {
@@ -225,6 +238,10 @@ func (c *Type) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Type) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
 // Hash field
 // Song file hash checksum
 type Hash struct {
@@ -259,6 +276,10 @@ func (c *Hash) GetColumnName() string {
 
 func (c *Hash) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Hash) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
 }
 
 // New return new *Song with default values
