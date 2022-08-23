@@ -91,7 +91,7 @@ type {{ $col.StructName }}[T any] struct {
 
 {{- range $col.Children }}
 func (q *{{$col.StructName}}[T]) And{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T] {
-	q.whereSql = " and `{{ .ColName }}` = ?"
+	q.whereSql += " and `{{ .ColName }}` = ?"
 	q.whereParams = append(q.whereParams, val)
 	{{- if eq .InterfaceName "orderReadQuery" }}
 	return q.idxQuery

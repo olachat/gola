@@ -91,7 +91,7 @@ type idxQuery1[T any] struct {
 }
 
 func (q *idxQuery1[T]) AndCountryCodeEQ(val uint) orderReadQuery[T] {
-	q.whereSql = " and `country_code` = ?"
+	q.whereSql += " and `country_code` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
