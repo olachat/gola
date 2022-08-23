@@ -303,12 +303,14 @@ func (c *Song) Insert() error {
 	if err != nil {
 		return err
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return err
-	}
+	if !c.Id.isAssigned {
+		id, err := result.LastInsertId()
+		if err != nil {
+			return err
+		}
 
-	c.Id.val = uint(id)
+		c.Id.val = uint(id)
+	}
 
 	affectedRows, err := result.RowsAffected()
 	if err != nil {

@@ -494,12 +494,14 @@ func (c *Blog) Insert() error {
 	if err != nil {
 		return err
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return err
-	}
+	if !c.Id.isAssigned {
+		id, err := result.LastInsertId()
+		if err != nil {
+			return err
+		}
 
-	c.Id.val = int(id)
+		c.Id.val = int(id)
+	}
 
 	affectedRows, err := result.RowsAffected()
 	if err != nil {
