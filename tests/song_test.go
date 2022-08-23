@@ -267,4 +267,15 @@ func TestSongJSONEncode(t *testing.T) {
 	if str != `{"id":0,"title":"","rank":5,"type":"1+9","hash":"hash"}` {
 		t.Error("Song json encode err: " + str)
 	}
+
+	var s2 *songs.Song
+	json.Unmarshal(jsondata, &s2)
+	jsondata, err = json.Marshal(&s2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if str != string(jsondata) {
+		t.Error("Song json re-encode err: " + string(jsondata))
+	}
 }
