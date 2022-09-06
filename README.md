@@ -25,44 +25,17 @@ Use `go test ./golalib -update`, if template is changed, and want to update `gol
 # Todo
 
 - [ ] CURD
-  - [x] Insert
-    - [x] Default Value
-    - [x] LAST_INSERT_ID()
-  - [x] Update
-    - [x] Partial Update
-    - [ ] Auto updatedt field value
-  - [x] Delete
-  - [x] Count
+  - [ ] Auto updatedt field value
+- [ ] index query methods
   - [ ] Count with IAQ
-- [x] Default & per struct connstr
-- [x] Safety
-  - [x] SQL escape
-  - [x] parameterize
-- [x] code gen template
-  - [x] struct
-  - [ ] index query methods
-    - [x] index
-    - [ ] uniuqe index
-    - [x] paging & order
-      - [ ] paging using cursor
-- [x] better primary key support
-  - [x] Single Key types / names
-  - [x] Composite key
-  - [x] Non auto incremental pk
-- [x] db types
-  - [x] timestamp
-  - [x] boolean
-  - [x] float
-  - [x] enum
-  - [x] set
-- [x] Remove sqlboiler dependency in code gen
-- [x] Project badges
+  - [ ] uniuqe index
+  - [ ] paging using cursor
+- [ ] nullable types
 - [ ] Hooks
   - [ ] Insert
   - [ ] Update
   - [ ] Delete
 - [ ] Tests
-  - [x] Use sql to create table & insert testdata
   - [ ] Performance test
 - [ ] context support
 - [ ] transaction support
