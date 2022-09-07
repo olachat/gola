@@ -30,6 +30,8 @@ const (
 	TypeDesc
 	HashAsc
 	HashDesc
+	ManifestAsc
+	ManifestDesc
 )
 
 func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
@@ -56,6 +58,10 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 			q.orders[i] = "`hash` asc"
 		case HashDesc:
 			q.orders[i] = "`hash` desc"
+		case ManifestAsc:
+			q.orders[i] = "`manifest` asc"
+		case ManifestDesc:
+			q.orders[i] = "`manifest` desc"
 		}
 	}
 	return q

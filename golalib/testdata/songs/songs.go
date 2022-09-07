@@ -26,6 +26,8 @@ type Song struct {
 	Type `json:"type"`
 	// Song file hash checksum varchar
 	Hash `json:"hash"`
+	//  varbinary
+	Manifest `json:"manifest"`
 }
 
 type withPK interface {
@@ -322,6 +324,51 @@ func (c *Hash) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Manifest field
+//
+type Manifest struct {
+	_updated bool
+	val      []byte
+}
+
+func (c *Manifest) GetManifest() []byte {
+	return c.val
+}
+
+func (c *Manifest) SetManifest(val []byte) bool {
+	c._updated = true
+	c.val = val
+	return true
+}
+
+func (c *Manifest) IsUpdated() bool {
+	return c._updated
+}
+
+func (c *Manifest) resetUpdated() {
+	c._updated = false
+}
+
+func (c *Manifest) GetColumnName() string {
+	return "manifest"
+}
+
+func (c *Manifest) GetValPointer() any {
+	return &c.val
+}
+
+func (c *Manifest) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Manifest) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // New return new *Song with default values
 func New() *Song {
 	return &Song{
@@ -330,6 +377,7 @@ func New() *Song {
 		Rank{val: int(0)},
 		Type{},
 		Hash{},
+		Manifest{},
 	}
 }
 
@@ -342,26 +390,27 @@ func NewWithPK(val uint) *Song {
 		Rank{val: int(0)},
 		Type{},
 		Hash{},
+		Manifest{},
 	}
 	c.Id.val = val
 	c.Id.isAssigned = true
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`) values (?, ?, ?, ?)"
-const insertWithPK string = "INSERT IGNORE INTO `songs` (`id`, `title`, `rank`, `type`, `hash`) values (?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`, `manifest`) values (?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT IGNORE INTO `songs` (`id`, `title`, `rank`, `type`, `hash`, `manifest`) values (?, ?, ?, ?, ?, ?)"
 
 // Insert Song struct to `songs` table
 func (c *Song) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
+		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetManifest())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetManifest())
 		if err != nil {
 			return err
 		}
@@ -390,6 +439,7 @@ func (c *Song) resetUpdated() {
 	c.Rank.resetUpdated()
 	c.Type.resetUpdated()
 	c.Hash.resetUpdated()
+	c.Manifest.resetUpdated()
 }
 
 // Update Song struct in `songs` table
@@ -411,6 +461,10 @@ func (obj *Song) Update() (bool, error) {
 	if obj.Hash.IsUpdated() {
 		updatedFields = append(updatedFields, "`hash` = ?")
 		params = append(params, obj.GetHash())
+	}
+	if obj.Manifest.IsUpdated() {
+		updatedFields = append(updatedFields, "`manifest` = ?")
+		params = append(params, obj.GetManifest())
 	}
 
 	if len(updatedFields) == 0 {
@@ -474,6 +528,12 @@ func Update(obj withPK) (bool, error) {
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`hash` = ?")
 				params = append(params, c.GetHash())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Manifest:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "`manifest` = ?")
+				params = append(params, c.GetManifest())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

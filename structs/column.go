@@ -73,6 +73,10 @@ func (c Column) GoType() string {
 		return "string"
 	}
 
+	if strings.HasPrefix(c.DBType, "varbinary") || strings.HasPrefix(c.DBType, "binary") {
+		return "[]byte"
+	}
+
 	if strings.HasPrefix(c.DBType, "decimal") {
 		return "float32"
 	}
