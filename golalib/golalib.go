@@ -22,7 +22,7 @@ import (
 
 `output`: output folder path
 */
-func Run(config mysqldriver.DBConfig, output string) {
+func Run(config mysqldriver.DBConfig, output string) int {
 	m := &mysqldriver.MySQLDriver{}
 	db, err := m.Assemble(config)
 	if err != nil {
@@ -58,7 +58,11 @@ func Run(config mysqldriver.DBConfig, output string) {
 			if needMkdir {
 				pos := strings.LastIndex(path, string(filepath.Separator))
 				expectedFileFolder := output + path[0:pos]
-				os.Mkdir(expectedFileFolder, os.ModePerm)
+				err = os.Mkdir(expectedFileFolder, os.ModePerm)
+				if err != nil && os.IsNotExist(err) {
+					println("Failed to create folder, please ensure " + output[:len(output)-1] + " exists")
+					return 1
+				}
 				needMkdir = false
 			}
 
@@ -70,6 +74,9 @@ func Run(config mysqldriver.DBConfig, output string) {
 	for path, data := range files {
 		ioutil.WriteFile(output+path, data, 0644)
 	}
+
+	fmt.Printf("code generated in %s\n", output[:len(output)-1])
+	return 0
 }
 
 func genTPL(t ormtpl.TplStruct, tplName string) []byte {
