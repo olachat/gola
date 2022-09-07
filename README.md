@@ -9,9 +9,90 @@
 
 # gola
 
-`gola` is a ORM for go utilizing generic with unique design goals.
+`gola` is an ORM lib for go utilizing generic with unique approach:
 
-# Test
+## Fully strong typed
+
+No need to specify column name via string for all CRUD ops:
+
+```go
+b := book.NewBook()
+b.SetTitle("The Go Programming Language")
+b.SetPrice(10)
+b.Insert() // Auto-increment Primary Key id will be assigned
+
+b.SetPrice(20)
+b.Update() // Only price field will be updated
+
+book.DeleteByPK(b.GetId())
+```
+
+
+## IAQ - Index Aware Query
+
+Flexible select methods based on db index, i.e. IAQ - Index Aware Query.
+
+## Extreme fast
+
+## Misc
+
+* JSON Marshal
+
+# Usage
+
+* Make use have [go 1.18](https://go.dev/dl/) or above installed
+* Install the lastest version of gola binary:
+
+`go install github.com/olachat/gola`
+
+Check gola version: `gola --version`
+
+The lastest version should be `0.1.0`
+
+## Model Generation
+
+
+
+
+## Setup
+
+
+## CRUD
+
+### Struct Methods
+
+Insert
+
+AutoIncrement Key
+
+Update
+
+  Partial
+
+### Package Methods
+
+FetchByPK
+FetchFieldsByPK
+SelectFields
+DeleteByPK
+
+
+### coredb Methods
+
+```
+coredb.Setup
+coredb.Exec
+coredb.Query[T]
+coredb.QueryInt
+```
+
+# Contribute
+
+Clone the source source:
+
+`git clone git@github.com:olachat/gola.git`
+
+## Test
 
 `go test ./golalib` command will:
 
@@ -30,13 +111,13 @@ Use `go test ./golalib -update`, if template is changed, and want to update `gol
   - [ ] Count with IAQ
   - [ ] uniuqe index
   - [ ] paging using cursor
-- [ ] nullable types
+- [ ] data types
+  - [ ] nullable types
+  - [ ] decimal
 - [ ] Hooks
   - [ ] Insert
   - [ ] Update
   - [ ] Delete
-- [ ] Tests
-  - [ ] Performance test
 - [ ] context support
 - [ ] transaction support
 - [ ] zero reflect verison?
