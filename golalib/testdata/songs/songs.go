@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/olachat/gola/coredb"
+
+	"github.com/volatiletech/null/v8"
 )
 
 const DBName string = "testdata"
@@ -26,6 +28,8 @@ type Song struct {
 	Type `json:"type"`
 	// Song file hash checksum varchar
 	Hash `json:"hash"`
+	//  varchar
+	Remark `json:"remark"`
 	//  varbinary
 	Manifest `json:"manifest"`
 }
@@ -324,6 +328,54 @@ func (c *Hash) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Remark field
+//
+type Remark struct {
+	_updated bool
+	val      null.String
+}
+
+func (c *Remark) GetRemark() null.String {
+	return c.val
+}
+
+func (c *Remark) SetRemark(val null.String) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
+	c.val = val
+	return true
+}
+
+func (c *Remark) IsUpdated() bool {
+	return c._updated
+}
+
+func (c *Remark) resetUpdated() {
+	c._updated = false
+}
+
+func (c *Remark) GetColumnName() string {
+	return "remark"
+}
+
+func (c *Remark) GetValPointer() any {
+	return &c.val
+}
+
+func (c *Remark) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Remark) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Manifest field
 //
 type Manifest struct {
@@ -377,6 +429,7 @@ func New() *Song {
 		Rank{val: int(0)},
 		Type{},
 		Hash{},
+		Remark{},
 		Manifest{},
 	}
 }
@@ -390,6 +443,7 @@ func NewWithPK(val uint) *Song {
 		Rank{val: int(0)},
 		Type{},
 		Hash{},
+		Remark{},
 		Manifest{},
 	}
 	c.Id.val = val
@@ -397,20 +451,20 @@ func NewWithPK(val uint) *Song {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`, `manifest`) values (?, ?, ?, ?, ?)"
-const insertWithPK string = "INSERT IGNORE INTO `songs` (`id`, `title`, `rank`, `type`, `hash`, `manifest`) values (?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT IGNORE INTO `songs` (`id`, `title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?, ?)"
 
 // Insert Song struct to `songs` table
 func (c *Song) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetManifest())
+		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetRemark(), c.GetManifest())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetManifest())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetRemark(), c.GetManifest())
 		if err != nil {
 			return err
 		}
@@ -439,6 +493,7 @@ func (c *Song) resetUpdated() {
 	c.Rank.resetUpdated()
 	c.Type.resetUpdated()
 	c.Hash.resetUpdated()
+	c.Remark.resetUpdated()
 	c.Manifest.resetUpdated()
 }
 
@@ -461,6 +516,10 @@ func (obj *Song) Update() (bool, error) {
 	if obj.Hash.IsUpdated() {
 		updatedFields = append(updatedFields, "`hash` = ?")
 		params = append(params, obj.GetHash())
+	}
+	if obj.Remark.IsUpdated() {
+		updatedFields = append(updatedFields, "`remark` = ?")
+		params = append(params, obj.GetRemark())
 	}
 	if obj.Manifest.IsUpdated() {
 		updatedFields = append(updatedFields, "`manifest` = ?")
@@ -528,6 +587,12 @@ func Update(obj withPK) (bool, error) {
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`hash` = ?")
 				params = append(params, c.GetHash())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Remark:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "`remark` = ?")
+				params = append(params, c.GetRemark())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Manifest:

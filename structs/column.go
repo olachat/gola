@@ -70,6 +70,9 @@ func (c Column) GoType() string {
 	}
 
 	if strings.HasPrefix(c.DBType, "varchar") || strings.HasPrefix(c.DBType, "char") {
+		if c.Nullable {
+			return "null.String"
+		}
 		return "string"
 	}
 

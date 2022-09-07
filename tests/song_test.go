@@ -279,7 +279,7 @@ func TestSongJSONEncode(t *testing.T) {
 	}
 
 	str := string(jsondata)
-	if str != `{"id":0,"title":"","rank":5,"type":"1+9","hash":"hash","manifest":"YWJj"}` {
+	if str != `{"id":0,"title":"","rank":5,"type":"1+9","hash":"hash","remark":null,"manifest":"YWJj"}` {
 		t.Error("Song json encode err: " + str)
 	}
 

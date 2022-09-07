@@ -244,8 +244,13 @@ func (t *Table) FirstIdxColumns() []*IdxNode {
 func (t *Table) Imports() string {
 	packages := make(map[string]bool)
 	for _, c := range t.Columns {
-		if c.GoType() == "time.Time" {
+		t := c.GoType()
+		if t == "time.Time" {
 			packages[`"time"`] = true
+		}
+
+		if t == "null.String" {
+			packages[`"github.com/volatiletech/null/v8"`] = true
 		}
 	}
 
