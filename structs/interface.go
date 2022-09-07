@@ -13,7 +13,6 @@ import (
 const (
 	ConfigBlacklist = "blacklist"
 	ConfigWhitelist = "whitelist"
-	ConfigSchema    = "schema"
 
 	ConfigUser    = "user"
 	ConfigPass    = "pass"
