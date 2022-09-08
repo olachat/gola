@@ -41,9 +41,7 @@ func (*cmd) Run(args []string) int {
 	dbconfig := mysqldriver.NewDBConfig(config)
 	output := config.DefaultString("output", "temp")
 
-	Run(dbconfig, output)
-
-	return 0
+	return Run(dbconfig, output)
 }
 
 func (*cmd) Synopsis() string {

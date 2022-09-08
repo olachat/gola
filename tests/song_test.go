@@ -242,11 +242,15 @@ func TestSongInsertWithPK(t *testing.T) {
 	id = uint(99)
 	s = songs.NewWithPK(id)
 	s.SetHash("99")
+	s.SetManifest([]byte("abc"))
 	err = s.Insert()
 	if err != nil {
 		t.Error(err)
 	}
 	s = songs.FetchByPK(id)
+	if string(s.GetManifest()) != "abc" {
+		t.Error("Insert with []byte error")
+	}
 
 	if s == nil {
 		t.Error("Reinsert with pk failed")
@@ -267,6 +271,7 @@ func TestSongJSONEncode(t *testing.T) {
 	s.SetRank(5)
 	s.SetType(songs.SongType1x2B9)
 	s.SetHash("hash")
+	s.SetManifest([]byte("abc"))
 
 	jsondata, err := json.Marshal(&s)
 	if err != nil {
@@ -274,7 +279,7 @@ func TestSongJSONEncode(t *testing.T) {
 	}
 
 	str := string(jsondata)
-	if str != `{"id":0,"title":"","rank":5,"type":"1+9","hash":"hash"}` {
+	if str != `{"id":0,"title":"","rank":5,"type":"1+9","hash":"hash","remark":null,"manifest":"YWJj"}` {
 		t.Error("Song json encode err: " + str)
 	}
 

@@ -99,6 +99,8 @@ func (c Config) Int(key string) (int, bool) {
 	switch t := i.(type) {
 	case int:
 		integer = t
+	case int64:
+		integer = int(t)
 	case float64:
 		integer = int(t)
 	case string:
