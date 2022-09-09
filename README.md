@@ -73,9 +73,9 @@ The methods like `WhereCountryEQ` and `AndCategoryIdEQ` are **strictly** generat
 
 If columns are not available in any index, query methods won't be accessible.
 
-In this way, `gola` will then ensure that all queries written backed by index.
+In this way, `gola` will then ensure that all queries are backed by index.
 
-PS: Query using abitary raw SQL is also supported, but purposely made not as convinient as IAQ.
+PS: Query using arbitrary SQL is also supported, but purposely made not as convenient as IAQ.
 
 ## Extreme fast
 
@@ -88,7 +88,7 @@ PS: Query using abitary raw SQL is also supported, but purposely made not as con
 
 # Usage
 
-* Make use have [go 1.18](https://go.dev/dl/) or above installed
+* Make sure have [go 1.18](https://go.dev/dl/) or above installed
 * Install the lastest version of gola binary:
 
 `go install github.com/olachat/gola`
@@ -118,7 +118,7 @@ output = "models"
 
 `gola gen` will then generate orm codes for `blogs` table into `models` folder.
 
-if whitelist is not sepcified, all tables in `dbname` database will be generated if not blacklisted.
+if whitelist is not specified, all tables in `dbname` database will be generated if not blacklisted.
 
 ## Setup
 
@@ -154,7 +154,7 @@ If you don't need read / write db separation, could just return the same instanc
 
 ## CRUD
 
-Commmon crud operations are all supported.
+Common crud operations are all supported.
 
 ### Struct Methods
 
@@ -168,7 +168,7 @@ Commmon crud operations are all supported.
 
 ### Package Methods
 
-Each table will be generated into it's own package / folder.
+Each table will be generated into its own package / folder.
 
 For example, there are two tables `bloggers` and `blogs` in `blogdb` database, and code generated into `models` folder.
 
@@ -200,7 +200,7 @@ Clone the source source:
 
 ## Test
 
-`go test ./...` will run full test for gola.
+`go test ./...` will run a full test for gola.
 
 `go test ./golalib` command will:
 
@@ -220,7 +220,7 @@ Use `go test ./golalib -update`, if template is changed, and want to update `gol
   - [ ] uniuqe index
   - [ ] paging using cursor
 - [ ] data types
-  - [ ] nullable types
+  - [ ] more nullable types
   - [ ] decimal
 - [ ] Hooks
   - [ ] Insert
@@ -228,7 +228,5 @@ Use `go test ./golalib -update`, if template is changed, and want to update `gol
   - [ ] Delete
 - [ ] context support
 - [ ] transaction support
-- [ ] zero reflect verison?
 - [ ] Cache support
-- [ ] docs & docs & docs...
-- [ ] IAQ: Index Aware Query doc
+- [ ] tutorial
