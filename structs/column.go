@@ -70,9 +70,9 @@ func (c Column) GoType() string {
 	}
 
 	if strings.HasPrefix(c.DBType, "varchar") || strings.HasPrefix(c.DBType, "char") {
-		if c.Nullable {
-			return "null.String"
-		}
+		// if c.Nullable {
+		// 	return "null.String"
+		// }
 		return "string"
 	}
 
@@ -114,9 +114,9 @@ func (c Column) GoName() string {
 
 // IsNullable returns if the column is nullable as string
 func (c Column) IsNullable() string {
-	if c.Nullable {
-		return "true"
-	}
+	// if c.Nullable {
+	// 	return "true"
+	// }
 
 	return "false"
 }

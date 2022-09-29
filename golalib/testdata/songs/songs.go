@@ -9,8 +9,6 @@ import (
 	"strings"
 
 	"github.com/olachat/gola/coredb"
-
-	"github.com/volatiletech/null/v8"
 )
 
 const DBName string = "testdata"
@@ -332,14 +330,14 @@ func (c *Hash) UnmarshalJSON(data []byte) error {
 //
 type Remark struct {
 	_updated bool
-	val      null.String
+	val      string
 }
 
-func (c *Remark) GetRemark() null.String {
+func (c *Remark) GetRemark() string {
 	return c.val
 }
 
-func (c *Remark) SetRemark(val null.String) bool {
+func (c *Remark) SetRemark(val string) bool {
 	if c.val == val {
 		return false
 	}
