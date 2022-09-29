@@ -64,9 +64,9 @@ func (n *IdxNode) StructName() string {
 
 // GetAllChildren returns all children in current index node tree
 // result is sorted in node's order ascending
-func (n *IdxNode) GetAllChildren() []*IdxNode {
-	result := n.Children
+func (n *IdxNode) GetAllChildren() (result []*IdxNode) {
 	for _, child := range n.Children {
+		result = append(result, child)
 		result = append(result, child.GetAllChildren()...)
 	}
 
