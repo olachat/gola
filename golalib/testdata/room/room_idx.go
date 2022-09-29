@@ -126,6 +126,20 @@ func SelectFields[T any]() iQuery[T] {
 	return new(idxQuery[T])
 }
 
+func (q *idxQuery[T]) WhereGroupEQ(val uint) orderReadQuery[T] {
+	q.whereSql += " where `group` = ?"
+	q.whereParams = append(q.whereParams, val)
+	return q
+}
+
+func (q *idxQuery[T]) WhereGroupIN(vals ...uint) orderReadQuery[T] {
+	q.whereSql = " where `group` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	for _, val := range vals {
+		q.whereParams = append(q.whereParams, val)
+	}
+	return q
+}
+
 func (q *idxQuery[T]) WhereLangEQ(val string) iQuery1[T] {
 	q.whereSql += " where `lang` = ?"
 	q.whereParams = append(q.whereParams, val)
@@ -140,28 +154,14 @@ func (q *idxQuery[T]) WhereLangIN(vals ...string) iQuery1[T] {
 	return &idxQuery1[T]{q}
 }
 
-func (q *idxQuery[T]) WhereDeletedEQ(val bool) orderReadQuery[T] {
-	q.whereSql += " where `deleted` = ?"
+func (q *idxQuery[T]) WherePriorityEQ(val float64) orderReadQuery[T] {
+	q.whereSql += " where `priority` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q
 }
 
-func (q *idxQuery[T]) WhereDeletedIN(vals ...bool) orderReadQuery[T] {
-	q.whereSql = " where `deleted` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
-	for _, val := range vals {
-		q.whereParams = append(q.whereParams, val)
-	}
-	return q
-}
-
-func (q *idxQuery[T]) WhereDeletedEQ(val bool) orderReadQuery[T] {
-	q.whereSql += " where `deleted` = ?"
-	q.whereParams = append(q.whereParams, val)
-	return q
-}
-
-func (q *idxQuery[T]) WhereDeletedIN(vals ...bool) orderReadQuery[T] {
-	q.whereSql = " where `deleted` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+func (q *idxQuery[T]) WherePriorityIN(vals ...float64) orderReadQuery[T] {
+	q.whereSql = " where `priority` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
