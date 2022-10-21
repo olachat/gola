@@ -7,5 +7,7 @@ CREATE TABLE `songs` (
   `remark` varchar(128),
   `manifest` varbinary(255) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `hash` (`hash`)
+  UNIQUE KEY `hash` (`hash`),
+  KEY `remark` (`remark`),
+  KEY `remark2` (`rank`, `remark`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = COMPACT COMMENT = 'Song list';

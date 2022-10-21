@@ -68,8 +68,8 @@ type orderReadQuery[T any] interface {
 
 type iQuery[T any] interface {
 {{- range $i, $col := .FirstIdxColumns }}
-	Where{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T]
-	Where{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T]
+	Where{{ .GoName }}EQ(val {{ .GoTypeNotNull }}) {{ .InterfaceName }}[T]
+	Where{{ .GoName }}IN(vals ...{{ .GoTypeNotNull }}) {{ .InterfaceName }}[T]
 {{- end }}
 	orderReadQuery[T]
 }
@@ -77,8 +77,8 @@ type iQuery[T any] interface {
 {{- range $i, $col := .GetIndexNodes }}
 type {{ $col.InterfaceName }}[T any] interface {
 {{- range $col.Children }}
-	And{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T]
-	And{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T]
+	And{{ .GoName }}EQ(val {{ .GoTypeNotNull }}) {{ .InterfaceName }}[T]
+	And{{ .GoName }}IN(vals ...{{ .GoTypeNotNull }}) {{ .InterfaceName }}[T]
 {{- end }}
 	orderReadQuery[T]
 }
@@ -90,7 +90,7 @@ type {{ $col.StructName }}[T any] struct {
 }
 
 {{- range $col.Children }}
-func (q *{{$col.StructName}}[T]) And{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T] {
+func (q *{{$col.StructName}}[T]) And{{ .GoName }}EQ(val {{ .GoTypeNotNull }}) {{ .InterfaceName }}[T] {
 	q.whereSql += " and `{{ .ColName }}` = ?"
 	q.whereParams = append(q.whereParams, val)
 	{{- if eq .InterfaceName "orderReadQuery" }}
@@ -100,7 +100,7 @@ func (q *{{$col.StructName}}[T]) And{{ .GoName }}EQ(val {{ .GoType }}) {{ .Inter
 	{{- end}}
 }
 
-func (q *{{$col.StructName}}[T]) And{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T] {
+func (q *{{$col.StructName}}[T]) And{{ .GoName }}IN(vals ...{{ .GoTypeNotNull }}) {{ .InterfaceName }}[T] {
 	q.whereSql += " and `{{ .ColName }}` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
@@ -127,7 +127,7 @@ func SelectFields[T any]() iQuery[T] {
 }
 
 {{range $i, $col := .FirstIdxColumns }}
-func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName }}[T] {
+func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoTypeNotNull }}) {{ .InterfaceName }}[T] {
 	q.whereSql += " where `{{ .Name }}` = ?"
 	q.whereParams = append(q.whereParams, val)
 	{{- if eq .InterfaceName "orderReadQuery" }}
@@ -137,7 +137,7 @@ func (q *idxQuery[T]) Where{{ .GoName }}EQ(val {{ .GoType }}) {{ .InterfaceName 
 	{{- end}}
 }
 
-func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoType }}) {{ .InterfaceName }}[T] {
+func (q *idxQuery[T]) Where{{ .GoName }}IN(vals ...{{ .GoTypeNotNull }}) {{ .InterfaceName }}[T] {
 	q.whereSql = " where `{{ .Name }}` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)

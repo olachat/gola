@@ -107,6 +107,16 @@ func (c Column) GoType() string {
 	panic("Unsupported db type: " + c.DBType)
 }
 
+// GoTypeNotNull returns type in go of the column as it's not nullable
+func (c Column) GoTypeNotNull() string {
+	t := c.GoType()
+	if t == "null.String" {
+		return "string"
+	}
+
+	return t
+}
+
 // GoName returns the variable name for go of the column
 func (c Column) GoName() string {
 	return getGoName(c.Name)
