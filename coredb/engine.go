@@ -3,7 +3,6 @@ package coredb
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"reflect"
 	"strings"
 )
@@ -85,7 +84,7 @@ func FindOne[T any](dbname string, tableName string, where WhereQuery) *T {
 		// It's on purpose the hide the error
 		// But should re-consider later
 		if err2 != sql.ErrNoRows {
-			log.Fatal(err2)
+			panic("QueryRow failed: " + err2.Error())
 		}
 
 		return nil
