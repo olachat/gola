@@ -59,7 +59,10 @@ func FetchByPKs[T any](dbname string, tableName string, pkName string, vals []an
 	query := fmt.Sprintf("WHERE `%s` IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
 	w := NewWhere(query, vals...)
 
-	result, _ := Find[T](dbname, tableName, w)
+	result, err := Find[T](dbname, tableName, w)
+	if err != nil {
+		panic("Find failled: " + err.Error())
+	}
 	return result
 }
 
