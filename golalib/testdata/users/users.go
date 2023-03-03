@@ -153,7 +153,6 @@ const (
 )
 
 // Id field
-//
 type Id struct {
 	isAssigned bool
 	val        int

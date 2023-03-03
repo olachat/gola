@@ -91,7 +91,6 @@ func Count(whereSQL string, params ...any) (int, error) {
 // Column types
 
 // Id field
-//
 type Id struct {
 	isAssigned bool
 	val        uint
@@ -122,7 +121,6 @@ func (c *Id) UnmarshalJSON(data []byte) error {
 }
 
 // Group field
-//
 type Group struct {
 	_updated bool
 	val      uint
@@ -170,7 +168,6 @@ func (c *Group) UnmarshalJSON(data []byte) error {
 }
 
 // Lang field
-//
 type Lang struct {
 	_updated bool
 	val      string
@@ -218,7 +215,6 @@ func (c *Lang) UnmarshalJSON(data []byte) error {
 }
 
 // Priority field
-//
 type Priority struct {
 	_updated bool
 	val      float64
@@ -266,7 +262,6 @@ func (c *Priority) UnmarshalJSON(data []byte) error {
 }
 
 // Deleted field
-//
 type Deleted struct {
 	_updated bool
 	val      bool

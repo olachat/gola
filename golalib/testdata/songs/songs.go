@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/olachat/gola/coredb"
+
+	"github.com/jordan-bonecutter/goption"
 )
 
 const DBName string = "testdata"
@@ -104,7 +106,6 @@ const (
 )
 
 // Id field
-//
 type Id struct {
 	isAssigned bool
 	val        uint
@@ -231,7 +232,6 @@ func (c *Rank) UnmarshalJSON(data []byte) error {
 }
 
 // Type field
-//
 type Type struct {
 	_updated bool
 	val      SongType
@@ -327,17 +327,16 @@ func (c *Hash) UnmarshalJSON(data []byte) error {
 }
 
 // Remark field
-//
 type Remark struct {
 	_updated bool
-	val      string
+	val      goption.Option[string]
 }
 
-func (c *Remark) GetRemark() string {
+func (c *Remark) GetRemark() goption.Option[string] {
 	return c.val
 }
 
-func (c *Remark) SetRemark(val string) bool {
+func (c *Remark) SetRemark(val goption.Option[string]) bool {
 	if c.val == val {
 		return false
 	}
@@ -375,7 +374,6 @@ func (c *Remark) UnmarshalJSON(data []byte) error {
 }
 
 // Manifest field
-//
 type Manifest struct {
 	_updated bool
 	val      []byte

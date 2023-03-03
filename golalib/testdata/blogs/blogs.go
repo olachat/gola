@@ -101,7 +101,6 @@ func Count(whereSQL string, params ...any) (int, error) {
 // Column types
 
 // Id field
-//
 type Id struct {
 	isAssigned bool
 	val        int

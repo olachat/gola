@@ -66,7 +66,13 @@ insert into users (name, email, created_at, updated_at, float_type, double_type,
 ("Jane Doe", "jane@doe.com", NOW(), NOW(), 3.5, 334.8593, 'singing','swimming', ('SQUASH,BADMINTON'), ("SQUASH,TENNIS")),
 ("Evil Bob", "evilbob@gmail.com", NOW(), NOW(), 4.5, 42234.83, 'singing','running', ('TENNIS'), ('BADMINTON,BASKETBALL'))
 	`)
-
+	_, err = db.Exec(`
+insert into songs (id,title,type,manifest) values
+(999,'song1 2 3','101','a')
+`)
+	if err != nil {
+		panic("fail to insert song for testing")
+	}
 }
 
 type SimpleUser struct {

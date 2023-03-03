@@ -6,6 +6,7 @@ import (
 
 	"encoding/json"
 
+	"github.com/jordan-bonecutter/goption"
 	"github.com/olachat/gola/coredb"
 	"github.com/olachat/gola/golalib/testdata/song_user_favourites"
 	"github.com/olachat/gola/golalib/testdata/songs"
@@ -16,13 +17,14 @@ func TestSong(t *testing.T) {
 	s.SetRank(5)
 	s.SetType(songs.SongType1x2B9)
 	s.SetHash("hash")
+	s.SetRemark(goption.Some("hello remark"))
 	err := s.Insert()
 	if err != nil {
 		t.Error(err)
 	}
 
 	id := s.GetId()
-	if id != 1 {
+	if id != 1000 {
 		t.Error("Insert song error")
 	}
 
@@ -31,11 +33,22 @@ func TestSong(t *testing.T) {
 		t.Error("Re-fetch song error")
 	}
 
+	if !s.GetRemark().Ok() {
+		t.Error("song remarks should be present")
+	}
+	if s.GetRemark().String() != "hello remark" {
+		t.Error("song remarks should be 'hello remark'")
+	}
+
 	s.SetType(songs.SongTypeEmpty)
+	s.SetRemark(goption.None[string]())
 	s.Update()
 	s = songs.FetchByPK(id)
 	if s.GetType() != songs.SongTypeEmpty {
 		t.Error("Song update error")
+	}
+	if s.GetRemark().Ok() {
+		t.Error("remark should be not present")
 	}
 
 	pk := song_user_favourites.PK{
@@ -78,6 +91,55 @@ func TestSong(t *testing.T) {
 	obj = song_user_favourites.FetchByPK(pk)
 	if obj.GetRemark() != "bingo" {
 		t.Error("SongUserFavourite update failed")
+	}
+}
+
+func TestFetchSong(t *testing.T) {
+	s := songs.FetchByPK(999)
+	if s == nil {
+		t.Error("song should exist")
+	}
+	if s.GetId() != 999 {
+		t.Error("song id should be 999")
+	}
+	if s.GetTitle() != "song1 2 3" {
+		t.Error("song title wrong")
+	}
+	if string(s.GetManifest()) != "a" {
+		t.Error("song manifest wrong")
+	}
+	if s.GetType() != songs.SongType101 {
+		t.Error("song wrong type")
+	}
+	if s.GetRemark().Ok() {
+		t.Error("song remark should not be present")
+	}
+	ss := songs.FetchFieldsByPK[struct {
+		songs.Id
+		songs.Remark
+	}](999)
+	if ss.GetId() != 999 {
+		t.Errorf("song id should be 999")
+	}
+	if ss.GetRemark().Ok() {
+		t.Error("song remark should not be present")
+	}
+	ss.SetRemark(goption.Some("remarks 123"))
+	updated, err := songs.Update(ss)
+	if !updated {
+		t.Error("song should be updated")
+	}
+	if err != nil {
+		t.Error("update song should succeed")
+	}
+	sss := songs.FetchFieldsByPK[struct {
+		songs.Remark
+	}](999)
+	if !sss.GetRemark().Ok() {
+		t.Error("song remark should be present")
+	}
+	if sss.GetRemark().String() != "remarks 123" {
+		t.Error("song remark should 'remarks 123'")
 	}
 }
 
@@ -217,7 +279,7 @@ func TestSongUpdate(t *testing.T) {
 	}
 }
 func TestSongInsertWithPK(t *testing.T) {
-	id := uint(100)
+	id := uint(1100)
 	s := songs.NewWithPK(id)
 	s.SetHash("100")
 	err := s.Insert()
@@ -261,7 +323,7 @@ func TestSongInsertWithPK(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if s.GetId() != 102 {
+	if s.GetId() != 1100+1+1 {
 		t.Error("Insert without pk after pk failed")
 	}
 }

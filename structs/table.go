@@ -252,6 +252,9 @@ func (t *Table) Imports() string {
 		if t == "null.String" {
 			packages[`"github.com/volatiletech/null/v8"`] = true
 		}
+		if strings.HasPrefix(t, "goption") {
+			packages[`"github.com/jordan-bonecutter/goption"`] = true
+		}
 	}
 
 	imports := []string{}

@@ -87,7 +87,6 @@ func Count(whereSQL string, params ...any) (int, error) {
 // Column types
 
 // UserId field
-//
 type UserId struct {
 	val int
 }
@@ -117,7 +116,6 @@ func (c *UserId) UnmarshalJSON(data []byte) error {
 }
 
 // Level field
-//
 type Level struct {
 	_updated bool
 	val      int8

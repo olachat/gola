@@ -1,6 +1,7 @@
 package structs
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -65,14 +66,17 @@ func (c Column) GoType() string {
 
 	for dbType, goType := range dbTypeToGoTypes {
 		if c.DBType == dbType || strings.HasPrefix(c.DBType, dbType+"(") {
+			if c.Nullable {
+				return fmt.Sprintf("goption.Option[%s]", goType)
+			}
 			return goType
 		}
 	}
 
 	if strings.HasPrefix(c.DBType, "varchar") || strings.HasPrefix(c.DBType, "char") {
-		// if c.Nullable {
-		// 	return "null.String"
-		// }
+		if c.Nullable {
+			return "goption.Option[string]"
+		}
 		return "string"
 	}
 
@@ -81,6 +85,9 @@ func (c Column) GoType() string {
 	}
 
 	if strings.HasPrefix(c.DBType, "decimal") {
+		if c.Nullable {
+			return "goption.Option[float32]"
+		}
 		return "float32"
 	}
 
@@ -93,10 +100,16 @@ func (c Column) GoType() string {
 	}
 
 	if strings.HasPrefix(c.DBType, "set") {
+		if c.Nullable {
+			return "goption.Option[string]"
+		}
 		return "string"
 	}
 
 	if strings.Contains(c.DBType, "text") || strings.HasPrefix(c.DBType, "blob") {
+		if c.Nullable {
+			return "goption.Option[string]"
+		}
 		return "string"
 	}
 

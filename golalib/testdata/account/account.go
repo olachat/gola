@@ -88,7 +88,6 @@ const (
 )
 
 // UserId field
-//
 type UserId struct {
 	val int
 }
