@@ -252,8 +252,11 @@ func (c *Type) SetType(val goption.Option[SongType]) bool {
 	}
 	if !val.Ok() {
 		c.val = goption.None[string]()
+		c._updated = true
+		return true
 	}
 	c.val = goption.Some[string](string(val.Unwrap()))
+	c._updated = true
 	return true
 }
 

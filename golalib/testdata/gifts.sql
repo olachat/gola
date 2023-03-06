@@ -3,7 +3,7 @@ CREATE TABLE `gifts` (
   `name` varchar(100) COMMENT 'gift name',
   `is_free` tinyint(1) COMMENT 'is free gift',
   `gift_count` smallint,
-  `gift_type` enum('', 'freebie', 'sovenir', 'membership') DEFAULT '',
+  `gift_type` enum('', 'freebie', 'sovenir', 'membership'),
   `create_time` bigint,
   `discount` float unsigned,
   `price` double unsigned,

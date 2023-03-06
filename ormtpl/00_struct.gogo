@@ -142,6 +142,7 @@ func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoSetNullableType}}) bool {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = goption.Some(strings.Join(strSlice, ","))
+	c._updated = true
 	return true
 }
 
@@ -165,6 +166,7 @@ func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoSetEnumType}}) bool {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
+	c._updated = true
 	return true
 }
     {{- end}}
@@ -189,8 +191,11 @@ func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoEnumNullableType}}) bool {
 	}
 	if !val.Ok() {
 		c.val = goption.None[string]()
+		c._updated = true
+		return true
 	}
 	c.val = goption.Some[string](string(val.Unwrap()))
+	c._updated = true
 	return true
 }
 {{else}}

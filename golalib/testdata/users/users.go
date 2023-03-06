@@ -588,6 +588,7 @@ func (c *Sports) SetSports(val []UserSports) bool {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
+	c._updated = true
 	return true
 }
 func (c *Sports) IsUpdated() bool {
@@ -640,6 +641,7 @@ func (c *Sports2) SetSports2(val []UserSports2) bool {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
+	c._updated = true
 	return true
 }
 func (c *Sports2) IsUpdated() bool {
@@ -692,6 +694,7 @@ func (c *SportsNoDefault) SetSportsNoDefault(val []UserSportsNoDefault) bool {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
+	c._updated = true
 	return true
 }
 func (c *SportsNoDefault) IsUpdated() bool {

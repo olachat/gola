@@ -320,8 +320,11 @@ func (c *GiftType) SetGiftType(val goption.Option[GiftGiftType]) bool {
 	}
 	if !val.Ok() {
 		c.val = goption.None[string]()
+		c._updated = true
+		return true
 	}
 	c.val = goption.Some[string](string(val.Unwrap()))
+	c._updated = true
 	return true
 }
 
@@ -706,6 +709,7 @@ func (c *Branches) SetBranches(val goption.Option[[]GiftBranches]) bool {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = goption.Some(strings.Join(strSlice, ","))
+	c._updated = true
 	return true
 }
 func (c *Branches) IsUpdated() bool {
