@@ -234,19 +234,26 @@ func (c *Rank) UnmarshalJSON(data []byte) error {
 // Type field
 type Type struct {
 	_updated bool
-	val      SongType
+	val      goption.Option[string]
 }
 
-func (c *Type) GetType() SongType {
-	return c.val
+func (c *Type) GetType() goption.Option[SongType] {
+	if !c.val.Ok() {
+		return goption.None[SongType]()
+	}
+	return goption.Some[SongType](SongType(c.val.Unwrap()))
 }
-
-func (c *Type) SetType(val SongType) bool {
-	if c.val == val {
+func (c *Type) SetType(val goption.Option[SongType]) bool {
+	if !c.val.Ok() && !val.Ok() {
 		return false
 	}
-	c._updated = true
-	c.val = val
+	if c.val.Ok() && val.Ok() && c.val.Unwrap() == string(val.Unwrap()) {
+		return false
+	}
+	if !val.Ok() {
+		c.val = goption.None[string]()
+	}
+	c.val = goption.Some[string](string(val.Unwrap()))
 	return true
 }
 

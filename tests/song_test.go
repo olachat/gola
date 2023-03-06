@@ -15,7 +15,7 @@ import (
 func TestSong(t *testing.T) {
 	s := songs.New()
 	s.SetRank(5)
-	s.SetType(songs.SongType1x2B9)
+	s.SetType(goption.Some(songs.SongType1x2B9))
 	s.SetHash("hash")
 	s.SetRemark(goption.Some("hello remark"))
 	err := s.Insert()
@@ -29,7 +29,7 @@ func TestSong(t *testing.T) {
 	}
 
 	s = songs.FetchByPK(id)
-	if s.GetRank() != 5 || s.GetHash() != "hash" || s.GetType() != songs.SongType1x2B9 {
+	if s.GetRank() != 5 || s.GetHash() != "hash" || s.GetType().Unwrap() != songs.SongType1x2B9 {
 		t.Error("Re-fetch song error")
 	}
 
@@ -40,11 +40,11 @@ func TestSong(t *testing.T) {
 		t.Error("song remarks should be 'hello remark'")
 	}
 
-	s.SetType(songs.SongTypeEmpty)
+	s.SetType(goption.Some(songs.SongTypeEmpty))
 	s.SetRemark(goption.None[string]())
 	s.Update()
 	s = songs.FetchByPK(id)
-	if s.GetType() != songs.SongTypeEmpty {
+	if s.GetType().Unwrap() != songs.SongTypeEmpty {
 		t.Error("Song update error")
 	}
 	if s.GetRemark().Ok() {
@@ -108,7 +108,7 @@ func TestFetchSong(t *testing.T) {
 	if string(s.GetManifest()) != "a" {
 		t.Error("song manifest wrong")
 	}
-	if s.GetType() != songs.SongType101 {
+	if s.GetType().Unwrap() != songs.SongType101 {
 		t.Error("song wrong type")
 	}
 	if s.GetRemark().Ok() {
@@ -331,7 +331,7 @@ func TestSongInsertWithPK(t *testing.T) {
 func TestSongJSONEncode(t *testing.T) {
 	s := songs.New()
 	s.SetRank(5)
-	s.SetType(songs.SongType1x2B9)
+	s.SetType(goption.Some(songs.SongType1x2B9))
 	s.SetHash("hash")
 	s.SetManifest([]byte("abc"))
 

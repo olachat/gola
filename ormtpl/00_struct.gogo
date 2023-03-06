@@ -116,26 +116,81 @@ const (
 // {{.GoName}} field
 // {{.Comment}}
 {{- if .IsSet}}
+    {{- if .IsNullable}}
+type {{.GoName}} struct {
+	_updated bool
+	val goption.Option[string]
+}
+func (c *{{.GoName}}) Get{{.GoName}}() {{.GoSetNullableType}} {
+	if !c.val.Ok() {
+		return goption.None[[]{{.GoSetEnumType}}]()
+	}
+	strSlice := strings.Split(c.val.Unwrap(), ",")
+	valSlice := make([]{{.GoSetEnumType}}, 0, len(strSlice))
+	for _, s := range strSlice {
+		valSlice = append(valSlice, {{.GoSetEnumType}}(strings.ToLower(s)))
+	}
+	return goption.Some(valSlice)
+}
+
+func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoSetNullableType}}) bool {
+	if !val.Ok(){
+		c.val = goption.None[string]()
+	}
+	strSlice := make([]string, 0, len(val.Unwrap()))
+	for _, v := range val.Unwrap() {
+		strSlice = append(strSlice, string(v))
+	}
+	c.val = goption.Some(strings.Join(strSlice, ","))
+	return true
+}
+
+    {{- else}}
 type {{.GoName}} struct {
 	_updated bool
 	val string
 }
-
-func (c *{{.GoName}}) Get{{.GoName}}() []{{.GoType}} {
+func (c *{{.GoName}}) Get{{.GoName}}() []{{.GoSetEnumType}} {
 	strSlice := strings.Split(c.val, ",")
-	valSlice := make([]{{.GoType}}, 0, len(strSlice))
+	valSlice := make([]{{.GoSetEnumType}}, 0, len(strSlice))
 	for _, s := range strSlice {
-		valSlice = append(valSlice, {{.GoType}}(strings.ToLower(s)))
+		valSlice = append(valSlice, {{.GoSetEnumType}}(strings.ToLower(s)))
 	}
 	return valSlice
 }
 
-func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) bool {
+func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoSetEnumType}}) bool {
 	strSlice := make([]string, 0, len(val))
 	for _, v := range val {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
+	return true
+}
+    {{- end}}
+
+{{- else if and (.IsEnum) (.IsNullable)}}
+type {{.GoName}} struct {
+	_updated bool
+	val goption.Option[string]
+}
+func (c *{{.GoName}}) Get{{.GoName}}() {{.GoEnumNullableType}} {
+	if !c.val.Ok() {
+		return goption.None[{{.GoSetEnumType}}]()
+	}
+	return goption.Some[{{.GoSetEnumType}}]({{.GoSetEnumType}}(c.val.Unwrap()))
+}
+func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoEnumNullableType}}) bool {
+	if !c.val.Ok() && !val.Ok() {
+		return false
+	}
+	if c.val.Ok() && val.Ok() && c.val.Unwrap() == string(val.Unwrap()) {
+		return false
+	}
+	if !val.Ok() {
+		c.val = goption.None[string]()
+	}
+	c.val = goption.Some[string](string(val.Unwrap()))
 	return true
 }
 {{else}}
@@ -155,7 +210,7 @@ func (c *{{.GoName}}) Get{{.GoName}}() {{.GoType}} {
 }
 {{ if not .IsPrimaryKey}}
 func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) bool {
-{{- if ne .GoType "[]byte"}}
+{{- if and (ne .GoType "[]byte") (ne .GoType "goption.Option[[]byte]")}}
 	if c.val == val {
 		return false
 	}

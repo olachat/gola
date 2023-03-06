@@ -244,15 +244,18 @@ func (t *Table) FirstIdxColumns() []*IdxNode {
 func (t *Table) Imports() string {
 	packages := make(map[string]bool)
 	for _, c := range t.Columns {
-		t := c.GoType()
-		if t == "time.Time" {
+		goType := c.GoType()
+		if goType == "time.Time" {
+			packages[`"time"`] = true
+		}
+		if goType == "goption.Option[time.Time]" {
 			packages[`"time"`] = true
 		}
 
-		if t == "null.String" {
+		if goType == "null.String" {
 			packages[`"github.com/volatiletech/null/v8"`] = true
 		}
-		if strings.HasPrefix(t, "goption") {
+		if strings.HasPrefix(goType, "goption") {
 			packages[`"github.com/jordan-bonecutter/goption"`] = true
 		}
 	}
