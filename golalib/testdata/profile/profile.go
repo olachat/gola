@@ -103,6 +103,10 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UserId) getUserIdForDB() int {
+	return c.val
+}
+
 func (c *UserId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -148,6 +152,10 @@ func (c *Level) GetColumnName() string {
 
 func (c *Level) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Level) getLevelForDB() int8 {
+	return c.val
 }
 
 func (c *Level) MarshalJSON() ([]byte, error) {
@@ -198,6 +206,10 @@ func (c *NickName) GetValPointer() any {
 	return &c.val
 }
 
+func (c *NickName) getNickNameForDB() string {
+	return c.val
+}
+
 func (c *NickName) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -222,13 +234,13 @@ func NewWithPK(val int) *Profile {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
 
 // Insert Profile struct to `profile` table
 func (c *Profile) Insert() error {
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetLevel(), c.GetNickName())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getLevelForDB(), c.getNickNameForDB())
 	if err != nil {
 		return err
 	}

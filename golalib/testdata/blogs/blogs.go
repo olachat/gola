@@ -118,6 +118,10 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) getIdForDB() int {
+	return c.val
+}
+
 func (c *Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -164,6 +168,10 @@ func (c *UserId) GetColumnName() string {
 
 func (c *UserId) GetValPointer() any {
 	return &c.val
+}
+
+func (c *UserId) getUserIdForDB() int {
+	return c.val
 }
 
 func (c *UserId) MarshalJSON() ([]byte, error) {
@@ -214,6 +222,10 @@ func (c *Slug) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Slug) getSlugForDB() string {
+	return c.val
+}
+
 func (c *Slug) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -260,6 +272,10 @@ func (c *Title) GetColumnName() string {
 
 func (c *Title) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Title) getTitleForDB() string {
+	return c.val
 }
 
 func (c *Title) MarshalJSON() ([]byte, error) {
@@ -310,6 +326,10 @@ func (c *CategoryId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *CategoryId) getCategoryIdForDB() int {
+	return c.val
+}
+
 func (c *CategoryId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -356,6 +376,10 @@ func (c *IsPinned) GetColumnName() string {
 
 func (c *IsPinned) GetValPointer() any {
 	return &c.val
+}
+
+func (c *IsPinned) getIsPinnedForDB() bool {
+	return c.val
 }
 
 func (c *IsPinned) MarshalJSON() ([]byte, error) {
@@ -406,6 +430,10 @@ func (c *IsVip) GetValPointer() any {
 	return &c.val
 }
 
+func (c *IsVip) getIsVipForDB() bool {
+	return c.val
+}
+
 func (c *IsVip) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -452,6 +480,10 @@ func (c *Country) GetColumnName() string {
 
 func (c *Country) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Country) getCountryForDB() string {
+	return c.val
 }
 
 func (c *Country) MarshalJSON() ([]byte, error) {
@@ -502,6 +534,10 @@ func (c *CreatedAt) GetValPointer() any {
 	return &c.val
 }
 
+func (c *CreatedAt) getCreatedAtForDB() uint {
+	return c.val
+}
+
 func (c *CreatedAt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -548,6 +584,10 @@ func (c *UpdatedAt) GetColumnName() string {
 
 func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
+}
+
+func (c *UpdatedAt) getUpdatedAtForDB() uint {
+	return c.val
 }
 
 func (c *UpdatedAt) MarshalJSON() ([]byte, error) {
@@ -598,20 +638,20 @@ func NewWithPK(val int) *Blog {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-const insertWithPK string = "INSERT IGNORE INTO `blogs` (`id`, `user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT INTO `blogs` (`id`, `user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 // Insert Blog struct to `blogs` table
 func (c *Blog) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB())
 		if err != nil {
 			return err
 		}

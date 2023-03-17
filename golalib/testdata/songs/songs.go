@@ -123,6 +123,10 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) getIdForDB() uint {
+	return c.val
+}
+
 func (c *Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -169,6 +173,10 @@ func (c *Title) GetColumnName() string {
 
 func (c *Title) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Title) getTitleForDB() string {
+	return c.val
 }
 
 func (c *Title) MarshalJSON() ([]byte, error) {
@@ -219,6 +227,10 @@ func (c *Rank) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Rank) getRankForDB() int {
+	return c.val
+}
+
 func (c *Rank) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -234,29 +246,19 @@ func (c *Rank) UnmarshalJSON(data []byte) error {
 // Type field
 type Type struct {
 	_updated bool
-	val      goption.Option[string]
+	val      goption.Option[SongType]
 }
 
 func (c *Type) GetType() goption.Option[SongType] {
-	if !c.val.Ok() {
-		return goption.None[SongType]()
-	}
-	return goption.Some[SongType](SongType(c.val.Unwrap()))
+	return c.val
 }
+
 func (c *Type) SetType(val goption.Option[SongType]) bool {
-	if !c.val.Ok() && !val.Ok() {
+	if c.val == val {
 		return false
 	}
-	if c.val.Ok() && val.Ok() && c.val.Unwrap() == string(val.Unwrap()) {
-		return false
-	}
-	if !val.Ok() {
-		c.val = goption.None[string]()
-		c._updated = true
-		return true
-	}
-	c.val = goption.Some[string](string(val.Unwrap()))
 	c._updated = true
+	c.val = val
 	return true
 }
 
@@ -274,6 +276,10 @@ func (c *Type) GetColumnName() string {
 
 func (c *Type) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Type) getTypeForDB() goption.Option[SongType] {
+	return c.val
 }
 
 func (c *Type) MarshalJSON() ([]byte, error) {
@@ -324,6 +330,10 @@ func (c *Hash) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Hash) getHashForDB() string {
+	return c.val
+}
+
 func (c *Hash) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -371,6 +381,10 @@ func (c *Remark) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Remark) getRemarkForDB() goption.Option[string] {
+	return c.val
+}
+
 func (c *Remark) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -415,6 +429,10 @@ func (c *Manifest) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Manifest) getManifestForDB() []byte {
+	return c.val
+}
+
 func (c *Manifest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -457,20 +475,20 @@ func NewWithPK(val uint) *Song {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?)"
-const insertWithPK string = "INSERT IGNORE INTO `songs` (`id`, `title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `songs` (`title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT INTO `songs` (`id`, `title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?, ?)"
 
 // Insert Song struct to `songs` table
 func (c *Song) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetRemark(), c.GetManifest())
+		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getTitleForDB(), c.getRankForDB(), c.getTypeForDB(), c.getHashForDB(), c.getRemarkForDB(), c.getManifestForDB())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetRemark(), c.GetManifest())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.getTitleForDB(), c.getRankForDB(), c.getTypeForDB(), c.getHashForDB(), c.getRemarkForDB(), c.getManifestForDB())
 		if err != nil {
 			return err
 		}

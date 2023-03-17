@@ -144,6 +144,10 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) getIdForDB() uint {
+	return c.val
+}
+
 func (c *Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -192,6 +196,10 @@ func (c *Name) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Name) getNameForDB() goption.Option[string] {
+	return c.val
+}
+
 func (c *Name) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -208,19 +216,37 @@ func (c *Name) UnmarshalJSON(data []byte) error {
 // is free gift
 type IsFree struct {
 	_updated bool
-	val      goption.Option[bool]
+	val      goption.Option[int]
 }
 
 func (c *IsFree) GetIsFree() goption.Option[bool] {
-	return c.val
+	if !c.val.Ok() {
+		return goption.None[bool]()
+	}
+	return goption.Some[bool](c.val.Unwrap() > 0)
 }
 
 func (c *IsFree) SetIsFree(val goption.Option[bool]) bool {
-	if c.val == val {
+	if !val.Ok() && !c.val.Ok() {
 		return false
 	}
+	if val.Ok() && c.val.Ok() {
+		if c.val.Unwrap() == 0 && !val.Unwrap() {
+			return false
+		}
+		if c.val.Unwrap() == 1 && val.Unwrap() {
+			return false
+		}
+	}
 	c._updated = true
-	c.val = val
+	if !val.Ok() {
+		c.val = goption.None[int]()
+	}
+	if val.Unwrap() {
+		c.val = goption.Some(1)
+	} else {
+		c.val = goption.Some(0)
+	}
 	return true
 }
 
@@ -238,6 +264,10 @@ func (c *IsFree) GetColumnName() string {
 
 func (c *IsFree) GetValPointer() any {
 	return &c.val
+}
+
+func (c *IsFree) getIsFreeForDB() goption.Option[int] {
+	return c.val
 }
 
 func (c *IsFree) MarshalJSON() ([]byte, error) {
@@ -287,6 +317,10 @@ func (c *GiftCount) GetValPointer() any {
 	return &c.val
 }
 
+func (c *GiftCount) getGiftCountForDB() goption.Option[int16] {
+	return c.val
+}
+
 func (c *GiftCount) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -302,29 +336,19 @@ func (c *GiftCount) UnmarshalJSON(data []byte) error {
 // GiftType field
 type GiftType struct {
 	_updated bool
-	val      goption.Option[string]
+	val      goption.Option[GiftGiftType]
 }
 
 func (c *GiftType) GetGiftType() goption.Option[GiftGiftType] {
-	if !c.val.Ok() {
-		return goption.None[GiftGiftType]()
-	}
-	return goption.Some[GiftGiftType](GiftGiftType(c.val.Unwrap()))
+	return c.val
 }
+
 func (c *GiftType) SetGiftType(val goption.Option[GiftGiftType]) bool {
-	if !c.val.Ok() && !val.Ok() {
+	if c.val == val {
 		return false
 	}
-	if c.val.Ok() && val.Ok() && c.val.Unwrap() == string(val.Unwrap()) {
-		return false
-	}
-	if !val.Ok() {
-		c.val = goption.None[string]()
-		c._updated = true
-		return true
-	}
-	c.val = goption.Some[string](string(val.Unwrap()))
 	c._updated = true
+	c.val = val
 	return true
 }
 
@@ -342,6 +366,10 @@ func (c *GiftType) GetColumnName() string {
 
 func (c *GiftType) GetValPointer() any {
 	return &c.val
+}
+
+func (c *GiftType) getGiftTypeForDB() goption.Option[GiftGiftType] {
+	return c.val
 }
 
 func (c *GiftType) MarshalJSON() ([]byte, error) {
@@ -391,6 +419,10 @@ func (c *CreateTime) GetValPointer() any {
 	return &c.val
 }
 
+func (c *CreateTime) getCreateTimeForDB() goption.Option[int64] {
+	return c.val
+}
+
 func (c *CreateTime) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -436,6 +468,10 @@ func (c *Discount) GetColumnName() string {
 
 func (c *Discount) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Discount) getDiscountForDB() goption.Option[float64] {
+	return c.val
 }
 
 func (c *Discount) MarshalJSON() ([]byte, error) {
@@ -485,6 +521,10 @@ func (c *Price) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Price) getPriceForDB() goption.Option[float64] {
+	return c.val
+}
+
 func (c *Price) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -532,6 +572,10 @@ func (c *Remark) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Remark) getRemarkForDB() goption.Option[string] {
+	return c.val
+}
+
 func (c *Remark) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -574,6 +618,10 @@ func (c *Manifest) GetColumnName() string {
 
 func (c *Manifest) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Manifest) getManifestForDB() goption.Option[[]byte] {
+	return c.val
 }
 
 func (c *Manifest) MarshalJSON() ([]byte, error) {
@@ -623,6 +671,10 @@ func (c *Description) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Description) getDescriptionForDB() goption.Option[string] {
+	return c.val
+}
+
 func (c *Description) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -670,6 +722,10 @@ func (c *UpdateTime) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UpdateTime) getUpdateTimeForDB() goption.Option[time.Time] {
+	return c.val
+}
+
 func (c *UpdateTime) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -712,6 +768,7 @@ func (c *Branches) SetBranches(val goption.Option[[]GiftBranches]) bool {
 	c._updated = true
 	return true
 }
+
 func (c *Branches) IsUpdated() bool {
 	return c._updated
 }
@@ -726,6 +783,10 @@ func (c *Branches) GetColumnName() string {
 
 func (c *Branches) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Branches) getBranchesForDB() goption.Option[string] {
+	return c.val
 }
 
 func (c *Branches) MarshalJSON() ([]byte, error) {
@@ -782,20 +843,20 @@ func NewWithPK(val uint) *Gift {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `gifts` (`name`, `is_free`, `gift_count`, `gift_type`, `create_time`, `discount`, `price`, `remark`, `manifest`, `description`, `update_time`, `branches`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-const insertWithPK string = "INSERT IGNORE INTO `gifts` (`id`, `name`, `is_free`, `gift_count`, `gift_type`, `create_time`, `discount`, `price`, `remark`, `manifest`, `description`, `update_time`, `branches`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `gifts` (`name`, `is_free`, `gift_count`, `gift_type`, `create_time`, `discount`, `price`, `remark`, `manifest`, `description`, `update_time`, `branches`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT INTO `gifts` (`id`, `name`, `is_free`, `gift_count`, `gift_type`, `create_time`, `discount`, `price`, `remark`, `manifest`, `description`, `update_time`, `branches`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 // Insert Gift struct to `gifts` table
 func (c *Gift) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetName(), c.GetIsFree(), c.GetGiftCount(), c.GetGiftType(), c.GetCreateTime(), c.GetDiscount(), c.GetPrice(), c.GetRemark(), c.GetManifest(), c.GetDescription(), c.GetUpdateTime(), c.GetBranches())
+		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getNameForDB(), c.getIsFreeForDB(), c.getGiftCountForDB(), c.getGiftTypeForDB(), c.getCreateTimeForDB(), c.getDiscountForDB(), c.getPriceForDB(), c.getRemarkForDB(), c.getManifestForDB(), c.getDescriptionForDB(), c.getUpdateTimeForDB(), c.getBranchesForDB())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetName(), c.GetIsFree(), c.GetGiftCount(), c.GetGiftType(), c.GetCreateTime(), c.GetDiscount(), c.GetPrice(), c.GetRemark(), c.GetManifest(), c.GetDescription(), c.GetUpdateTime(), c.GetBranches())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.getNameForDB(), c.getIsFreeForDB(), c.getGiftCountForDB(), c.getGiftTypeForDB(), c.getCreateTimeForDB(), c.getDiscountForDB(), c.getPriceForDB(), c.getRemarkForDB(), c.getManifestForDB(), c.getDescriptionForDB(), c.getUpdateTimeForDB(), c.getBranchesForDB())
 		if err != nil {
 			return err
 		}

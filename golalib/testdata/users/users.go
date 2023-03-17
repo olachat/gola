@@ -170,6 +170,10 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) getIdForDB() int {
+	return c.val
+}
+
 func (c *Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -216,6 +220,10 @@ func (c *Name) GetColumnName() string {
 
 func (c *Name) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Name) getNameForDB() string {
+	return c.val
 }
 
 func (c *Name) MarshalJSON() ([]byte, error) {
@@ -266,6 +274,10 @@ func (c *Email) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Email) getEmailForDB() string {
+	return c.val
+}
+
 func (c *Email) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -312,6 +324,10 @@ func (c *CreatedAt) GetColumnName() string {
 
 func (c *CreatedAt) GetValPointer() any {
 	return &c.val
+}
+
+func (c *CreatedAt) getCreatedAtForDB() uint {
+	return c.val
 }
 
 func (c *CreatedAt) MarshalJSON() ([]byte, error) {
@@ -362,6 +378,10 @@ func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UpdatedAt) getUpdatedAtForDB() uint {
+	return c.val
+}
+
 func (c *UpdatedAt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -408,6 +428,10 @@ func (c *FloatType) GetColumnName() string {
 
 func (c *FloatType) GetValPointer() any {
 	return &c.val
+}
+
+func (c *FloatType) getFloatTypeForDB() float64 {
+	return c.val
 }
 
 func (c *FloatType) MarshalJSON() ([]byte, error) {
@@ -458,6 +482,10 @@ func (c *DoubleType) GetValPointer() any {
 	return &c.val
 }
 
+func (c *DoubleType) getDoubleTypeForDB() float64 {
+	return c.val
+}
+
 func (c *DoubleType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -504,6 +532,10 @@ func (c *Hobby) GetColumnName() string {
 
 func (c *Hobby) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Hobby) getHobbyForDB() UserHobby {
+	return c.val
 }
 
 func (c *Hobby) MarshalJSON() ([]byte, error) {
@@ -554,6 +586,10 @@ func (c *HobbyNoDefault) GetValPointer() any {
 	return &c.val
 }
 
+func (c *HobbyNoDefault) getHobbyNoDefaultForDB() UserHobbyNoDefault {
+	return c.val
+}
+
 func (c *HobbyNoDefault) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -591,6 +627,7 @@ func (c *Sports) SetSports(val []UserSports) bool {
 	c._updated = true
 	return true
 }
+
 func (c *Sports) IsUpdated() bool {
 	return c._updated
 }
@@ -605,6 +642,10 @@ func (c *Sports) GetColumnName() string {
 
 func (c *Sports) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Sports) getSportsForDB() string {
+	return c.val
 }
 
 func (c *Sports) MarshalJSON() ([]byte, error) {
@@ -644,6 +685,7 @@ func (c *Sports2) SetSports2(val []UserSports2) bool {
 	c._updated = true
 	return true
 }
+
 func (c *Sports2) IsUpdated() bool {
 	return c._updated
 }
@@ -658,6 +700,10 @@ func (c *Sports2) GetColumnName() string {
 
 func (c *Sports2) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Sports2) getSports2ForDB() string {
+	return c.val
 }
 
 func (c *Sports2) MarshalJSON() ([]byte, error) {
@@ -697,6 +743,7 @@ func (c *SportsNoDefault) SetSportsNoDefault(val []UserSportsNoDefault) bool {
 	c._updated = true
 	return true
 }
+
 func (c *SportsNoDefault) IsUpdated() bool {
 	return c._updated
 }
@@ -711,6 +758,10 @@ func (c *SportsNoDefault) GetColumnName() string {
 
 func (c *SportsNoDefault) GetValPointer() any {
 	return &c.val
+}
+
+func (c *SportsNoDefault) getSportsNoDefaultForDB() string {
+	return c.val
 }
 
 func (c *SportsNoDefault) MarshalJSON() ([]byte, error) {
@@ -737,7 +788,7 @@ func New() *User {
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
-		Sports{val: "swim, football"},
+		Sports{val: "swim,football"},
 		Sports2{val: "swim,football"},
 		SportsNoDefault{},
 	}
@@ -756,7 +807,7 @@ func NewWithPK(val int) *User {
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
-		Sports{val: "swim, football"},
+		Sports{val: "swim,football"},
 		Sports2{val: "swim,football"},
 		SportsNoDefault{},
 	}
@@ -765,20 +816,20 @@ func NewWithPK(val int) *User {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-const insertWithPK string = "INSERT IGNORE INTO `users` (`id`, `name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT INTO `users` (`id`, `name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 // Insert User struct to `users` table
 func (c *User) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getNameForDB(), c.getEmailForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB(), c.getFloatTypeForDB(), c.getDoubleTypeForDB(), c.getHobbyForDB(), c.getHobbyNoDefaultForDB(), c.getSportsForDB(), c.getSports2ForDB(), c.getSportsNoDefaultForDB())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.getNameForDB(), c.getEmailForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB(), c.getFloatTypeForDB(), c.getDoubleTypeForDB(), c.getHobbyForDB(), c.getHobbyNoDefaultForDB(), c.getSportsForDB(), c.getSports2ForDB(), c.getSportsNoDefaultForDB())
 		if err != nil {
 			return err
 		}

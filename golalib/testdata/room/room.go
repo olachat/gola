@@ -108,6 +108,10 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) getIdForDB() uint {
+	return c.val
+}
+
 func (c *Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -153,6 +157,10 @@ func (c *Group) GetColumnName() string {
 
 func (c *Group) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Group) getGroupForDB() uint {
+	return c.val
 }
 
 func (c *Group) MarshalJSON() ([]byte, error) {
@@ -202,6 +210,10 @@ func (c *Lang) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Lang) getLangForDB() string {
+	return c.val
+}
+
 func (c *Lang) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -247,6 +259,10 @@ func (c *Priority) GetColumnName() string {
 
 func (c *Priority) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Priority) getPriorityForDB() float64 {
+	return c.val
 }
 
 func (c *Priority) MarshalJSON() ([]byte, error) {
@@ -296,6 +312,10 @@ func (c *Deleted) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Deleted) getDeletedForDB() bool {
+	return c.val
+}
+
 func (c *Deleted) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -334,20 +354,20 @@ func NewWithPK(val uint) *Room {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `room` (`group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?)"
-const insertWithPK string = "INSERT IGNORE INTO `room` (`id`, `group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `room` (`group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?)"
+const insertWithPK string = "INSERT INTO `room` (`id`, `group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?, ?)"
 
 // Insert Room struct to `room` table
 func (c *Room) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetGroup(), c.GetLang(), c.GetPriority(), c.GetDeleted())
+		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getGroupForDB(), c.getLangForDB(), c.getPriorityForDB(), c.getDeletedForDB())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetGroup(), c.GetLang(), c.GetPriority(), c.GetDeleted())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.getGroupForDB(), c.getLangForDB(), c.getPriorityForDB(), c.getDeletedForDB())
 		if err != nil {
 			return err
 		}

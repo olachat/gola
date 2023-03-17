@@ -59,13 +59,27 @@ func init() {
 	}
 
 	//add data
-	db.Exec(`
+	_, err = db.Exec(`
 insert into users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports_no_default, sports) values
 ("John Doe", "john@doe.com", NOW(), NOW(), 1.55555, 1.8729, 'running','swimming', ('SWIM,TENNIS'), ("TENNIS")),
 ("John Doe", "johnalt@doe.com", NOW(), NOW(), 2.5, 2.8239, 'swimming','running', ('BASKETBALL'), ("FOOTBALL")),
 ("Jane Doe", "jane@doe.com", NOW(), NOW(), 3.5, 334.8593, 'singing','swimming', ('SQUASH,BADMINTON'), ("SQUASH,TENNIS")),
-("Evil Bob", "evilbob@gmail.com", NOW(), NOW(), 4.5, 42234.83, 'singing','running', ('TENNIS'), ('BADMINTON,BASKETBALL'))
+("Evil Bob", "evilbob@gmail.com", NOW(), NOW(), 4.5, 42234.83, 'singing','running', 'tennis', 'BADMINTON,BASKETBALL')
 	`)
+	if err != nil {
+		panic("insert failed " + err.Error())
+	}
+
+	r, err := db.Exec("INSERT IGNORE INTO `users` (`id`, `name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 40014, "name", "email", uint64(2), uint64(3), 4.5, 5.6, "running", "singing", "swim,tennis", "swim", "")
+	if err != nil {
+		panic(err.Error())
+	}
+	if count, err := r.RowsAffected(); err != nil {
+		panic(err.Error())
+	} else if count == 0 {
+		panic("nothing inserted")
+	}
+
 	_, err = db.Exec(`
 insert into songs (id,title,type,manifest) values
 (999,'song1 2 3','101','a')
@@ -73,9 +87,18 @@ insert into songs (id,title,type,manifest) values
 	if err != nil {
 		panic("fail to insert song for testing")
 	}
+
 	_, err = db.Exec(`
 	insert into gifts (id) values
 	(1)
+	`)
+	if err != nil {
+		panic("fail to insert gift. " + err.Error())
+	}
+
+	_, err = db.Exec(`
+	insert into gifts (id,name,is_free,gift_count,gift_type,create_time,discount,price,remark,manifest,description,update_time,branches) values
+	(2,"name",1,3,'freebie',1678935576,7.5,255.33,'remark is long text','printable manifest','description text','2019-01-01 00:00:01','vivo,sentosa')
 	`)
 	if err != nil {
 		panic("fail to insert gift. " + err.Error())
@@ -89,11 +112,27 @@ type SimpleUser struct {
 
 func TestUserInsert(t *testing.T) {
 	u := users.NewWithPK(11)
-	u.SetEmail("hello")
+	u.SetEmail("hello10023")
 	u.SetName("maou sheng")
 	u.SetCreatedAt(111)
 	u.SetUpdatedAt(222)
-	u.Insert()
+	u.SetSports([]users.UserSports{
+		users.UserSportsBadminton,
+		users.UserSportsBasketball,
+	})
+	u.SetHobbyNoDefault(users.UserHobbyNoDefaultRunning)
+	err := u.Insert()
+	if err != nil {
+		t.Fatalf("fail to insert: %s", err.Error())
+	}
+	uOut := users.FetchByPK(11)
+	sports := uOut.GetSports()
+	if !contains(sports, users.UserSportsBadminton) {
+		t.Errorf("uOut.GetSports should contain badminton. Actual: %v", uOut.GetSports())
+	}
+	if !contains(sports, users.UserSportsBasketball) {
+		t.Errorf("uOut.GetSports should contain badminton. Actual: %v", uOut.GetSports())
+	}
 }
 
 func TestUserDouble(t *testing.T) {

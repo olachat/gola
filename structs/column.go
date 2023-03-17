@@ -68,6 +68,23 @@ func (c Column) GoEnumNullableType() string {
 	return fmt.Sprintf("goption.Option[%s]", c.Table.ClassName()+c.GoName())
 }
 
+func (c Column) ValType() string {
+	if c.FullDBType == "tinyint(1)" {
+		if c.Nullable {
+			return "goption.Option[int]"
+		}
+		return "bool"
+	}
+	if c.IsSet() {
+		if c.Nullable {
+			return "goption.Option[string]"
+		} else {
+			return "string"
+		}
+	}
+	return c.GoType()
+}
+
 // GoType returns type in go of the column.
 // Uses goption for nullable fields
 func (c Column) GoType() string {
@@ -221,6 +238,11 @@ func (c Column) IsSet() bool {
 // IsBool returns if column type is boolean as tinyint(1)
 func (c Column) IsBool() bool {
 	return c.FullDBType == "tinyint(1)"
+}
+
+// IsNullableBool returns if column type is boolean as tinyint(1) and nullable
+func (c Column) IsNullableBool() bool {
+	return c.FullDBType == "tinyint(1)" && c.Nullable
 }
 
 // GetEnumConst returns enum const definitions in go

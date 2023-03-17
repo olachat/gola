@@ -104,6 +104,10 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UserId) getUserIdForDB() int {
+	return c.val
+}
+
 func (c *UserId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -152,6 +156,10 @@ func (c *Type) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Type) getTypeForDB() AccountType {
+	return c.val
+}
+
 func (c *Type) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -180,6 +188,10 @@ func (c *CountryCode) GetColumnName() string {
 
 func (c *CountryCode) GetValPointer() any {
 	return &c.val
+}
+
+func (c *CountryCode) getCountryCodeForDB() uint {
+	return c.val
 }
 
 func (c *CountryCode) MarshalJSON() ([]byte, error) {
@@ -230,6 +242,10 @@ func (c *Money) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Money) getMoneyForDB() int {
+	return c.val
+}
+
 func (c *Money) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -256,13 +272,13 @@ func NewWithPK(val PK) *Account {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
 
 // Insert Account struct to `account` table
 func (c *Account) Insert() error {
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getTypeForDB(), c.getCountryCodeForDB(), c.getMoneyForDB())
 	if err != nil {
 		return err
 	}

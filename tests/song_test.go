@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 
 	"github.com/jordan-bonecutter/goption"
-	"github.com/olachat/gola/coredb"
 	"github.com/olachat/gola/golalib/testdata/song_user_favourites"
 	"github.com/olachat/gola/golalib/testdata/songs"
 )
@@ -18,6 +17,7 @@ func TestSong(t *testing.T) {
 	s.SetType(goption.Some(songs.SongType1x2B9))
 	s.SetHash("hash")
 	s.SetRemark(goption.Some("hello remark"))
+	s.SetManifest([]byte("manifest"))
 	err := s.Insert()
 	if err != nil {
 		t.Error(err)
@@ -67,7 +67,7 @@ func TestSong(t *testing.T) {
 
 	f2 := song_user_favourites.NewWithPK(pk)
 	err = f2.Insert()
-	if err != coredb.ErrAvoidInsert {
+	if err == nil {
 		t.Error("Repeat insert must fail")
 	}
 
@@ -249,6 +249,7 @@ func TestSongDelete(t *testing.T) {
 func TestSongUpdate(t *testing.T) {
 	s := songs.New()
 	s.SetHash("hashhash")
+	s.SetManifest([]byte(""))
 	err := s.Insert()
 	if err != nil {
 		t.Error(err)
@@ -282,6 +283,7 @@ func TestSongInsertWithPK(t *testing.T) {
 	id := uint(1100)
 	s := songs.NewWithPK(id)
 	s.SetHash("100")
+	s.SetManifest([]byte(""))
 	err := s.Insert()
 	if err != nil {
 		t.Error(err)
@@ -293,6 +295,7 @@ func TestSongInsertWithPK(t *testing.T) {
 	}
 	s = songs.New()
 	s.SetHash("hashhash")
+	s.SetManifest([]byte(""))
 	err = s.Insert()
 	if err != nil {
 		t.Error(err)
@@ -319,6 +322,7 @@ func TestSongInsertWithPK(t *testing.T) {
 	}
 	s = songs.New()
 	s.SetHash("hashhash")
+	s.SetManifest([]byte(""))
 	err = s.Insert()
 	if err != nil {
 		t.Error(err)
