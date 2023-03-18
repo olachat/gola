@@ -22,7 +22,7 @@ const (
 	testDBName string = "testdb"
 )
 
-var tableNames = []string{"users", "blogs", "songs", "song_user_favourites", "profile", "account", "gifts"}
+var tableNames = []string{"users", "blogs", "songs", "song_user_favourites", "profile", "account", "gifts", "gifts_with_default"}
 
 func init() {
 	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
@@ -102,6 +102,14 @@ insert into songs (id,title,type,manifest) values
 	`)
 	if err != nil {
 		panic("fail to insert gift. " + err.Error())
+	}
+
+	_, err = db.Exec(`
+	insert into gifts_with_default (id) values
+	(1)
+	`)
+	if err != nil {
+		panic("fail to insert gift_with_default. " + err.Error())
 	}
 }
 

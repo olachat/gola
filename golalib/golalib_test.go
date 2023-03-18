@@ -31,7 +31,7 @@ var s *server.Server
 var testDBPort int = 33066
 var testDBName string = "testdata"
 var testTables = []string{"blogs", "users", "songs", "song_user_favourites",
-	"profile", "account", "room", "gifts"}
+	"profile", "account", "room", "gifts", "gifts_with_default"}
 var testDataPath = "testdata" + string(filepath.Separator)
 
 var update = flag.Bool("update", false, "update generated files")

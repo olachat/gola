@@ -454,7 +454,7 @@ func New() *Song {
 		Type{},
 		Hash{},
 		Remark{},
-		Manifest{},
+		Manifest{val: []byte("man")},
 	}
 }
 
@@ -468,7 +468,7 @@ func NewWithPK(val uint) *Song {
 		Type{},
 		Hash{},
 		Remark{},
-		Manifest{},
+		Manifest{val: []byte("man")},
 	}
 	c.Id.val = val
 	c.Id.isAssigned = true
