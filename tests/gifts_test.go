@@ -11,8 +11,15 @@ import (
 
 func TestFetchGiftNull(t *testing.T) {
 	gift := gifts.FetchByPK(1)
+	assertNullGift(t, gift, 1)
+}
+
+func assertNullGift(t *testing.T, gift *gifts.Gift, pk uint) {
 	if gift == nil {
-		t.Errorf("gift should not be nil")
+		t.Fatalf("gift should not be nil")
+	}
+	if gift.GetId() != pk {
+		t.Errorf("wrong pk")
 	}
 	if gift.GetBranches().Ok() {
 		t.Errorf("branches should be null")
@@ -55,7 +62,7 @@ func TestFetchGiftNull(t *testing.T) {
 func TestFetchGiftWithValue(t *testing.T) {
 	gift := gifts.FetchByPK(2)
 	if gift == nil {
-		t.Errorf("gift should not be nil")
+		t.Fatal("gift should not be nil")
 	}
 
 	if !gift.GetBranches().Ok() {
@@ -154,30 +161,109 @@ func TestFetchGiftWithValue(t *testing.T) {
 // TODO: insert and retrieve and compare, update and retrieve and compare
 func TestInsertRetrieveUpdate(t *testing.T) {
 	g1 := gifts.NewWithPK(21)
-	g1.SetBranches(goption.Some([]gifts.GiftBranches{
+	err := g1.Insert()
+	if err != nil {
+		t.Fatalf("fail to insert. %v", err)
+	}
+	gOut := gifts.FetchByPK(21)
+	assertNullGift(t, gOut, 21)
+
+	g2 := gifts.New()
+	g2.SetBranches(goption.Some([]gifts.GiftBranches{
 		gifts.GiftBranchesOrchard,
 		gifts.GiftBranchesChangi,
 	}))
-	g1.SetCreateTime(goption.Some[int64](9999999))
-	g1.SetDescription(goption.Some("describe what this gift is about"))
-	g1.SetDiscount(goption.Some(7.5))
-	g1.SetGiftCount(goption.Some[int16](5))
-	g1.SetGiftType(goption.Some(gifts.GiftGiftTypeEmpty))
-	g1.SetIsFree(goption.Some(false))
-	g1.SetManifest(goption.Some([]byte("manifest string")))
-	g1.SetName(goption.Some("xmas gift"))
-	g1.SetPrice(goption.Some(15.5))
-	g1.SetRemark(goption.Some("selling out soon"))
+	g2.SetCreateTime(goption.Some[int64](9999999))
+	g2.SetDescription(goption.Some("describe what this gift is about"))
+	g2.SetDiscount(goption.Some(7.5))
+	g2.SetGiftCount(goption.Some[int16](5))
+	g2.SetGiftType(goption.Some(gifts.GiftGiftTypeEmpty))
+	g2.SetIsFree(goption.Some(false))
+	g2.SetManifest(goption.Some([]byte("manifest string")))
+	g2.SetName(goption.Some("xmas gift"))
+	g2.SetPrice(goption.Some(15.5))
+	g2.SetRemark(goption.Some("selling out soon"))
 	now := time.Now().UTC().Truncate(time.Microsecond)
-	g1.SetUpdateTime(goption.Some(now))
-	err := g1.Insert()
+	g2.SetUpdateTime(goption.Some(now))
+	err = g2.Insert()
 	if err != nil {
 		panic(err.Error())
 	}
-	g1out := gifts.FindOne("where gift_type = ?", gifts.GiftGiftTypeEmpty)
-	j1, _ := json.Marshal(g1)
-	j1Out, _ := json.Marshal(g1out)
-	if string(j1) != string(j1Out) {
+	g2out := gifts.FindOne("where id = ?", g2.GetId())
+	if g2out == nil {
+		t.Fatal("g2out should not be nil")
+	}
+	j2, _ := json.Marshal(g2)
+	j2Out, _ := json.Marshal(g2out)
+	if string(j2) != string(j2Out) {
 		t.Fatalf("gift fetched is not as expected")
+	}
+
+	g2out.SetBranches(goption.Some([]gifts.GiftBranches{
+		gifts.GiftBranchesVivo,
+		gifts.GiftBranchesSentosa,
+	}))
+	g2out.SetCreateTime(goption.Some[int64](111))
+	g2out.SetDescription(goption.Some("describe 2"))
+	g2out.SetDiscount(goption.Some(4.67))
+	g2out.SetGiftCount(goption.Some[int16](50))
+	g2out.SetGiftType(goption.Some(gifts.GiftGiftTypeSovenir))
+	g2out.SetIsFree(goption.Some(true))
+	g2out.SetManifest(goption.Some([]byte("manifest 2")))
+	g2out.SetName(goption.Some("gift 2"))
+	g2out.SetPrice(goption.Some(65.555))
+	g2out.SetRemark(goption.Some("remark 2"))
+	now2 := time.Now().UTC().Truncate(time.Microsecond)
+	g2out.SetUpdateTime(goption.Some(now2))
+	ok, err := g2out.Update()
+	if err != nil {
+		panic(err.Error())
+	}
+	if !ok {
+		t.Fatal("update not done")
+	}
+
+	g22 := gifts.FindOne("where id = ?", g2out.GetId())
+	if g22 == nil {
+		t.Fatal("g22 should not be nil")
+	}
+	if !contains(g22.GetBranches().Unwrap(), gifts.GiftBranchesVivo) {
+		t.Error("should contain vivo")
+	}
+	if !contains(g22.GetBranches().Unwrap(), gifts.GiftBranchesVivo) {
+		t.Error("should contain vivo")
+	}
+	if g22.GetCreateTime().Unwrap() != 111 {
+		t.Error("wrong create time")
+	}
+	if g22.GetDescription().Unwrap() != "describe 2" {
+		t.Error("wrong desc")
+	}
+	if g22.GetDiscount().Unwrap() != 4.67 {
+		t.Error("wrong discount")
+	}
+	if g22.GetGiftCount().Unwrap() != 50 {
+		t.Error("wrong gift_count")
+	}
+	if g22.GetGiftType().Unwrap() != gifts.GiftGiftTypeSovenir {
+		t.Error("wrong gift type")
+	}
+	if g22.GetIsFree().Unwrap() != true {
+		t.Error("wrong is free")
+	}
+	if string(g22.GetManifest().Unwrap()) != "manifest 2" {
+		t.Error("wrong manifest")
+	}
+	if g22.GetName().Unwrap() != "gift 2" {
+		t.Error("wrong name")
+	}
+	if g22.GetPrice().Unwrap() != 65.555 {
+		t.Error("wrong price")
+	}
+	if g22.GetRemark().Unwrap() != "remark 2" {
+		t.Error("wrong remark")
+	}
+	if g22.GetUpdateTime().Unwrap() != now2 {
+		t.Error("wrong update time")
 	}
 }
