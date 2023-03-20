@@ -32,3 +32,12 @@ func MustParseTime(timestr string) time.Time {
 	}
 	return t
 }
+
+func ValueInSet(set []string, s string) bool {
+	for _, v := range set {
+		if strings.EqualFold(v, s) {
+			return true
+		}
+	}
+	return false
+}

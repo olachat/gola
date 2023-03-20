@@ -693,39 +693,39 @@ func (obj *Blog) Update() (bool, error) {
 	var params []any
 	if obj.UserId.IsUpdated() {
 		updatedFields = append(updatedFields, "`user_id` = ?")
-		params = append(params, obj.GetUserId())
+		params = append(params, obj.getUserIdForDB())
 	}
 	if obj.Slug.IsUpdated() {
 		updatedFields = append(updatedFields, "`slug` = ?")
-		params = append(params, obj.GetSlug())
+		params = append(params, obj.getSlugForDB())
 	}
 	if obj.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "`title` = ?")
-		params = append(params, obj.GetTitle())
+		params = append(params, obj.getTitleForDB())
 	}
 	if obj.CategoryId.IsUpdated() {
 		updatedFields = append(updatedFields, "`category_id` = ?")
-		params = append(params, obj.GetCategoryId())
+		params = append(params, obj.getCategoryIdForDB())
 	}
 	if obj.IsPinned.IsUpdated() {
 		updatedFields = append(updatedFields, "`is_pinned` = ?")
-		params = append(params, obj.GetIsPinned())
+		params = append(params, obj.getIsPinnedForDB())
 	}
 	if obj.IsVip.IsUpdated() {
 		updatedFields = append(updatedFields, "`is_vip` = ?")
-		params = append(params, obj.GetIsVip())
+		params = append(params, obj.getIsVipForDB())
 	}
 	if obj.Country.IsUpdated() {
 		updatedFields = append(updatedFields, "`country` = ?")
-		params = append(params, obj.GetCountry())
+		params = append(params, obj.getCountryForDB())
 	}
 	if obj.CreatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`created_at` = ?")
-		params = append(params, obj.GetCreatedAt())
+		params = append(params, obj.getCreatedAtForDB())
 	}
 	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`updated_at` = ?")
-		params = append(params, obj.GetUpdatedAt())
+		params = append(params, obj.getUpdatedAtForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -770,55 +770,55 @@ func Update(obj withPK) (bool, error) {
 		case *UserId:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`user_id` = ?")
-				params = append(params, c.GetUserId())
+				params = append(params, c.getUserIdForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Slug:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`slug` = ?")
-				params = append(params, c.GetSlug())
+				params = append(params, c.getSlugForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Title:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`title` = ?")
-				params = append(params, c.GetTitle())
+				params = append(params, c.getTitleForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CategoryId:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`category_id` = ?")
-				params = append(params, c.GetCategoryId())
+				params = append(params, c.getCategoryIdForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsPinned:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`is_pinned` = ?")
-				params = append(params, c.GetIsPinned())
+				params = append(params, c.getIsPinnedForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsVip:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`is_vip` = ?")
-				params = append(params, c.GetIsVip())
+				params = append(params, c.getIsVipForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Country:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`country` = ?")
-				params = append(params, c.GetCountry())
+				params = append(params, c.getCountryForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`created_at` = ?")
-				params = append(params, c.GetCreatedAt())
+				params = append(params, c.getCreatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`updated_at` = ?")
-				params = append(params, c.GetUpdatedAt())
+				params = append(params, c.getUpdatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

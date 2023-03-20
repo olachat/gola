@@ -108,6 +108,9 @@ type {{$table.ClassName}}{{.GoName}} string
 const (
 	{{.GetSetConst}}
 )
+var {{$table.ClassName}}{{.GoName}}List = []string{
+	{{.GetSetConstList}}
+}
 	{{- end }}
 {{- end }}
 
@@ -126,6 +129,9 @@ func (c *{{.GoName}}) Get{{.GoName}}() {{.GoSetNullableType}} {
 		return goption.None[[]{{.GoSetEnumType}}]()
 	}
 	strSlice := strings.Split(c.val.Unwrap(), ",")
+	if len(strSlice) == 1 && !coredb.ValueInSet({{$table.ClassName}}{{.GoName}}List, strSlice[0]) {
+		return goption.Some([]{{.GoSetEnumType}}{})
+	}
 	valSlice := make([]{{.GoSetEnumType}}, 0, len(strSlice))
 	for _, s := range strSlice {
 		valSlice = append(valSlice, {{.GoSetEnumType}}(strings.ToLower(s)))
@@ -153,6 +159,9 @@ type {{.GoName}} struct {
 }
 func (c *{{.GoName}}) Get{{.GoName}}() []{{.GoSetEnumType}} {
 	strSlice := strings.Split(c.val, ",")
+	if len(strSlice) == 1 && !coredb.ValueInSet({{$table.ClassName}}{{.GoName}}List, strSlice[0]) {
+		return []{{.GoSetEnumType}}{}
+	}
 	valSlice := make([]{{.GoSetEnumType}}, 0, len(strSlice))
 	for _, s := range strSlice {
 		valSlice = append(valSlice, {{.GoSetEnumType}}(strings.ToLower(s)))
@@ -392,7 +401,7 @@ func (obj *{{.ClassName}}) Update() (bool, error) {
 	{{- range $i, $c := .GetNonPKColumns }}
 	if obj.{{ $c.GoName }}.IsUpdated() {
 		updatedFields = append(updatedFields, "`{{ $c.Name }}` = ?")
-		params = append(params, obj.Get{{ $c.GoName }}())
+		params = append(params, obj.get{{$c.GoName}}ForDB())
 	}
 	{{- end }}
 
@@ -439,7 +448,7 @@ func Update(obj withPK) (bool, error) {
 		case *{{.GoName}}:
 		if c.IsUpdated() {
 			updatedFields = append(updatedFields, "`{{ $c.Name }}` = ?")
-			params = append(params, c.Get{{ $c.GoName }}())
+			params = append(params, c.get{{$c.GoName}}ForDB())
 			resetFuncs = append(resetFuncs, c.resetUpdated)
 		}
 		{{- end }}

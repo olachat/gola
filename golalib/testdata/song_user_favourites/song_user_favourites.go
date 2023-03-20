@@ -415,19 +415,19 @@ func (obj *SongUserFavourite) Update() (bool, error) {
 	var params []any
 	if obj.Remark.IsUpdated() {
 		updatedFields = append(updatedFields, "`remark` = ?")
-		params = append(params, obj.GetRemark())
+		params = append(params, obj.getRemarkForDB())
 	}
 	if obj.IsFavourite.IsUpdated() {
 		updatedFields = append(updatedFields, "`is_favourite` = ?")
-		params = append(params, obj.GetIsFavourite())
+		params = append(params, obj.getIsFavouriteForDB())
 	}
 	if obj.CreatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`created_at` = ?")
-		params = append(params, obj.GetCreatedAt())
+		params = append(params, obj.getCreatedAtForDB())
 	}
 	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`updated_at` = ?")
-		params = append(params, obj.GetUpdatedAt())
+		params = append(params, obj.getUpdatedAtForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -472,25 +472,25 @@ func Update(obj withPK) (bool, error) {
 		case *Remark:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`remark` = ?")
-				params = append(params, c.GetRemark())
+				params = append(params, c.getRemarkForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsFavourite:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`is_favourite` = ?")
-				params = append(params, c.GetIsFavourite())
+				params = append(params, c.getIsFavouriteForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`created_at` = ?")
-				params = append(params, c.GetCreatedAt())
+				params = append(params, c.getCreatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`updated_at` = ?")
-				params = append(params, c.GetUpdatedAt())
+				params = append(params, c.getUpdatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

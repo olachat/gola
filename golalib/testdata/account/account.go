@@ -306,11 +306,11 @@ func (obj *Account) Update() (bool, error) {
 	var params []any
 	if obj.Type.IsUpdated() {
 		updatedFields = append(updatedFields, "`type` = ?")
-		params = append(params, obj.GetType())
+		params = append(params, obj.getTypeForDB())
 	}
 	if obj.Money.IsUpdated() {
 		updatedFields = append(updatedFields, "`money` = ?")
-		params = append(params, obj.GetMoney())
+		params = append(params, obj.getMoneyForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -355,13 +355,13 @@ func Update(obj withPK) (bool, error) {
 		case *Type:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`type` = ?")
-				params = append(params, c.GetType())
+				params = append(params, c.getTypeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Money:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`money` = ?")
-				params = append(params, c.GetMoney())
+				params = append(params, c.getMoneyForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

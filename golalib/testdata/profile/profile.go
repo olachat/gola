@@ -268,11 +268,11 @@ func (obj *Profile) Update() (bool, error) {
 	var params []any
 	if obj.Level.IsUpdated() {
 		updatedFields = append(updatedFields, "`level` = ?")
-		params = append(params, obj.GetLevel())
+		params = append(params, obj.getLevelForDB())
 	}
 	if obj.NickName.IsUpdated() {
 		updatedFields = append(updatedFields, "`nick_name` = ?")
-		params = append(params, obj.GetNickName())
+		params = append(params, obj.getNickNameForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -317,13 +317,13 @@ func Update(obj withPK) (bool, error) {
 		case *Level:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`level` = ?")
-				params = append(params, c.GetLevel())
+				params = append(params, c.getLevelForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *NickName:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`nick_name` = ?")
-				params = append(params, c.GetNickName())
+				params = append(params, c.getNickNameForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

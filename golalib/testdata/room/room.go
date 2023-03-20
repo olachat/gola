@@ -404,19 +404,19 @@ func (obj *Room) Update() (bool, error) {
 	var params []any
 	if obj.Group.IsUpdated() {
 		updatedFields = append(updatedFields, "`group` = ?")
-		params = append(params, obj.GetGroup())
+		params = append(params, obj.getGroupForDB())
 	}
 	if obj.Lang.IsUpdated() {
 		updatedFields = append(updatedFields, "`lang` = ?")
-		params = append(params, obj.GetLang())
+		params = append(params, obj.getLangForDB())
 	}
 	if obj.Priority.IsUpdated() {
 		updatedFields = append(updatedFields, "`priority` = ?")
-		params = append(params, obj.GetPriority())
+		params = append(params, obj.getPriorityForDB())
 	}
 	if obj.Deleted.IsUpdated() {
 		updatedFields = append(updatedFields, "`deleted` = ?")
-		params = append(params, obj.GetDeleted())
+		params = append(params, obj.getDeletedForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -461,25 +461,25 @@ func Update(obj withPK) (bool, error) {
 		case *Group:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`group` = ?")
-				params = append(params, c.GetGroup())
+				params = append(params, c.getGroupForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Lang:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`lang` = ?")
-				params = append(params, c.GetLang())
+				params = append(params, c.getLangForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Priority:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`priority` = ?")
-				params = append(params, c.GetPriority())
+				params = append(params, c.getPriorityForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Deleted:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`deleted` = ?")
-				params = append(params, c.GetDeleted())
+				params = append(params, c.getDeletedForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

@@ -3,6 +3,7 @@ package tests
 import (
 	"database/sql"
 	"fmt"
+	"math"
 	"testing"
 
 	sqle "github.com/dolthub/go-mysql-server"
@@ -101,18 +102,45 @@ insert into songs (id,title,type,manifest) values
 
 	_, err = db.Exec(`
 	insert into gifts (id,name,is_free,gift_count,gift_type,create_time,discount,price,remark,manifest,description,update_time,branches) values
-	(2,"name",1,3,'freebie',1678935576,7.5,255.33,'remark is long text','printable manifest','description text','2019-01-01 00:00:01','vivo,sentosa')
-	`)
+	(2,"name",1,3,'freebie',1678935576,7.5,255.33,'remark is long text','printable manifest','description text','2019-01-01 00:00:01','vivo,sentosa')`)
 	if err != nil {
 		panic("fail to insert gift. " + err.Error())
 	}
 
 	_, err = db.Exec(`
 	insert into gifts_with_default (id) values
-	(1)
-	`)
+	(1)`)
 	if err != nil {
 		panic("fail to insert gift_with_default. " + err.Error())
+	}
+
+	_, err = db.Exec(`
+	insert into gifts_with_default (id,name,is_free,gift_count,gift_type,create_time,discount,price,remark,manifest,description,update_time,branches) values
+	(2,"name",1,3,'freebie',1678935576,7.5,255.33,'remark is long text','printable manifest','description text','2019-01-01 00:00:01','vivo,sentosa')`)
+	if err != nil {
+		panic("fail to insert gift. " + err.Error())
+	}
+
+	_, err = db.Exec(`
+	insert into gifts_nn (id,name,is_free,gift_count,gift_type,create_time,discount,price,remark,manifest,description,update_time,branches) values
+	(1,"name",1,3,'freebie',1678935576,7.5,255.33,'remark is long text','printable manifest','description text','2019-01-01 00:00:01','vivo,sentosa')`)
+	if err != nil {
+		panic("fail to insert gift_with_default. " + err.Error())
+	}
+
+	_, err = db.Exec(`
+	insert into gifts_nn_with_default (id) values
+	(1)`)
+	if err != nil {
+		panic("fail to insert gifts_nn_with_default. " + err.Error())
+	}
+
+	_, err = db.Exec(`
+	insert into gifts_nn_with_default (id,name,is_free,gift_count,gift_type,create_time,discount,price,remark,manifest,description,update_time,branches) values
+	(2,"name",1,3,'freebie',1678935576,7.5,255.33,'remark is long text','printable manifest','description text','2019-01-01 00:00:01','vivo,sentosa')
+	`)
+	if err != nil {
+		panic("fail to insert gift. " + err.Error())
 	}
 }
 
@@ -316,6 +344,10 @@ func contains[T comparable](slice []T, item T) bool {
 		}
 	}
 	return false
+}
+
+func isFloatSimilar(expected float64, actual float64) bool {
+	return math.Abs(expected-actual) < 0.000001
 }
 
 func TestUserMethods(t *testing.T) {

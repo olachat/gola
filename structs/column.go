@@ -294,6 +294,17 @@ func (c Column) GetSetConst() string {
 	return strings.Join(elements, "\n")
 }
 
+// GetSetConstList returns a list of set const definitions in go
+func (c Column) GetSetConstList() string {
+	enums := strings.Split(strings.ReplaceAll(getValue(c.FullDBType), "'", ""), ",")
+	elements := make([]string, len(enums))
+	for i, enum := range enums {
+		elements[i] = `"` + enum + `"`
+	}
+
+	return strings.Join(elements, ",\n") + ","
+}
+
 // IsPrimaryKey returns if column is primary key
 func (c Column) IsPrimaryKey() bool {
 	if c.Table.PKey == nil {

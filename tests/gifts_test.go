@@ -158,7 +158,6 @@ func TestFetchGiftWithValue(t *testing.T) {
 	}
 }
 
-// TODO: insert and retrieve and compare, update and retrieve and compare
 func TestInsertRetrieveUpdate(t *testing.T) {
 	g1 := gifts.NewWithPK(21)
 	err := g1.Insert()
@@ -239,7 +238,7 @@ func TestInsertRetrieveUpdate(t *testing.T) {
 	if g22.GetDescription().Unwrap() != "describe 2" {
 		t.Error("wrong desc")
 	}
-	if g22.GetDiscount().Unwrap() != 4.67 {
+	if !isFloatSimilar(g22.GetDiscount().Unwrap(), 4.67) {
 		t.Error("wrong discount")
 	}
 	if g22.GetGiftCount().Unwrap() != 50 {
@@ -257,7 +256,7 @@ func TestInsertRetrieveUpdate(t *testing.T) {
 	if g22.GetName().Unwrap() != "gift 2" {
 		t.Error("wrong name")
 	}
-	if g22.GetPrice().Unwrap() != 65.555 {
+	if !isFloatSimilar(g22.GetPrice().Unwrap(), 65.555) {
 		t.Error("wrong price")
 	}
 	if g22.GetRemark().Unwrap() != "remark 2" {

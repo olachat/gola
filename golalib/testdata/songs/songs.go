@@ -527,27 +527,27 @@ func (obj *Song) Update() (bool, error) {
 	var params []any
 	if obj.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "`title` = ?")
-		params = append(params, obj.GetTitle())
+		params = append(params, obj.getTitleForDB())
 	}
 	if obj.Rank.IsUpdated() {
 		updatedFields = append(updatedFields, "`rank` = ?")
-		params = append(params, obj.GetRank())
+		params = append(params, obj.getRankForDB())
 	}
 	if obj.Type.IsUpdated() {
 		updatedFields = append(updatedFields, "`type` = ?")
-		params = append(params, obj.GetType())
+		params = append(params, obj.getTypeForDB())
 	}
 	if obj.Hash.IsUpdated() {
 		updatedFields = append(updatedFields, "`hash` = ?")
-		params = append(params, obj.GetHash())
+		params = append(params, obj.getHashForDB())
 	}
 	if obj.Remark.IsUpdated() {
 		updatedFields = append(updatedFields, "`remark` = ?")
-		params = append(params, obj.GetRemark())
+		params = append(params, obj.getRemarkForDB())
 	}
 	if obj.Manifest.IsUpdated() {
 		updatedFields = append(updatedFields, "`manifest` = ?")
-		params = append(params, obj.GetManifest())
+		params = append(params, obj.getManifestForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -592,37 +592,37 @@ func Update(obj withPK) (bool, error) {
 		case *Title:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`title` = ?")
-				params = append(params, c.GetTitle())
+				params = append(params, c.getTitleForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Rank:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`rank` = ?")
-				params = append(params, c.GetRank())
+				params = append(params, c.getRankForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Type:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`type` = ?")
-				params = append(params, c.GetType())
+				params = append(params, c.getTypeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Hash:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`hash` = ?")
-				params = append(params, c.GetHash())
+				params = append(params, c.getHashForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Remark:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`remark` = ?")
-				params = append(params, c.GetRemark())
+				params = append(params, c.getRemarkForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Manifest:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`manifest` = ?")
-				params = append(params, c.GetManifest())
+				params = append(params, c.getManifestForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

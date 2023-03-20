@@ -130,6 +130,15 @@ const (
 	UserSportsBadminton  UserSports = "badminton"
 )
 
+var UserSportsList = []string{
+	"swim",
+	"tennis",
+	"basketball",
+	"football",
+	"squash",
+	"badminton",
+}
+
 type UserSports2 string
 
 const (
@@ -141,6 +150,15 @@ const (
 	UserSports2Badminton  UserSports2 = "badminton"
 )
 
+var UserSports2List = []string{
+	"swim",
+	"tennis",
+	"basketball",
+	"football",
+	"squash",
+	"badminton",
+}
+
 type UserSportsNoDefault string
 
 const (
@@ -151,6 +169,15 @@ const (
 	UserSportsNoDefaultSquash     UserSportsNoDefault = "squash"
 	UserSportsNoDefaultBadminton  UserSportsNoDefault = "badminton"
 )
+
+var UserSportsNoDefaultList = []string{
+	"swim",
+	"tennis",
+	"basketball",
+	"football",
+	"squash",
+	"badminton",
+}
 
 // Id field
 type Id struct {
@@ -611,6 +638,9 @@ type Sports struct {
 
 func (c *Sports) GetSports() []UserSports {
 	strSlice := strings.Split(c.val, ",")
+	if len(strSlice) == 1 && !coredb.ValueInSet(UserSportsList, strSlice[0]) {
+		return []UserSports{}
+	}
 	valSlice := make([]UserSports, 0, len(strSlice))
 	for _, s := range strSlice {
 		valSlice = append(valSlice, UserSports(strings.ToLower(s)))
@@ -669,6 +699,9 @@ type Sports2 struct {
 
 func (c *Sports2) GetSports2() []UserSports2 {
 	strSlice := strings.Split(c.val, ",")
+	if len(strSlice) == 1 && !coredb.ValueInSet(UserSports2List, strSlice[0]) {
+		return []UserSports2{}
+	}
 	valSlice := make([]UserSports2, 0, len(strSlice))
 	for _, s := range strSlice {
 		valSlice = append(valSlice, UserSports2(strings.ToLower(s)))
@@ -727,6 +760,9 @@ type SportsNoDefault struct {
 
 func (c *SportsNoDefault) GetSportsNoDefault() []UserSportsNoDefault {
 	strSlice := strings.Split(c.val, ",")
+	if len(strSlice) == 1 && !coredb.ValueInSet(UserSportsNoDefaultList, strSlice[0]) {
+		return []UserSportsNoDefault{}
+	}
 	valSlice := make([]UserSportsNoDefault, 0, len(strSlice))
 	for _, s := range strSlice {
 		valSlice = append(valSlice, UserSportsNoDefault(strings.ToLower(s)))
@@ -873,47 +909,47 @@ func (obj *User) Update() (bool, error) {
 	var params []any
 	if obj.Name.IsUpdated() {
 		updatedFields = append(updatedFields, "`name` = ?")
-		params = append(params, obj.GetName())
+		params = append(params, obj.getNameForDB())
 	}
 	if obj.Email.IsUpdated() {
 		updatedFields = append(updatedFields, "`email` = ?")
-		params = append(params, obj.GetEmail())
+		params = append(params, obj.getEmailForDB())
 	}
 	if obj.CreatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`created_at` = ?")
-		params = append(params, obj.GetCreatedAt())
+		params = append(params, obj.getCreatedAtForDB())
 	}
 	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`updated_at` = ?")
-		params = append(params, obj.GetUpdatedAt())
+		params = append(params, obj.getUpdatedAtForDB())
 	}
 	if obj.FloatType.IsUpdated() {
 		updatedFields = append(updatedFields, "`float_type` = ?")
-		params = append(params, obj.GetFloatType())
+		params = append(params, obj.getFloatTypeForDB())
 	}
 	if obj.DoubleType.IsUpdated() {
 		updatedFields = append(updatedFields, "`double_type` = ?")
-		params = append(params, obj.GetDoubleType())
+		params = append(params, obj.getDoubleTypeForDB())
 	}
 	if obj.Hobby.IsUpdated() {
 		updatedFields = append(updatedFields, "`hobby` = ?")
-		params = append(params, obj.GetHobby())
+		params = append(params, obj.getHobbyForDB())
 	}
 	if obj.HobbyNoDefault.IsUpdated() {
 		updatedFields = append(updatedFields, "`hobby_no_default` = ?")
-		params = append(params, obj.GetHobbyNoDefault())
+		params = append(params, obj.getHobbyNoDefaultForDB())
 	}
 	if obj.Sports.IsUpdated() {
 		updatedFields = append(updatedFields, "`sports` = ?")
-		params = append(params, obj.GetSports())
+		params = append(params, obj.getSportsForDB())
 	}
 	if obj.Sports2.IsUpdated() {
 		updatedFields = append(updatedFields, "`sports2` = ?")
-		params = append(params, obj.GetSports2())
+		params = append(params, obj.getSports2ForDB())
 	}
 	if obj.SportsNoDefault.IsUpdated() {
 		updatedFields = append(updatedFields, "`sports_no_default` = ?")
-		params = append(params, obj.GetSportsNoDefault())
+		params = append(params, obj.getSportsNoDefaultForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -958,67 +994,67 @@ func Update(obj withPK) (bool, error) {
 		case *Name:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`name` = ?")
-				params = append(params, c.GetName())
+				params = append(params, c.getNameForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Email:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`email` = ?")
-				params = append(params, c.GetEmail())
+				params = append(params, c.getEmailForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`created_at` = ?")
-				params = append(params, c.GetCreatedAt())
+				params = append(params, c.getCreatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`updated_at` = ?")
-				params = append(params, c.GetUpdatedAt())
+				params = append(params, c.getUpdatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *FloatType:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`float_type` = ?")
-				params = append(params, c.GetFloatType())
+				params = append(params, c.getFloatTypeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *DoubleType:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`double_type` = ?")
-				params = append(params, c.GetDoubleType())
+				params = append(params, c.getDoubleTypeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Hobby:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`hobby` = ?")
-				params = append(params, c.GetHobby())
+				params = append(params, c.getHobbyForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *HobbyNoDefault:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`hobby_no_default` = ?")
-				params = append(params, c.GetHobbyNoDefault())
+				params = append(params, c.getHobbyNoDefaultForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Sports:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`sports` = ?")
-				params = append(params, c.GetSports())
+				params = append(params, c.getSportsForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Sports2:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`sports2` = ?")
-				params = append(params, c.GetSports2())
+				params = append(params, c.getSports2ForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *SportsNoDefault:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`sports_no_default` = ?")
-				params = append(params, c.GetSportsNoDefault())
+				params = append(params, c.getSportsNoDefaultForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

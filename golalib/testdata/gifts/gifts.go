@@ -126,6 +126,13 @@ const (
 	GiftBranchesChangi  GiftBranches = "changi"
 )
 
+var GiftBranchesList = []string{
+	"orchard",
+	"vivo",
+	"sentosa",
+	"changi",
+}
+
 // Id field
 type Id struct {
 	isAssigned bool
@@ -749,6 +756,9 @@ func (c *Branches) GetBranches() goption.Option[[]GiftBranches] {
 		return goption.None[[]GiftBranches]()
 	}
 	strSlice := strings.Split(c.val.Unwrap(), ",")
+	if len(strSlice) == 1 && !coredb.ValueInSet(GiftBranchesList, strSlice[0]) {
+		return goption.Some([]GiftBranches{})
+	}
 	valSlice := make([]GiftBranches, 0, len(strSlice))
 	for _, s := range strSlice {
 		valSlice = append(valSlice, GiftBranches(strings.ToLower(s)))
@@ -901,51 +911,51 @@ func (obj *Gift) Update() (bool, error) {
 	var params []any
 	if obj.Name.IsUpdated() {
 		updatedFields = append(updatedFields, "`name` = ?")
-		params = append(params, obj.GetName())
+		params = append(params, obj.getNameForDB())
 	}
 	if obj.IsFree.IsUpdated() {
 		updatedFields = append(updatedFields, "`is_free` = ?")
-		params = append(params, obj.GetIsFree())
+		params = append(params, obj.getIsFreeForDB())
 	}
 	if obj.GiftCount.IsUpdated() {
 		updatedFields = append(updatedFields, "`gift_count` = ?")
-		params = append(params, obj.GetGiftCount())
+		params = append(params, obj.getGiftCountForDB())
 	}
 	if obj.GiftType.IsUpdated() {
 		updatedFields = append(updatedFields, "`gift_type` = ?")
-		params = append(params, obj.GetGiftType())
+		params = append(params, obj.getGiftTypeForDB())
 	}
 	if obj.CreateTime.IsUpdated() {
 		updatedFields = append(updatedFields, "`create_time` = ?")
-		params = append(params, obj.GetCreateTime())
+		params = append(params, obj.getCreateTimeForDB())
 	}
 	if obj.Discount.IsUpdated() {
 		updatedFields = append(updatedFields, "`discount` = ?")
-		params = append(params, obj.GetDiscount())
+		params = append(params, obj.getDiscountForDB())
 	}
 	if obj.Price.IsUpdated() {
 		updatedFields = append(updatedFields, "`price` = ?")
-		params = append(params, obj.GetPrice())
+		params = append(params, obj.getPriceForDB())
 	}
 	if obj.Remark.IsUpdated() {
 		updatedFields = append(updatedFields, "`remark` = ?")
-		params = append(params, obj.GetRemark())
+		params = append(params, obj.getRemarkForDB())
 	}
 	if obj.Manifest.IsUpdated() {
 		updatedFields = append(updatedFields, "`manifest` = ?")
-		params = append(params, obj.GetManifest())
+		params = append(params, obj.getManifestForDB())
 	}
 	if obj.Description.IsUpdated() {
 		updatedFields = append(updatedFields, "`description` = ?")
-		params = append(params, obj.GetDescription())
+		params = append(params, obj.getDescriptionForDB())
 	}
 	if obj.UpdateTime.IsUpdated() {
 		updatedFields = append(updatedFields, "`update_time` = ?")
-		params = append(params, obj.GetUpdateTime())
+		params = append(params, obj.getUpdateTimeForDB())
 	}
 	if obj.Branches.IsUpdated() {
 		updatedFields = append(updatedFields, "`branches` = ?")
-		params = append(params, obj.GetBranches())
+		params = append(params, obj.getBranchesForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -990,73 +1000,73 @@ func Update(obj withPK) (bool, error) {
 		case *Name:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`name` = ?")
-				params = append(params, c.GetName())
+				params = append(params, c.getNameForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsFree:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`is_free` = ?")
-				params = append(params, c.GetIsFree())
+				params = append(params, c.getIsFreeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *GiftCount:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`gift_count` = ?")
-				params = append(params, c.GetGiftCount())
+				params = append(params, c.getGiftCountForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *GiftType:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`gift_type` = ?")
-				params = append(params, c.GetGiftType())
+				params = append(params, c.getGiftTypeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreateTime:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`create_time` = ?")
-				params = append(params, c.GetCreateTime())
+				params = append(params, c.getCreateTimeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Discount:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`discount` = ?")
-				params = append(params, c.GetDiscount())
+				params = append(params, c.getDiscountForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Price:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`price` = ?")
-				params = append(params, c.GetPrice())
+				params = append(params, c.getPriceForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Remark:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`remark` = ?")
-				params = append(params, c.GetRemark())
+				params = append(params, c.getRemarkForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Manifest:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`manifest` = ?")
-				params = append(params, c.GetManifest())
+				params = append(params, c.getManifestForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Description:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`description` = ?")
-				params = append(params, c.GetDescription())
+				params = append(params, c.getDescriptionForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdateTime:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`update_time` = ?")
-				params = append(params, c.GetUpdateTime())
+				params = append(params, c.getUpdateTimeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Branches:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`branches` = ?")
-				params = append(params, c.GetBranches())
+				params = append(params, c.getBranchesForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}
