@@ -1,6 +1,7 @@
 package structs
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -53,54 +54,109 @@ var dbTypeToGoTypes = map[string]string{
 	"mediumint unsigned": "uint",
 	"int unsigned":       "uint",
 	"bigint unsigned":    "uint64",
-	"float":              "float32",
+	"float":              "float64",
 	"double":             "float64",
 }
 
-// GoType returns type in go of the column
+func (c Column) GoSetEnumType() string {
+	return c.Table.ClassName() + c.GoName()
+}
+func (c Column) GoSetNullableType() string {
+	return fmt.Sprintf("goption.Option[[]%s]", c.Table.ClassName()+c.GoName())
+}
+func (c Column) GoEnumNullableType() string {
+	return fmt.Sprintf("goption.Option[%s]", c.Table.ClassName()+c.GoName())
+}
+
+func (c Column) ValType() string {
+	if c.FullDBType == "tinyint(1)" {
+		if c.Nullable {
+			return "goption.Option[int]"
+		}
+		return "bool"
+	}
+	if c.IsSet() {
+		if c.Nullable {
+			return "goption.Option[string]"
+		} else {
+			return "string"
+		}
+	}
+	return c.GoType()
+}
+
+// GoType returns type in go of the column.
+// Uses goption for nullable fields
 func (c Column) GoType() string {
 	if c.FullDBType == "tinyint(1)" {
+		if c.Nullable {
+			return "goption.Option[bool]"
+		}
 		return "bool"
 	}
 
 	for dbType, goType := range dbTypeToGoTypes {
 		if c.DBType == dbType || strings.HasPrefix(c.DBType, dbType+"(") {
+			if c.Nullable {
+				return fmt.Sprintf("goption.Option[%s]", goType)
+			}
 			return goType
 		}
 	}
 
 	if strings.HasPrefix(c.DBType, "varchar") || strings.HasPrefix(c.DBType, "char") {
 		if c.Nullable {
-			return "null.String"
+			return "goption.Option[string]"
 		}
 		return "string"
 	}
 
 	if strings.HasPrefix(c.DBType, "varbinary") || strings.HasPrefix(c.DBType, "binary") {
+		if c.Nullable {
+			return "goption.Option[[]byte]"
+		}
 		return "[]byte"
 	}
 
 	if strings.HasPrefix(c.DBType, "decimal") {
-		return "float32"
+		if c.Nullable {
+			return "goption.Option[float64]"
+		}
+		return "float64"
 	}
 
 	if c.IsEnum() {
+		if c.Nullable {
+			return fmt.Sprintf("goption.Option[%s]", c.Table.ClassName()+c.GoName())
+		}
 		return c.Table.ClassName() + c.GoName()
 	}
 
 	if c.IsSet() {
+		if c.Nullable {
+			return fmt.Sprintf("goption.Option[[]%s]", c.Table.ClassName()+c.GoName())
+		}
 		return c.Table.ClassName() + c.GoName()
 	}
 
 	if strings.HasPrefix(c.DBType, "set") {
+		if c.Nullable {
+			return "goption.Option[string]"
+		}
 		return "string"
 	}
 
 	if strings.Contains(c.DBType, "text") || strings.HasPrefix(c.DBType, "blob") {
+		if c.Nullable {
+			return "goption.Option[string]"
+		}
 		return "string"
 	}
 
 	if strings.HasPrefix(c.DBType, "timestamp") {
+		if c.Nullable {
+			return "goption.Option[time.Time]"
+		}
 		return "time.Time"
 	}
 
@@ -123,12 +179,8 @@ func (c Column) GoName() string {
 }
 
 // IsNullable returns if the column is nullable as string
-func (c Column) IsNullable() string {
-	if c.Nullable {
-		return "true"
-	}
-
-	return "false"
+func (c Column) IsNullable() bool {
+	return c.Nullable
 }
 
 // HasDefault returns if the column has default value
@@ -149,12 +201,19 @@ func getQuotedStr(str string) string {
 
 // GoDefaultValue returns the go value of column's default value
 func (c Column) GoDefaultValue() string {
-	goType := c.GoType()
+	valType := c.ValType()
 	lowerCaseDefault := strings.ToLower(c.Default)
-	if goType == "string" || c.IsEnum() {
+
+	if strings.Contains(valType, "goption") && c.IsEnum() {
+		return strings.ReplaceAll(valType, "Option", "Some") + "(\"" + c.Default + "\")"
+	} else if valType == "string" || c.IsEnum() {
 		return getQuotedStr(lowerCaseDefault)
 	}
-	if goType == "string" || c.IsSet() {
+
+	if valType == "goption.Option[string]" {
+		return fmt.Sprintf("goption.Some[string](%s)", getQuotedStr(lowerCaseDefault))
+	}
+	if valType == "string" || c.IsSet() {
 		lowerCaseNoSpaceDefault := strings.ReplaceAll(lowerCaseDefault, " ", "")
 		if strings.HasPrefix(lowerCaseNoSpaceDefault, "(") && strings.HasSuffix(lowerCaseNoSpaceDefault, ")") {
 			return lowerCaseNoSpaceDefault[1 : len(lowerCaseNoSpaceDefault)-1]
@@ -162,25 +221,45 @@ func (c Column) GoDefaultValue() string {
 		return getQuotedStr(lowerCaseDefault)
 	}
 
-	if goType == "time.Time" {
+	if valType == "time.Time" {
 		if strings.Contains(c.Default, "CURRENT_TIMESTAMP") {
 			return "time.Now()"
 		}
-		return c.Default
+		return fmt.Sprintf("coredb.MustParseTime(\"%s\")", c.Default)
+	}
+	if valType == "goption.Option[time.Time]" {
+		if strings.Contains(c.Default, "CURRENT_TIMESTAMP") {
+			return "goption.Some[time.Time](time.Now())"
+		}
+		return fmt.Sprintf("goption.Some[time.Time](coredb.MustParseTime(\"%s\"))", c.Default)
 	}
 
-	if goType == "bool" {
+	if valType == "bool" {
 		if c.Default == "0" {
 			return "false"
 		}
 		return "true"
+	} else if valType == "goption.Option[bool]" {
+		var s string
+		if c.Default == "0" {
+			s = "false"
+		}
+		s = "true"
+		return fmt.Sprintf("goption.Some[bool](%s)", s)
 	}
 
-	if strings.Contains(goType, "int") || strings.Contains(goType, "float") {
-		return goType + "(" + strings.ReplaceAll(c.Default, `"`, "") + ")"
+	if (strings.Contains(valType, "int") || strings.Contains(valType, "float")) &&
+		strings.Contains(valType, "goption") {
+		return strings.ReplaceAll(valType, "Option", "Some") + "(" + strings.ReplaceAll(c.Default, `"`, "") + ")"
+	} else if strings.Contains(valType, "int") || strings.Contains(valType, "float") {
+		return valType + "(" + strings.ReplaceAll(c.Default, `"`, "") + ")"
 	}
 
-	return goType + "(" + c.Default + ")"
+	if valType == "goption.Option[[]byte]" {
+		return strings.ReplaceAll(valType, "Option", "Some") + "([]byte(\"" + c.Default + "\"))"
+	}
+
+	return valType + "(\"" + c.Default + "\")"
 }
 
 // IsEnum returns if column type is enum
@@ -198,12 +277,17 @@ func (c Column) IsBool() bool {
 	return c.FullDBType == "tinyint(1)"
 }
 
+// IsNullableBool returns if column type is boolean as tinyint(1) and nullable
+func (c Column) IsNullableBool() bool {
+	return c.FullDBType == "tinyint(1)" && c.Nullable
+}
+
 // GetEnumConst returns enum const definitions in go
 func (c Column) GetEnumConst() string {
 	enums := strings.Split(strings.ReplaceAll(getValue(c.FullDBType), "'", ""), ",")
 	elements := make([]string, len(enums))
 	for i, enum := range enums {
-		elements[i] = c.GoType() + getGoName(enum) + " " + c.GoType() + " = " + `"` + enum + `"`
+		elements[i] = c.Table.ClassName() + c.GoName() + getGoName(enum) + " " + c.Table.ClassName() + c.GoName() + " = " + `"` + enum + `"`
 	}
 
 	return strings.Join(elements, "\n")
@@ -214,10 +298,21 @@ func (c Column) GetSetConst() string {
 	enums := strings.Split(strings.ReplaceAll(getValue(c.FullDBType), "'", ""), ",")
 	elements := make([]string, len(enums))
 	for i, enum := range enums {
-		elements[i] = c.GoType() + getGoName(enum) + " " + c.GoType() + " = " + `"` + enum + `"`
+		elements[i] = c.Table.ClassName() + c.GoName() + getGoName(enum) + " " + c.Table.ClassName() + c.GoName() + " = " + `"` + enum + `"`
 	}
 
 	return strings.Join(elements, "\n")
+}
+
+// GetSetConstList returns a list of set const definitions in go
+func (c Column) GetSetConstList() string {
+	enums := strings.Split(strings.ReplaceAll(getValue(c.FullDBType), "'", ""), ",")
+	elements := make([]string, len(enums))
+	for i, enum := range enums {
+		elements[i] = `"` + enum + `"`
+	}
+
+	return strings.Join(elements, ",\n") + ","
 }
 
 // IsPrimaryKey returns if column is primary key

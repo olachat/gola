@@ -18,7 +18,8 @@ import (
 	"github.com/olachat/gola/structs"
 )
 
-/*Run gola to perform code gen
+/*
+Run gola to perform code gen
 
 `output`: output folder path
 */

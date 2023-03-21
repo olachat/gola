@@ -88,7 +88,6 @@ const (
 )
 
 // UserId field
-//
 type UserId struct {
 	val int
 }
@@ -103,6 +102,10 @@ func (c *UserId) GetColumnName() string {
 
 func (c *UserId) GetValPointer() any {
 	return &c.val
+}
+
+func (c *UserId) getUserIdForDB() int {
+	return c.val
 }
 
 func (c *UserId) MarshalJSON() ([]byte, error) {
@@ -153,6 +156,10 @@ func (c *Type) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Type) getTypeForDB() AccountType {
+	return c.val
+}
+
 func (c *Type) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -181,6 +188,10 @@ func (c *CountryCode) GetColumnName() string {
 
 func (c *CountryCode) GetValPointer() any {
 	return &c.val
+}
+
+func (c *CountryCode) getCountryCodeForDB() uint {
+	return c.val
 }
 
 func (c *CountryCode) MarshalJSON() ([]byte, error) {
@@ -231,6 +242,10 @@ func (c *Money) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Money) getMoneyForDB() int {
+	return c.val
+}
+
 func (c *Money) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -257,13 +272,13 @@ func NewWithPK(val PK) *Account {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
 
 // Insert Account struct to `account` table
 func (c *Account) Insert() error {
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getTypeForDB(), c.getCountryCodeForDB(), c.getMoneyForDB())
 	if err != nil {
 		return err
 	}
@@ -291,11 +306,11 @@ func (obj *Account) Update() (bool, error) {
 	var params []any
 	if obj.Type.IsUpdated() {
 		updatedFields = append(updatedFields, "`type` = ?")
-		params = append(params, obj.GetType())
+		params = append(params, obj.getTypeForDB())
 	}
 	if obj.Money.IsUpdated() {
 		updatedFields = append(updatedFields, "`money` = ?")
-		params = append(params, obj.GetMoney())
+		params = append(params, obj.getMoneyForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -340,13 +355,13 @@ func Update(obj withPK) (bool, error) {
 		case *Type:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`type` = ?")
-				params = append(params, c.GetType())
+				params = append(params, c.getTypeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Money:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`money` = ?")
-				params = append(params, c.GetMoney())
+				params = append(params, c.getMoneyForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

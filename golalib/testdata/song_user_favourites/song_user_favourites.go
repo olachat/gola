@@ -105,6 +105,10 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UserId) getUserIdForDB() uint {
+	return c.val
+}
+
 func (c *UserId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -133,6 +137,10 @@ func (c *SongId) GetColumnName() string {
 
 func (c *SongId) GetValPointer() any {
 	return &c.val
+}
+
+func (c *SongId) getSongIdForDB() uint {
+	return c.val
 }
 
 func (c *SongId) MarshalJSON() ([]byte, error) {
@@ -183,6 +191,10 @@ func (c *Remark) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Remark) getRemarkForDB() string {
+	return c.val
+}
+
 func (c *Remark) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -229,6 +241,10 @@ func (c *IsFavourite) GetColumnName() string {
 
 func (c *IsFavourite) GetValPointer() any {
 	return &c.val
+}
+
+func (c *IsFavourite) getIsFavouriteForDB() bool {
+	return c.val
 }
 
 func (c *IsFavourite) MarshalJSON() ([]byte, error) {
@@ -279,6 +295,10 @@ func (c *CreatedAt) GetValPointer() any {
 	return &c.val
 }
 
+func (c *CreatedAt) getCreatedAtForDB() time.Time {
+	return c.val
+}
+
 func (c *CreatedAt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -327,6 +347,10 @@ func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UpdatedAt) getUpdatedAtForDB() time.Time {
+	return c.val
+}
+
 func (c *UpdatedAt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -355,13 +379,13 @@ func NewWithPK(val PK) *SongUserFavourite {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `song_user_favourites` (`user_id`, `song_id`, `remark`, `is_favourite`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `song_user_favourites` (`user_id`, `song_id`, `remark`, `is_favourite`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)"
 
 // Insert SongUserFavourite struct to `song_user_favourites` table
 func (c *SongUserFavourite) Insert() error {
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetSongId(), c.GetRemark(), c.GetIsFavourite(), c.GetCreatedAt(), c.GetUpdatedAt())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getSongIdForDB(), c.getRemarkForDB(), c.getIsFavouriteForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB())
 	if err != nil {
 		return err
 	}
@@ -391,19 +415,19 @@ func (obj *SongUserFavourite) Update() (bool, error) {
 	var params []any
 	if obj.Remark.IsUpdated() {
 		updatedFields = append(updatedFields, "`remark` = ?")
-		params = append(params, obj.GetRemark())
+		params = append(params, obj.getRemarkForDB())
 	}
 	if obj.IsFavourite.IsUpdated() {
 		updatedFields = append(updatedFields, "`is_favourite` = ?")
-		params = append(params, obj.GetIsFavourite())
+		params = append(params, obj.getIsFavouriteForDB())
 	}
 	if obj.CreatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`created_at` = ?")
-		params = append(params, obj.GetCreatedAt())
+		params = append(params, obj.getCreatedAtForDB())
 	}
 	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`updated_at` = ?")
-		params = append(params, obj.GetUpdatedAt())
+		params = append(params, obj.getUpdatedAtForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -448,25 +472,25 @@ func Update(obj withPK) (bool, error) {
 		case *Remark:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`remark` = ?")
-				params = append(params, c.GetRemark())
+				params = append(params, c.getRemarkForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsFavourite:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`is_favourite` = ?")
-				params = append(params, c.GetIsFavourite())
+				params = append(params, c.getIsFavouriteForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`created_at` = ?")
-				params = append(params, c.GetCreatedAt())
+				params = append(params, c.getCreatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`updated_at` = ?")
-				params = append(params, c.GetUpdatedAt())
+				params = append(params, c.getUpdatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

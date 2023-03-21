@@ -5,7 +5,7 @@ CREATE TABLE `songs` (
   `type` enum('', '101', '1+9', '%1', '0.9') DEFAULT '',
   `hash` varchar(128) NOT NULL DEFAULT '' COMMENT 'Song file hash checksum',
   `remark` varchar(128),
-  `manifest` varbinary(255) NOT NULL,
+  `manifest` varbinary(255) NOT NULL DEFAULT 'man',
   PRIMARY KEY (`id`),
   UNIQUE KEY `hash` (`hash`),
   KEY `remark` (`remark`),
