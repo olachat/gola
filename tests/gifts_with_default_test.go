@@ -167,7 +167,7 @@ func TestGiftWithDefaultInsertRetrieveUpdate(t *testing.T) {
 	}))
 	gOut.SetCreateTime(goption.Some[int64](111))
 	gOut.SetDescription(goption.Some("describe 2"))
-	gOut.SetDiscount(goption.Some(4.67))
+	gOut.SetDiscount(goption.Some[float32](4.67))
 	gOut.SetGiftCount(goption.Some[int16](50))
 	gOut.SetGiftType(goption.Some(gifts_with_default.GiftsWithDefaultGiftTypeSovenir))
 	gOut.SetIsFree(goption.Some(true))

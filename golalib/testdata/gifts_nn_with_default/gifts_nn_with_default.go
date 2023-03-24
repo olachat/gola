@@ -428,14 +428,14 @@ func (c *CreateTime) UnmarshalJSON(data []byte) error {
 // Discount field
 type Discount struct {
 	_updated bool
-	val      float64
+	val      float32
 }
 
-func (c *Discount) GetDiscount() float64 {
+func (c *Discount) GetDiscount() float32 {
 	return c.val
 }
 
-func (c *Discount) SetDiscount(val float64) bool {
+func (c *Discount) SetDiscount(val float32) bool {
 	if c.val == val {
 		return false
 	}
@@ -460,7 +460,7 @@ func (c *Discount) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Discount) getDiscountForDB() float64 {
+func (c *Discount) getDiscountForDB() float32 {
 	return c.val
 }
 
@@ -848,7 +848,7 @@ func New() *GiftsNnWithDefault {
 		GiftCount{val: int16(1)},
 		GiftType{val: "membership"},
 		CreateTime{val: int64(999)},
-		Discount{val: float64(0.1)},
+		Discount{val: float32(0.1)},
 		Price{val: float64(5)},
 		Remark{val: "hope you like it"},
 		Manifest{val: []byte("manifest data")},
@@ -869,7 +869,7 @@ func NewWithPK(val uint) *GiftsNnWithDefault {
 		GiftCount{val: int16(1)},
 		GiftType{val: "membership"},
 		CreateTime{val: int64(999)},
-		Discount{val: float64(0.1)},
+		Discount{val: float32(0.1)},
 		Price{val: float64(5)},
 		Remark{val: "hope you like it"},
 		Manifest{val: []byte("manifest data")},

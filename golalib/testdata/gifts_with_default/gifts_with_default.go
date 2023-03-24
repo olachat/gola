@@ -447,14 +447,14 @@ func (c *CreateTime) UnmarshalJSON(data []byte) error {
 // Discount field
 type Discount struct {
 	_updated bool
-	val      goption.Option[float64]
+	val      goption.Option[float32]
 }
 
-func (c *Discount) GetDiscount() goption.Option[float64] {
+func (c *Discount) GetDiscount() goption.Option[float32] {
 	return c.val
 }
 
-func (c *Discount) SetDiscount(val goption.Option[float64]) bool {
+func (c *Discount) SetDiscount(val goption.Option[float32]) bool {
 	if c.val == val {
 		return false
 	}
@@ -479,7 +479,7 @@ func (c *Discount) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Discount) getDiscountForDB() goption.Option[float64] {
+func (c *Discount) getDiscountForDB() goption.Option[float32] {
 	return c.val
 }
 
@@ -873,7 +873,7 @@ func New() *GiftsWithDefault {
 		GiftCount{val: goption.Some[int16](1)},
 		GiftType{val: goption.Some[GiftsWithDefaultGiftType]("membership")},
 		CreateTime{val: goption.Some[int64](999)},
-		Discount{val: goption.Some[float64](0.1)},
+		Discount{val: goption.Some[float32](0.1)},
 		Price{val: goption.Some[float64](5)},
 		Remark{val: goption.Some[string]("hope you like it")},
 		Manifest{val: goption.Some[[]byte]([]byte("manifest data"))},
@@ -894,7 +894,7 @@ func NewWithPK(val uint) *GiftsWithDefault {
 		GiftCount{val: goption.Some[int16](1)},
 		GiftType{val: goption.Some[GiftsWithDefaultGiftType]("membership")},
 		CreateTime{val: goption.Some[int64](999)},
-		Discount{val: goption.Some[float64](0.1)},
+		Discount{val: goption.Some[float32](0.1)},
 		Price{val: goption.Some[float64](5)},
 		Remark{val: goption.Some[string]("hope you like it")},
 		Manifest{val: goption.Some[[]byte]([]byte("manifest data"))},

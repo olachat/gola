@@ -425,14 +425,14 @@ func (c *UpdatedAt) UnmarshalJSON(data []byte) error {
 // float
 type FloatType struct {
 	_updated bool
-	val      float64
+	val      float32
 }
 
-func (c *FloatType) GetFloatType() float64 {
+func (c *FloatType) GetFloatType() float32 {
 	return c.val
 }
 
-func (c *FloatType) SetFloatType(val float64) bool {
+func (c *FloatType) SetFloatType(val float32) bool {
 	if c.val == val {
 		return false
 	}
@@ -457,7 +457,7 @@ func (c *FloatType) GetValPointer() any {
 	return &c.val
 }
 
-func (c *FloatType) getFloatTypeForDB() float64 {
+func (c *FloatType) getFloatTypeForDB() float32 {
 	return c.val
 }
 
@@ -820,7 +820,7 @@ func New() *User {
 		Email{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
-		FloatType{val: float64(0)},
+		FloatType{val: float32(0)},
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
@@ -839,7 +839,7 @@ func NewWithPK(val int) *User {
 		Email{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
-		FloatType{val: float64(0)},
+		FloatType{val: float32(0)},
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},

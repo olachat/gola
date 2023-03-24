@@ -54,7 +54,7 @@ var dbTypeToGoTypes = map[string]string{
 	"mediumint unsigned": "uint",
 	"int unsigned":       "uint",
 	"bigint unsigned":    "uint64",
-	"float":              "float64",
+	"float":              "float32",
 	"double":             "float64",
 }
 
@@ -120,9 +120,9 @@ func (c Column) GoType() string {
 
 	if strings.HasPrefix(c.DBType, "decimal") {
 		if c.Nullable {
-			return "goption.Option[float64]"
+			return "goption.Option[float32]"
 		}
-		return "float64"
+		return "float32"
 	}
 
 	if c.IsEnum() {

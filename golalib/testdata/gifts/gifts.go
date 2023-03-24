@@ -445,14 +445,14 @@ func (c *CreateTime) UnmarshalJSON(data []byte) error {
 // Discount field
 type Discount struct {
 	_updated bool
-	val      goption.Option[float64]
+	val      goption.Option[float32]
 }
 
-func (c *Discount) GetDiscount() goption.Option[float64] {
+func (c *Discount) GetDiscount() goption.Option[float32] {
 	return c.val
 }
 
-func (c *Discount) SetDiscount(val goption.Option[float64]) bool {
+func (c *Discount) SetDiscount(val goption.Option[float32]) bool {
 	if c.val == val {
 		return false
 	}
@@ -477,7 +477,7 @@ func (c *Discount) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Discount) getDiscountForDB() goption.Option[float64] {
+func (c *Discount) getDiscountForDB() goption.Option[float32] {
 	return c.val
 }
 
