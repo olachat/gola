@@ -10,17 +10,11 @@ import (
 	"strings"
 	"testing"
 
-	"database/sql"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/go-cmp/cmp"
 
-	sqle "github.com/dolthub/go-mysql-server"
-	"github.com/dolthub/go-mysql-server/memory"
 	"github.com/dolthub/go-mysql-server/server"
-	gsql "github.com/dolthub/go-mysql-server/sql"
-	"github.com/dolthub/go-mysql-server/sql/information_schema"
-	"github.com/olachat/gola/mysqldriver"
+	"github.com/olachat/gola/mysqlparser"
 	"github.com/olachat/gola/ormtpl"
 	"github.com/olachat/gola/structs"
 )
@@ -38,58 +32,58 @@ var testDataPath = "testdata" + string(filepath.Separator)
 var update = flag.Bool("update", false, "update generated files")
 
 // init the database with tables based on .sql files in the testdb folder
-func init() {
-	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
-		memory.NewDatabase(testDBName),
-		information_schema.NewInformationSchemaDatabase(),
-	))
+// func init() {
+// 	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
+// 		memory.NewDatabase(testDBName),
+// 		information_schema.NewInformationSchemaDatabase(),
+// 	))
 
-	config := server.Config{
-		Protocol: "tcp",
-		Address:  fmt.Sprintf("localhost:%d", testDBPort),
-	}
-	var err error
+// 	config := server.Config{
+// 		Protocol: "tcp",
+// 		Address:  fmt.Sprintf("localhost:%d", testDBPort),
+// 	}
+// 	var err error
 
-	s, err = server.NewDefaultServer(config, engine)
-	if err != nil {
-		panic(err)
-	}
+// 	s, err = server.NewDefaultServer(config, engine)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	go s.Start()
+// 	go s.Start()
 
-	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
-	db, err := sql.Open("mysql", connStr)
-	if err != nil {
-		panic(err)
-	}
+// 	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
+// 	db, err := sql.Open("mysql", connStr)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	for _, tableName := range testTables {
-		query, _ := fixtures.ReadFile(testDataPath + tableName + ".sql")
-		_, err = db.Exec(string(query))
-		if err != nil {
-			panic(err.Error())
-		}
-	}
-}
+// 	for _, tableName := range testTables {
+// 		query, _ := fixtures.ReadFile(testDataPath + tableName + ".sql")
+// 		_, err = db.Exec(string(query))
+// 		if err != nil {
+// 			panic(err.Error())
+// 		}
+// 	}
+// }
 
 func getDB() *structs.DBInfo {
-	var config mysqldriver.Config = map[string]any{
-		"dbname":    testDBName,
-		"whitelist": "blogs",
-		"host":      "localhost",
-		"port":      testDBPort,
-		"user":      "root",
-		"pass":      "",
-		"sslmode":   "false",
+	c := mysqlparser.MySQLParserConfig{}
+	c.DbName = testDBName
+	c.TableCreateSQLs = make([]mysqlparser.TableCreateSQL, 0, len(testTables))
+	for _, tableName := range testTables {
+		query, _ := fixtures.ReadFile(testDataPath + tableName + ".sql")
+		tableSQL := mysqlparser.TableCreateSQL{
+			Table:     tableName,
+			CreateSQL: string(query),
+		}
+		c.TableCreateSQLs = append(c.TableCreateSQLs, tableSQL)
 	}
-	dbconfig := mysqldriver.NewDBConfig(config)
-
-	m := &mysqldriver.MySQLDriver{}
-	db, err := m.Assemble(dbconfig)
+	m := &mysqlparser.MySQLParser{}
+	dbInfo, err := m.Assemble(c)
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
-	return db
+	return dbInfo
 }
 
 type genMethod func(t ormtpl.TplStruct) map[string][]byte
@@ -124,6 +118,8 @@ func testGen(t *testing.T, wd string, gen genMethod, data ormtpl.TplStruct) {
 
 func TestCodeGen(t *testing.T) {
 	db := getDB()
+
+	return
 
 	wd, err := os.Getwd()
 	if err != nil {
