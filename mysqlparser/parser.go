@@ -94,6 +94,16 @@ func (p *MySQLParser) Columns(schema string, table *structs.Table, tableName str
 			DBType: colDef.Type.Type,
 			Table:  table,
 		}
+		col.FullDBType = col.DBType
+		if colDef.Type.Length != nil {
+			col.FullDBType = fmt.Sprintf("%s(%s)", col.FullDBType, colDef.Type.Length.Bytes())
+		}
+		if colDef.Type.Unsigned {
+			col.FullDBType = fmt.Sprintf("%s unsigned", col.FullDBType)
+		}
+		if len(colDef.Type.EnumValues) > 0 {
+			col.FullDBType = fmt.Sprintf("%s(%s)", col.FullDBType, strings.Join(colDef.Type.EnumValues, ","))
+		}
 		if opt != nil {
 			if opt.Comment != nil {
 				col.Comment = string(opt.Comment.Bytes())
@@ -110,13 +120,16 @@ func (p *MySQLParser) Columns(schema string, table *structs.Table, tableName str
 				case *sqlparser.CurTimeFuncExpr:
 					col.Default = v.Name.String()
 				}
-				fmt.Printf("%s:%s: Default: %s\n", table.Name, col.Name, col.Default)
+
 			}
 		}
 
 		col.Comment = strings.ReplaceAll(col.Comment, "\r\n", " ")
 		col.Comment = strings.ReplaceAll(col.Comment, "\n", " ")
 		col.Comment = strings.ReplaceAll(col.Comment, "\"", "'")
+
+		fmt.Printf("table:%s col:%s, type:%s \n", tableName, col.Name, col.FullDBType)
+
 		cols = append(cols, col)
 	}
 	return cols, nil
