@@ -41,3 +41,11 @@ func ValueInSet(set []string, s string) bool {
 	}
 	return false
 }
+
+func MapSlice[T, K any](data []T, convert func(T) K) []K {
+	out := make([]K, len(data))
+	for i, obj := range data {
+		out[i] = convert(obj)
+	}
+	return out
+}

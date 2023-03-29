@@ -7,6 +7,7 @@ import (
 
 	"log"
 
+	"github.com/olachat/gola/coredb"
 	"github.com/olachat/gola/structs"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
@@ -136,6 +137,21 @@ func (p *MySQLParser) Columns(schema string, table *structs.Table, tableName str
 }
 
 func (p *MySQLParser) SetIndexAndKey(tables []*structs.Table) (err error) {
+	for _, t := range tables {
+		stmt := p.tableCreateStatements[t.Name]
+		t.Indexes = make(map[string][]*structs.IndexDesc)
+		for _, idx := range stmt.TableSpec.Indexes {
+			if idx.Info.Primary {
+				t.PKey = &structs.PrimaryKey{}
+				t.PKey.Name = idx.Info.Name.Lowered()
+				t.PKey.Columns = coredb.MapSlice(idx.Columns, func(col *sqlparser.IndexColumn) string {
+					return col.Column.Lowered()
+				})
+			} else {
+				t.Indexes
+			}
+		}
+	}
 	return nil
 }
 
