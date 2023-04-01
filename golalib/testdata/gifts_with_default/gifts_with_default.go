@@ -19,25 +19,25 @@ const TableName string = "gifts_with_default"
 
 // GiftsWithDefault represents `gifts_with_default` table
 type GiftsWithDefault struct {
-	//  int unsigned
+	//  int(10) unsigned
 	Id `json:"id"`
-	// gift name varchar
+	// gift name varchar(100)
 	Name `json:"name"`
 	// is free gift tinyint(1)
 	IsFree `json:"is_free"`
-	//  smallint
+	//  smallint(6)
 	GiftCount `json:"gift_count"`
 	//  enum('','freebie','sovenir','membership')
 	GiftType `json:"gift_type"`
-	//  bigint
+	//  bigint(20)
 	CreateTime `json:"create_time"`
-	//  float
+	//  float unsigned
 	Discount `json:"discount"`
-	//  double
+	//  double unsigned
 	Price `json:"price"`
-	//  varchar
+	//  varchar(128)
 	Remark `json:"remark"`
-	//  varbinary
+	//  varbinary(255) binary
 	Manifest `json:"manifest"`
 	//  text
 	Description `json:"description"`
@@ -874,10 +874,10 @@ func New() *GiftsWithDefault {
 		GiftType{val: goption.Some[GiftsWithDefaultGiftType]("membership")},
 		CreateTime{val: goption.Some[int64](999)},
 		Discount{val: goption.Some[float64](0.1)},
-		Price{val: goption.Some[float64](5)},
+		Price{val: goption.Some[float64](5.0)},
 		Remark{val: goption.Some[string]("hope you like it")},
 		Manifest{val: goption.Some[[]byte]([]byte("manifest data"))},
-		Description{val: goption.Some[string]("default gift")},
+		Description{},
 		UpdateTime{val: goption.Some[time.Time](coredb.MustParseTime("2023-01-19 03:14:07.999999"))},
 		UpdateTime2{val: goption.Some[time.Time](time.Now())},
 		Branches{val: goption.Some[string]("sentosa,changi")},
@@ -895,10 +895,10 @@ func NewWithPK(val uint) *GiftsWithDefault {
 		GiftType{val: goption.Some[GiftsWithDefaultGiftType]("membership")},
 		CreateTime{val: goption.Some[int64](999)},
 		Discount{val: goption.Some[float64](0.1)},
-		Price{val: goption.Some[float64](5)},
+		Price{val: goption.Some[float64](5.0)},
 		Remark{val: goption.Some[string]("hope you like it")},
 		Manifest{val: goption.Some[[]byte]([]byte("manifest data"))},
-		Description{val: goption.Some[string]("default gift")},
+		Description{},
 		UpdateTime{val: goption.Some[time.Time](coredb.MustParseTime("2023-01-19 03:14:07.999999"))},
 		UpdateTime2{val: goption.Some[time.Time](time.Now())},
 		Branches{val: goption.Some[string]("sentosa,changi")},

@@ -17,10 +17,10 @@ func TestFetchGiftNotNullWithDefault(t *testing.T) {
 		t.Error("wrong id")
 	}
 
-	assertDefaultGiftNnWithDefault(t, gift)
+	assertDefaultGiftNnWithDefault(t, gift, "gift1")
 }
 
-func assertDefaultGiftNnWithDefault(t *testing.T, gift *gifts_nn_with_default.GiftsNnWithDefault) {
+func assertDefaultGiftNnWithDefault(t *testing.T, gift *gifts_nn_with_default.GiftsNnWithDefault, desc string) {
 	branches := gift.GetBranches()
 	if !contains(branches, gifts_nn_with_default.GiftsNnWithDefaultBranchesChangi) {
 		t.Errorf("branches should contain changi")
@@ -33,7 +33,7 @@ func assertDefaultGiftNnWithDefault(t *testing.T, gift *gifts_nn_with_default.Gi
 		t.Errorf("create time should be 999")
 	}
 
-	if gift.GetDescription() != "default gift" {
+	if gift.GetDescription() != desc {
 		t.Error("wrong description")
 	}
 
@@ -88,7 +88,7 @@ func TestGiftNotNullWithDefaultInsertRetrieveUpdate(t *testing.T) {
 		t.Error("wrong id")
 	}
 
-	assertDefaultGiftNnWithDefault(t, gift)
+	assertDefaultGiftNnWithDefault(t, gift, "")
 
 	err := gift.Insert()
 	if err != nil {
@@ -102,7 +102,7 @@ func TestGiftNotNullWithDefaultInsertRetrieveUpdate(t *testing.T) {
 	if gift.GetId() != 3 {
 		t.Error("wrong id")
 	}
-	assertDefaultGiftNnWithDefault(t, gift)
+	assertDefaultGiftNnWithDefault(t, gift, "")
 
 	gift.SetBranches([]gifts_nn_with_default.GiftsNnWithDefaultBranches{
 		gifts_nn_with_default.GiftsNnWithDefaultBranchesVivo,

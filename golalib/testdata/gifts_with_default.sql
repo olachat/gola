@@ -9,9 +9,9 @@ CREATE TABLE `gifts_with_default` (
   `price` double unsigned default 5.0,
   `remark` varchar(128) default 'hope you like it',
   `manifest` varbinary(255) default 'manifest data',
-  `description` text default ('default gift'),
+  `description` text,
   `update_time` timestamp default '2023-01-19 03:14:07.999999',
   `update_time2` timestamp default CURRENT_TIMESTAMP,
   `branches` set('orchard','vivo','sentosa','changi') default 'sentosa,changi',
   PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = COMPACT COMMENT = 'Song list';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = COMPACT COMMENT = 'gifts_with_default';

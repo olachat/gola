@@ -16,25 +16,25 @@ const TableName string = "blogs"
 
 // Blog represents `blogs` table
 type Blog struct {
-	//  int
+	//  int(11)
 	Id `json:"id"`
-	// User Id int
+	// User Id int(11)
 	UserId `json:"user_id"`
-	// Slug varchar
+	// Slug varchar(255)
 	Slug `json:"slug"`
-	// Title varchar
+	// Title varchar(255)
 	Title `json:"title"`
-	// Category Id int
+	// Category Id int(11)
 	CategoryId `json:"category_id"`
-	// Is pinned to top tinyint
+	// Is pinned to top tinyint(1)
 	IsPinned `json:"is_pinned"`
-	// Is VIP reader only tinyint
+	// Is VIP reader only tinyint(1)
 	IsVip `json:"is_vip"`
-	// Country of the blog user varchar
+	// Country of the blog user varchar(255)
 	Country `json:"country"`
-	// Created Timestamp int unsigned
+	// Created Timestamp int(11) unsigned
 	CreatedAt `json:"created_at"`
-	// Updated Timestamp int unsigned
+	// Updated Timestamp int(11) unsigned
 	UpdatedAt `json:"updated_at"`
 }
 

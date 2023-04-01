@@ -18,19 +18,19 @@ const TableName string = "songs"
 
 // Song represents `songs` table
 type Song struct {
-	//  int unsigned
+	//  int(10) unsigned
 	Id `json:"id"`
-	// Song title varchar
+	// Song title varchar(100)
 	Title `json:"title"`
-	// Song Ranking mediumint
+	// Song Ranking mediumint(8)
 	Rank `json:"rank"`
 	//  enum('','101','1+9','%1','0.9')
 	Type `json:"type"`
-	// Song file hash checksum varchar
+	// Song file hash checksum varchar(128)
 	Hash `json:"hash"`
-	//  varchar
+	//  varchar(128)
 	Remark `json:"remark"`
-	//  varbinary
+	//  varbinary(255) binary
 	Manifest `json:"manifest"`
 }
 

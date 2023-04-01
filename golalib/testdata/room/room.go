@@ -16,15 +16,15 @@ const TableName string = "room"
 
 // Room represents `room` table
 type Room struct {
-	//  int unsigned
+	//  int(11) unsigned
 	Id `json:"id"`
-	//  int unsigned
+	//  int(11) unsigned
 	Group `json:"group"`
-	//  varchar
+	//  varchar(5)
 	Lang `json:"lang"`
 	//  double
 	Priority `json:"priority"`
-	//  tinyint(1)
+	//  tinyint(1) unsigned
 	Deleted `json:"deleted"`
 }
 

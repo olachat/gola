@@ -18,25 +18,25 @@ const TableName string = "gifts_nn_with_default"
 
 // GiftsNnWithDefault represents `gifts_nn_with_default` table
 type GiftsNnWithDefault struct {
-	//  int unsigned
+	//  int(10) unsigned
 	Id `json:"id"`
-	// gift name varchar
+	// gift name varchar(100)
 	Name `json:"name"`
 	// is free gift tinyint(1)
 	IsFree `json:"is_free"`
-	//  smallint
+	//  smallint(6)
 	GiftCount `json:"gift_count"`
 	//  enum('','freebie','sovenir','membership')
 	GiftType `json:"gift_type"`
-	//  bigint
+	//  bigint(20)
 	CreateTime `json:"create_time"`
-	//  float
+	//  float unsigned
 	Discount `json:"discount"`
-	//  double
+	//  double unsigned
 	Price `json:"price"`
-	//  varchar
+	//  varchar(128)
 	Remark `json:"remark"`
-	//  varbinary
+	//  varbinary(255) binary
 	Manifest `json:"manifest"`
 	//  text
 	Description `json:"description"`
@@ -849,10 +849,10 @@ func New() *GiftsNnWithDefault {
 		GiftType{val: "membership"},
 		CreateTime{val: int64(999)},
 		Discount{val: float64(0.1)},
-		Price{val: float64(5)},
+		Price{val: float64(5.0)},
 		Remark{val: "hope you like it"},
 		Manifest{val: []byte("manifest data")},
-		Description{val: "default gift"},
+		Description{},
 		UpdateTime{val: coredb.MustParseTime("2023-01-19 03:14:07.999999")},
 		UpdateTime2{val: time.Now()},
 		Branches{val: "sentosa,changi"},
@@ -870,10 +870,10 @@ func NewWithPK(val uint) *GiftsNnWithDefault {
 		GiftType{val: "membership"},
 		CreateTime{val: int64(999)},
 		Discount{val: float64(0.1)},
-		Price{val: float64(5)},
+		Price{val: float64(5.0)},
 		Remark{val: "hope you like it"},
 		Manifest{val: []byte("manifest data")},
-		Description{val: "default gift"},
+		Description{},
 		UpdateTime{val: coredb.MustParseTime("2023-01-19 03:14:07.999999")},
 		UpdateTime2{val: time.Now()},
 		Branches{val: "sentosa,changi"},

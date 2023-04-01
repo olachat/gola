@@ -16,13 +16,13 @@ const TableName string = "account"
 
 // Account represents `account` table
 type Account struct {
-	//  int
+	//  int(11)
 	UserId `json:"user_id"`
 	// user account type enum('free','vip')
 	Type `json:"type"`
-	// user country code mediumint unsigned
+	// user country code mediumint(6) unsigned
 	CountryCode `json:"country_code"`
-	// Account money int
+	// Account money int(8)
 	Money `json:"money"`
 }
 type PK struct {

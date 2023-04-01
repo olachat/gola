@@ -1,6 +1,7 @@
 package golalib
 
 import (
+	"database/sql"
 	"embed"
 	"flag"
 	"fmt"
@@ -10,10 +11,14 @@ import (
 	"strings"
 	"testing"
 
+	sqle "github.com/dolthub/go-mysql-server"
+	"github.com/dolthub/go-mysql-server/memory"
+	"github.com/dolthub/go-mysql-server/server"
+	gsql "github.com/dolthub/go-mysql-server/sql"
+	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/go-cmp/cmp"
-
-	"github.com/dolthub/go-mysql-server/server"
+	"github.com/olachat/gola/mysqldriver"
 	"github.com/olachat/gola/mysqlparser"
 	"github.com/olachat/gola/ormtpl"
 	"github.com/olachat/gola/structs"
@@ -24,47 +29,72 @@ var fixtures embed.FS
 var s *server.Server
 var testDBPort int = 33066
 var testDBName string = "testdata"
-var testTables = []string{"blogs", "users", "songs", "song_user_favourites",
-	"profile", "account", "room", "gifts", "gifts_with_default",
-	"gifts_nn", "gifts_nn_with_default"}
+var testTables = []string{
+	"blogs",
+	"users", "songs", "song_user_favourites",
+	"profile", "account",
+	"room",
+	"gifts", "gifts_nn",
+	"gifts_with_default", "gifts_nn_with_default",
+}
 var testDataPath = "testdata" + string(filepath.Separator)
 
 var update = flag.Bool("update", false, "update generated files")
 
 // init the database with tables based on .sql files in the testdb folder
-// func init() {
-// 	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
-// 		memory.NewDatabase(testDBName),
-// 		information_schema.NewInformationSchemaDatabase(),
-// 	))
+func init() {
+	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
+		memory.NewDatabase(testDBName),
+		information_schema.NewInformationSchemaDatabase(),
+	))
 
-// 	config := server.Config{
-// 		Protocol: "tcp",
-// 		Address:  fmt.Sprintf("localhost:%d", testDBPort),
-// 	}
-// 	var err error
+	config := server.Config{
+		Protocol: "tcp",
+		Address:  fmt.Sprintf("localhost:%d", testDBPort),
+	}
+	var err error
 
-// 	s, err = server.NewDefaultServer(config, engine)
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	s, err = server.NewDefaultServer(config, engine)
+	if err != nil {
+		panic(err)
+	}
 
-// 	go s.Start()
+	go s.Start()
 
-// 	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
-// 	db, err := sql.Open("mysql", connStr)
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
+	db, err := sql.Open("mysql", connStr)
+	if err != nil {
+		panic(err)
+	}
 
-// 	for _, tableName := range testTables {
-// 		query, _ := fixtures.ReadFile(testDataPath + tableName + ".sql")
-// 		_, err = db.Exec(string(query))
-// 		if err != nil {
-// 			panic(err.Error())
-// 		}
-// 	}
-// }
+	for _, tableName := range testTables {
+		query, _ := fixtures.ReadFile(testDataPath + tableName + ".sql")
+		_, err = db.Exec(string(query))
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+}
+
+func getDB_old() *structs.DBInfo {
+	var config mysqldriver.Config = map[string]any{
+		"dbname":    testDBName,
+		"whitelist": testTables,
+		"host":      "localhost",
+		"port":      testDBPort,
+		"user":      "root",
+		"pass":      "",
+		"sslmode":   "false",
+	}
+	dbconfig := mysqldriver.NewDBConfig(config)
+
+	m := &mysqldriver.MySQLDriver{}
+	db, err := m.Assemble(dbconfig)
+	if err != nil {
+		panic(err)
+	}
+	return db
+}
 
 func getDB() *structs.DBInfo {
 	c := mysqlparser.MySQLParserConfig{}
@@ -118,8 +148,14 @@ func testGen(t *testing.T, wd string, gen genMethod, data ormtpl.TplStruct) {
 
 func TestCodeGen(t *testing.T) {
 	db := getDB()
-
-	return
+	// db := getDB_old()
+	// pp.Println(db)
+	// isSame := reflect.DeepEqual(db, db2)
+	// if !isSame {
+	// 	pp.Println(db)
+	// 	pp.Println(db2)
+	// }
+	// return
 
 	wd, err := os.Getwd()
 	if err != nil {

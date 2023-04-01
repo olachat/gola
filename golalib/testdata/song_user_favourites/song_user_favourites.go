@@ -18,11 +18,11 @@ const TableName string = "song_user_favourites"
 
 // SongUserFavourite represents `song_user_favourites` table
 type SongUserFavourite struct {
-	// User ID int unsigned
+	// User ID int(10) unsigned
 	UserId `json:"user_id"`
-	// Song ID int unsigned
+	// Song ID int(10) unsigned
 	SongId `json:"song_id"`
-	// favourite remark varchar
+	// favourite remark varchar(100)
 	Remark `json:"remark"`
 	// Is favourite tinyint(1)
 	IsFavourite `json:"is_favourite"`

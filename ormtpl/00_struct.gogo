@@ -19,7 +19,7 @@ const TableName string = "{{.Name}}"
 // {{.ClassName}} represents `{{.Name}}` table
 type {{.ClassName}} struct {
 	{{- range .Columns }}
-	// {{.Comment}} {{.DBType}}
+	// {{.Comment}} {{.FullDBType}}
 	{{.GoName}} `json:"{{.Name}}"`
 	{{- end }}
 }

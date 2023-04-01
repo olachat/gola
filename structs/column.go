@@ -55,7 +55,9 @@ var dbTypeToGoTypes = map[string]string{
 	"int unsigned":       "uint",
 	"bigint unsigned":    "uint64",
 	"float":              "float64",
+	"float unsigned":     "float64",
 	"double":             "float64",
+	"double unsigned":    "float64",
 }
 
 func (c Column) GoSetEnumType() string {
@@ -88,7 +90,7 @@ func (c Column) ValType() string {
 // GoType returns type in go of the column.
 // Uses goption for nullable fields
 func (c Column) GoType() string {
-	if c.FullDBType == "tinyint(1)" {
+	if c.FullDBType == "tinyint(1)" || c.FullDBType == "tinyint(1) unsigned" {
 		if c.Nullable {
 			return "goption.Option[bool]"
 		}
@@ -195,7 +197,7 @@ func (c Column) GoDefaultValue() string {
 	lowerCaseDefault := strings.ToLower(c.Default)
 
 	if strings.Contains(valType, "goption") && c.IsEnum() {
-		return strings.ReplaceAll(valType, "Option", "Some") + "(\"" + c.Default + "\")"
+		return strings.ReplaceAll(valType, "Option", "Some") + "(" + getQuotedStr(c.Default) + ")"
 	} else if valType == "string" || c.IsEnum() {
 		return getQuotedStr(lowerCaseDefault)
 	}
@@ -212,16 +214,16 @@ func (c Column) GoDefaultValue() string {
 	}
 
 	if valType == "time.Time" {
-		if strings.Contains(c.Default, "CURRENT_TIMESTAMP") {
+		if strings.Contains(strings.ToUpper(c.Default), "CURRENT_TIMESTAMP") {
 			return "time.Now()"
 		}
-		return fmt.Sprintf("coredb.MustParseTime(\"%s\")", c.Default)
+		return fmt.Sprintf("coredb.MustParseTime(%s)", getQuotedStr(c.Default))
 	}
 	if valType == "goption.Option[time.Time]" {
-		if strings.Contains(c.Default, "CURRENT_TIMESTAMP") {
+		if strings.Contains(strings.ToUpper(c.Default), "CURRENT_TIMESTAMP") {
 			return "goption.Some[time.Time](time.Now())"
 		}
-		return fmt.Sprintf("goption.Some[time.Time](coredb.MustParseTime(\"%s\"))", c.Default)
+		return fmt.Sprintf("goption.Some[time.Time](coredb.MustParseTime(%s))", getQuotedStr(c.Default))
 	}
 
 	if valType == "bool" {
@@ -246,10 +248,10 @@ func (c Column) GoDefaultValue() string {
 	}
 
 	if valType == "goption.Option[[]byte]" {
-		return strings.ReplaceAll(valType, "Option", "Some") + "([]byte(\"" + c.Default + "\"))"
+		return strings.ReplaceAll(valType, "Option", "Some") + "([]byte(" + getQuotedStr(c.Default) + "))"
 	}
 
-	return valType + "(\"" + c.Default + "\")"
+	return valType + "(" + getQuotedStr(c.Default) + ")"
 }
 
 // IsEnum returns if column type is enum

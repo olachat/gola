@@ -34,8 +34,8 @@ func assertDefaultGiftWithDefault(t *testing.T, gift *gifts_with_default.GiftsWi
 		t.Errorf("create time should be 999")
 	}
 
-	if gift.GetDescription().Unwrap() != "default gift" {
-		t.Error("wrong description")
+	if gift.GetDescription().Ok() {
+		t.Error("description should be nil")
 	}
 
 	if !isFloatSimilar(gift.GetDiscount().Unwrap(), 0.1) {

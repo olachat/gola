@@ -129,8 +129,8 @@ insert into songs (id,title,type,manifest) values
 	}
 
 	_, err = db.Exec(`
-	insert into gifts_nn_with_default (id) values
-	(1)`)
+	insert into gifts_nn_with_default (id,description) values
+	(1,'gift1')`)
 	if err != nil {
 		panic("fail to insert gifts_nn_with_default. " + err.Error())
 	}

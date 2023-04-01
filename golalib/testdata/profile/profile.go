@@ -16,11 +16,11 @@ const TableName string = "profile"
 
 // Profile represents `profile` table
 type Profile struct {
-	//  int
+	//  int(11)
 	UserId `json:"user_id"`
 	//  tinyint(4)
 	Level `json:"level"`
-	// Nick Name varchar
+	// Nick Name varchar(255)
 	NickName `json:"nick_name"`
 }
 

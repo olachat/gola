@@ -18,25 +18,25 @@ const TableName string = "gifts_nn"
 
 // GiftsNn represents `gifts_nn` table
 type GiftsNn struct {
-	//  int unsigned
+	//  int(10) unsigned
 	Id `json:"id"`
-	// gift name varchar
+	// gift name varchar(100)
 	Name `json:"name"`
 	// is free gift tinyint(1)
 	IsFree `json:"is_free"`
-	//  smallint
+	//  smallint(6)
 	GiftCount `json:"gift_count"`
 	//  enum('','freebie','sovenir','membership')
 	GiftType `json:"gift_type"`
-	//  bigint
+	//  bigint(20)
 	CreateTime `json:"create_time"`
-	//  float
+	//  float unsigned
 	Discount `json:"discount"`
-	//  double
+	//  double unsigned
 	Price `json:"price"`
-	//  varchar
+	//  varchar(128)
 	Remark `json:"remark"`
-	//  varbinary
+	//  varbinary(255) binary
 	Manifest `json:"manifest"`
 	//  text
 	Description `json:"description"`

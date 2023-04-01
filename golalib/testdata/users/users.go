@@ -16,15 +16,15 @@ const TableName string = "users"
 
 // User represents `users` table
 type User struct {
-	//  int
+	//  int(11)
 	Id `json:"id"`
-	// Name varchar
+	// Name varchar(255)
 	Name `json:"name"`
-	// Email address varchar
+	// Email address varchar(255)
 	Email `json:"email"`
-	// Created Timestamp int unsigned
+	// Created Timestamp int(11) unsigned
 	CreatedAt `json:"created_at"`
-	// Updated Timestamp int unsigned
+	// Updated Timestamp int(11) unsigned
 	UpdatedAt `json:"updated_at"`
 	// float float
 	FloatType `json:"float_type"`
@@ -820,8 +820,8 @@ func New() *User {
 		Email{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
-		FloatType{val: float64(0)},
-		DoubleType{val: float64(0)},
+		FloatType{val: float64(0.0)},
+		DoubleType{val: float64(0.0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
 		Sports{val: "swim,football"},
@@ -839,8 +839,8 @@ func NewWithPK(val int) *User {
 		Email{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
-		FloatType{val: float64(0)},
-		DoubleType{val: float64(0)},
+		FloatType{val: float64(0.0)},
+		DoubleType{val: float64(0.0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
 		Sports{val: "swim,football"},
