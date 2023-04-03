@@ -1,7 +1,6 @@
 package golalib
 
 import (
-	"database/sql"
 	"embed"
 	"flag"
 	"fmt"
@@ -11,14 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	sqle "github.com/dolthub/go-mysql-server"
-	"github.com/dolthub/go-mysql-server/memory"
 	"github.com/dolthub/go-mysql-server/server"
-	gsql "github.com/dolthub/go-mysql-server/sql"
-	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/go-cmp/cmp"
-	"github.com/olachat/gola/mysqldriver"
 	"github.com/olachat/gola/mysqlparser"
 	"github.com/olachat/gola/ormtpl"
 	"github.com/olachat/gola/structs"
@@ -40,61 +34,6 @@ var testTables = []string{
 var testDataPath = "testdata" + string(filepath.Separator)
 
 var update = flag.Bool("update", false, "update generated files")
-
-// init the database with tables based on .sql files in the testdb folder
-func init() {
-	engine := sqle.NewDefault(gsql.NewDatabaseProvider(
-		memory.NewDatabase(testDBName),
-		information_schema.NewInformationSchemaDatabase(),
-	))
-
-	config := server.Config{
-		Protocol: "tcp",
-		Address:  fmt.Sprintf("localhost:%d", testDBPort),
-	}
-	var err error
-
-	s, err = server.NewDefaultServer(config, engine)
-	if err != nil {
-		panic(err)
-	}
-
-	go s.Start()
-
-	connStr := mysqldriver.MySQLBuildQueryString("root", "", testDBName, "localhost", testDBPort, "false")
-	db, err := sql.Open("mysql", connStr)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, tableName := range testTables {
-		query, _ := fixtures.ReadFile(testDataPath + tableName + ".sql")
-		_, err = db.Exec(string(query))
-		if err != nil {
-			panic(err.Error())
-		}
-	}
-}
-
-func getDB_old() *structs.DBInfo {
-	var config mysqldriver.Config = map[string]any{
-		"dbname":    testDBName,
-		"whitelist": testTables,
-		"host":      "localhost",
-		"port":      testDBPort,
-		"user":      "root",
-		"pass":      "",
-		"sslmode":   "false",
-	}
-	dbconfig := mysqldriver.NewDBConfig(config)
-
-	m := &mysqldriver.MySQLDriver{}
-	db, err := m.Assemble(dbconfig)
-	if err != nil {
-		panic(err)
-	}
-	return db
-}
 
 func getDB() *structs.DBInfo {
 	c := mysqlparser.MySQLParserConfig{}
