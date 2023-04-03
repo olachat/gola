@@ -196,6 +196,10 @@ func (c Column) GoDefaultValue() string {
 	valType := c.ValType()
 	lowerCaseDefault := strings.ToLower(c.Default)
 
+	if c.Nullable && c.Default == "NULL" {
+		return strings.ReplaceAll(valType, "Option", "None") + "()"
+	}
+
 	if strings.Contains(valType, "goption") && c.IsEnum() {
 		return strings.ReplaceAll(valType, "Option", "Some") + "(" + getQuotedStr(c.Default) + ")"
 	} else if valType == "string" || c.IsEnum() {

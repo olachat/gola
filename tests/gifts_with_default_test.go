@@ -42,8 +42,8 @@ func assertDefaultGiftWithDefault(t *testing.T, gift *gifts_with_default.GiftsWi
 		t.Error("wrong discount")
 	}
 
-	if gift.GetGiftCount().Unwrap() != 1 {
-		t.Errorf("wrong gift count")
+	if gift.GetGiftCount().Ok() {
+		t.Errorf("gift count should be null")
 	}
 
 	if gift.GetGiftType().Unwrap() != gifts_with_default.GiftsWithDefaultGiftTypeMembership {

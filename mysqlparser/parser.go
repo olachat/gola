@@ -2,7 +2,6 @@ package mysqlparser
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -113,8 +112,6 @@ func (p *MySQLParser) Columns(schema string, table *structs.Table, tableName str
 		if col.Comment == "''" {
 			col.Comment = ""
 		}
-
-		fmt.Printf("table:%s col:%s, type:%s \n", tableName, col.Name, col.FullDBType)
 
 		cols = append(cols, col)
 	}

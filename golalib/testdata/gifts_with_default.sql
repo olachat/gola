@@ -2,7 +2,7 @@ CREATE TABLE `gifts_with_default` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) default 'gift for you' COMMENT 'gift name',
   `is_free` tinyint(1) default 1 COMMENT 'is free gift',
-  `gift_count` smallint default 1,
+  `gift_count` smallint default NULL,
   `gift_type` enum('', 'freebie', 'sovenir', 'membership') default 'membership',
   `create_time` bigint default 999,
   `discount` float unsigned default 0.1,
