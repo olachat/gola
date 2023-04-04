@@ -87,6 +87,17 @@ func (c Column) ValType() string {
 	return c.GoType()
 }
 
+func (c Column) GoIdxType() string {
+	goType := c.GoType()
+	if !strings.HasPrefix(goType, "goption.Option") {
+		return goType
+	}
+	goType = strings.ReplaceAll(goType, "goption.Option", "")
+	goType = strings.ReplaceAll(goType, "[", "")
+	goType = strings.ReplaceAll(goType, "]", "")
+	return goType
+}
+
 // GoType returns type in go of the column.
 // Uses goption for nullable fields
 func (c Column) GoType() string {

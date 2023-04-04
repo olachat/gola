@@ -12,5 +12,6 @@ CREATE TABLE `gifts` (
   `description` text,
   `update_time` timestamp,
   `branches` set('orchard','vivo','sentosa','changi'),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx`(`price`,`remark`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = COMPACT COMMENT = 'Song list';

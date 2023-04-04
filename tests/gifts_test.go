@@ -222,6 +222,33 @@ func TestInsertRetrieveUpdate(t *testing.T) {
 		t.Fatal("update not done")
 	}
 
+	glist := gifts.Select().WherePriceEQ(65.555).All()
+	if len(glist) != 1 {
+		t.Errorf("should retrieve 1 record")
+	}
+	if glist[0].GetId() != g2.GetId() {
+		t.Error("wrong id")
+	}
+	glist2 := gifts.Select().WherePriceEQ(65.55).All()
+	if len(glist2) != 0 {
+		t.Errorf("should retrieve 1 record")
+	}
+	glist3 := gifts.Select().WherePriceEQ(65.555).AndRemarkEQ("remark 2").All()
+	if len(glist3) != 1 {
+		t.Errorf("should retrieve 1 record")
+	}
+	if glist3[0].GetId() != g2.GetId() {
+		t.Error("wrong id")
+	}
+	glist4 := gifts.SelectFields[struct {
+		gifts.Id
+		gifts.Discount
+		gifts.CreateTime
+	}]().OrderBy(gifts.CreateTimeAsc).All()
+	if len(glist4) != 4 {
+		t.Error("wrong count")
+	}
+
 	g22 := gifts.FindOne("where id = ?", g2out.GetId())
 	if g22 == nil {
 		t.Fatal("g22 should not be nil")

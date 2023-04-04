@@ -130,7 +130,32 @@ type orderReadQuery[T any] interface {
 }
 
 type iQuery[T any] interface {
+	WherePriceEQ(val float64) iQuery1[T]
+	WherePriceIN(vals ...float64) iQuery1[T]
 	orderReadQuery[T]
+}
+type iQuery1[T any] interface {
+	AndRemarkEQ(val string) orderReadQuery[T]
+	AndRemarkIN(vals ...string) orderReadQuery[T]
+	orderReadQuery[T]
+}
+
+type idxQuery1[T any] struct {
+	*idxQuery[T]
+}
+
+func (q *idxQuery1[T]) AndRemarkEQ(val string) orderReadQuery[T] {
+	q.whereSql += " and `remark` = ?"
+	q.whereParams = append(q.whereParams, val)
+	return q.idxQuery
+}
+
+func (q *idxQuery1[T]) AndRemarkIN(vals ...string) orderReadQuery[T] {
+	q.whereSql += " and `remark` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	for _, val := range vals {
+		q.whereParams = append(q.whereParams, val)
+	}
+	return q.idxQuery
 }
 
 // Find methods
@@ -143,6 +168,20 @@ func Select() iQuery[Gift] {
 // SelectFields returns rows with selected fields from `gifts` table with index awared query
 func SelectFields[T any]() iQuery[T] {
 	return new(idxQuery[T])
+}
+
+func (q *idxQuery[T]) WherePriceEQ(val float64) iQuery1[T] {
+	q.whereSql += " where `price` = ?"
+	q.whereParams = append(q.whereParams, val)
+	return &idxQuery1[T]{q}
+}
+
+func (q *idxQuery[T]) WherePriceIN(vals ...float64) iQuery1[T] {
+	q.whereSql = " where `price` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	for _, val := range vals {
+		q.whereParams = append(q.whereParams, val)
+	}
+	return &idxQuery1[T]{q}
 }
 
 func (q *idxQuery[T]) GetWhere() (whereSql string, params []any) {
