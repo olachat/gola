@@ -59,7 +59,8 @@ func (p *MySQLParser) TableNames(schema string, whitelist, blacklist []string) (
 		sql := p.tableSQLs[table]
 		createStatement, err := p.parse(sql)
 		if err != nil {
-			continue
+			log.Printf("error parsing table %s: %v", table, err)
+			return nil, err
 		}
 		p.tableCreateStatements[table] = createStatement
 		out = append(out, table)
