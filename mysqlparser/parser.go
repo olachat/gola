@@ -8,8 +8,8 @@ import (
 	"log"
 
 	"github.com/blastrain/vitess-sqlparser/sqlparser"
-	"github.com/olachat/gola/coredb"
-	"github.com/olachat/gola/structs"
+	"github.com/olachat/gola/v2/coredb"
+	"github.com/olachat/gola/v2/structs"
 )
 
 type MySQLParser struct {

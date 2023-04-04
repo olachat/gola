@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jordan-bonecutter/goption"
-	"github.com/olachat/gola/golalib/testdata/gifts_with_default"
+	"github.com/olachat/gola/v2/golalib/testdata/gifts_with_default"
 )
 
 func TestFetchGiftWithDefault(t *testing.T) {

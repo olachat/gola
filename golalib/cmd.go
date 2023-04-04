@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/mitchellh/cli"
-	"github.com/olachat/gola/mysqldriver"
+	"github.com/olachat/gola/v2/mysqldriver"
 	"github.com/spf13/viper"
 )
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/olachat/gola/golalib/testdata/gifts_nn_with_default"
+	"github.com/olachat/gola/v2/golalib/testdata/gifts_nn_with_default"
 )
 
 func TestFetchGiftNotNullWithDefault(t *testing.T) {

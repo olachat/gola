@@ -13,10 +13,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/olachat/gola/mysqldriver"
-	"github.com/olachat/gola/mysqlparser"
-	"github.com/olachat/gola/ormtpl"
-	"github.com/olachat/gola/structs"
+	"github.com/olachat/gola/v2/mysqldriver"
+	"github.com/olachat/gola/v2/mysqlparser"
+	"github.com/olachat/gola/v2/ormtpl"
+	"github.com/olachat/gola/v2/structs"
 )
 
 func GenWithParser(config mysqlparser.MySQLParserConfig, output string) int {

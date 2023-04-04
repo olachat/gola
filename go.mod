@@ -1,4 +1,4 @@
-module github.com/olachat/gola
+module github.com/olachat/gola/v2
 
 go 1.18
 
