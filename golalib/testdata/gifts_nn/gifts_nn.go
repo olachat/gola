@@ -106,6 +106,62 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `gifts_nn` "+whereSQL, params...)
 }
 
+// FetchByPK returns a row from `gifts_nn` table with given primary key value
+func FetchByPKFromMaster(val uint) *GiftsNn {
+	return coredb.FetchByPKFromMaster[GiftsNn](DBName, TableName, []string{"id"}, val)
+}
+
+// FetchFieldsByPK returns a row with selected fields from gifts_nn table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val uint) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"id"}, val)
+}
+
+// FetchByPKs returns rows with from `gifts_nn` table with given primary key values
+func FetchByPKsFromMaster(vals ...uint) []*GiftsNn {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[GiftsNn](DBName, TableName, "id", pks)
+}
+
+// FetchFieldsByPKs returns rows with selected fields from `gifts_nn` table with given primary key values
+func FetchFieldsByPKsFromMaster[T any](vals ...uint) []*T {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "id", pks)
+}
+
+// FindOne returns a row from `gifts_nn` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *GiftsNn {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[GiftsNn](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `gifts_nn` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `gifts_nn` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*GiftsNn, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[GiftsNn](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `gifts_nn` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `gifts_nn` "+whereSQL, params...)
+}
+
 // Column types
 type GiftsNnGiftType string
 

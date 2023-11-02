@@ -79,6 +79,50 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `account` "+whereSQL, params...)
 }
 
+// FetchByPK returns a row from `account` table with given primary key value
+func FetchByPKFromMaster(val PK) *Account {
+	return coredb.FetchByPKFromMaster[Account](DBName, TableName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
+}
+
+// FetchFieldsByPK returns a row with selected fields from account table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val PK) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
+}
+
+// FindOne returns a row from `account` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *Account {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[Account](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `account` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `account` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*Account, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[Account](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `account` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `account` "+whereSQL, params...)
+}
+
 // Column types
 type AccountType string
 

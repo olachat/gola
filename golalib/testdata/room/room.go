@@ -88,6 +88,62 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `room` "+whereSQL, params...)
 }
 
+// FetchByPK returns a row from `room` table with given primary key value
+func FetchByPKFromMaster(val uint) *Room {
+	return coredb.FetchByPKFromMaster[Room](DBName, TableName, []string{"id"}, val)
+}
+
+// FetchFieldsByPK returns a row with selected fields from room table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val uint) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"id"}, val)
+}
+
+// FetchByPKs returns rows with from `room` table with given primary key values
+func FetchByPKsFromMaster(vals ...uint) []*Room {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[Room](DBName, TableName, "id", pks)
+}
+
+// FetchFieldsByPKs returns rows with selected fields from `room` table with given primary key values
+func FetchFieldsByPKsFromMaster[T any](vals ...uint) []*T {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "id", pks)
+}
+
+// FindOne returns a row from `room` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *Room {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[Room](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `room` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `room` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*Room, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[Room](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `room` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `room` "+whereSQL, params...)
+}
+
 // Column types
 
 // Id field

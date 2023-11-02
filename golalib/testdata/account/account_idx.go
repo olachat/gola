@@ -66,6 +66,17 @@ func (q *idxQuery[T]) Limit(offset, limit int) []*T {
 	return result
 }
 
+func (q *idxQuery[T]) AllFromMaster() []*T {
+	result, _ := coredb.FindFromMaster[T](DBName, TableName, q)
+	return result
+}
+
+func (q *idxQuery[T]) LimitFromMaster(offset, limit int) []*T {
+	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, limit)
+	result, _ := coredb.FindFromMaster[T](DBName, TableName, q)
+	return result
+}
+
 type order[T any] interface {
 	OrderBy(args ...orderBy) coredb.ReadQuery[T]
 }

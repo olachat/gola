@@ -94,6 +94,62 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, params...)
 }
 
+// FetchByPK returns a row from `{{.Name}}` table with given primary key value
+func FetchByPKFromMaster(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
+	return coredb.FetchByPKFromMaster[{{.ClassName}}](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
+}
+// FetchFieldsByPK returns a row with selected fields from {{.Name}} table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val {{.GetPrimaryKeyType}}) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
+}
+{{- if not .HasCompositePrimaryKey }}
+// FetchByPKs returns rows with from `{{.Name}}` table with given primary key values
+func FetchByPKsFromMaster(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[{{.ClassName}}](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
+}
+
+// FetchFieldsByPKs returns rows with selected fields from `{{.Name}}` table with given primary key values
+func FetchFieldsByPKsFromMaster[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
+}
+{{- end}}
+
+// FindOne returns a row from `{{.Name}}` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *{{.ClassName}} {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[{{.ClassName}}](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `{{.Name}}` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `{{.Name}}` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[{{.ClassName}}](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `{{.Name}}` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, params...)
+}
+
 // Column types
 
 {{- range .Columns }}

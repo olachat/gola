@@ -10,7 +10,7 @@ import (
 )
 
 func TestFetchGiftWithDefault(t *testing.T) {
-	gift := gifts_with_default.FetchByPK(1)
+	gift := gifts_with_default.FetchByPKFromMaster(1)
 	if gift == nil {
 		t.Fatalf("gift should not be nil")
 	}
@@ -152,7 +152,7 @@ func TestGiftWithDefaultInsertRetrieveUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("fail to insert. %v", err)
 	}
-	gOut := gifts_with_default.FetchByPK(3)
+	gOut := gifts_with_default.FetchByPKFromMaster(3)
 	if gOut == nil {
 		t.Fatal("should not be nil")
 	}
@@ -185,7 +185,7 @@ func TestGiftWithDefaultInsertRetrieveUpdate(t *testing.T) {
 		t.Fatal("update not done")
 	}
 
-	g22 := gifts_with_default.FindOne("where id = ?", gOut.GetId())
+	g22 := gifts_with_default.FindOneFromMaster("where id = ?", gOut.GetId())
 	if g22 == nil {
 		t.Fatal("g22 should not be nil")
 	}

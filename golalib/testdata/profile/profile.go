@@ -84,6 +84,62 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `profile` "+whereSQL, params...)
 }
 
+// FetchByPK returns a row from `profile` table with given primary key value
+func FetchByPKFromMaster(val int) *Profile {
+	return coredb.FetchByPKFromMaster[Profile](DBName, TableName, []string{"user_id"}, val)
+}
+
+// FetchFieldsByPK returns a row with selected fields from profile table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val int) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"user_id"}, val)
+}
+
+// FetchByPKs returns rows with from `profile` table with given primary key values
+func FetchByPKsFromMaster(vals ...int) []*Profile {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[Profile](DBName, TableName, "user_id", pks)
+}
+
+// FetchFieldsByPKs returns rows with selected fields from `profile` table with given primary key values
+func FetchFieldsByPKsFromMaster[T any](vals ...int) []*T {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "user_id", pks)
+}
+
+// FindOne returns a row from `profile` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *Profile {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[Profile](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `profile` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `profile` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*Profile, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[Profile](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `profile` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `profile` "+whereSQL, params...)
+}
+
 // Column types
 
 // UserId field
