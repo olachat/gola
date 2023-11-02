@@ -66,6 +66,32 @@ func FetchByPKs[T any](dbname string, tableName string, pkName string, vals []an
 	return result
 }
 
+// FetchByPKFromMaster returns a row of T type with given primary key value
+func FetchByPKFromMaster[T any](dbname string, tableName string, pkName []string, val ...any) *T {
+	sql := "WHERE `" + pkName[0] + "` = ?"
+	for _, name := range pkName[1:] {
+		sql += " AND `" + name + "` = ?"
+	}
+	w := NewWhere(sql, val...)
+	return FindOneFromMaster[T](dbname, tableName, w)
+}
+
+// FetchByPKsFromMaster returns rows of T type with given primary key values
+func FetchByPKsFromMaster[T any](dbname string, tableName string, pkName string, vals []any) []*T {
+	if len(vals) == 0 {
+		return make([]*T, 0)
+	}
+
+	query := fmt.Sprintf("WHERE `%s` IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
+	w := NewWhere(query, vals...)
+
+	result, err := FindFromMaster[T](dbname, tableName, w)
+	if err != nil {
+		panic("Find failled: " + err.Error())
+	}
+	return result
+}
+
 // Exec given query with given db info & params
 func Exec(dbname string, query string, params ...any) (sql.Result, error) {
 	mydb := getDB(dbname, DBModeWrite)
@@ -106,9 +132,50 @@ func Find[T any](dbname string, tableName string, where WhereQuery) ([]*T, error
 	return Query[T](dbname, query, params...)
 }
 
+// FindOneFromMaster using master DB returns a row from given table type with where query
+func FindOneFromMaster[T any](dbname string, tableName string, where WhereQuery) *T {
+	u := new(T)
+	columnsNames := GetColumnsNames[T]()
+	data := StrutForScan(u)
+	whereSQL, params := where.GetWhere()
+	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
+		tableName, whereSQL)
+	mydb := getDB(dbname, DBModeReadFromWrite)
+	err2 := mydb.QueryRow(query, params...).Scan(data...)
+
+	if err2 != nil {
+		// It's on purpose the hide the error
+		// But should re-consider later
+		if err2 != sql.ErrNoRows {
+			panic("QueryRow failed: " + err2.Error())
+		}
+
+		return nil
+	}
+
+	return u
+}
+
+// FindFromMaster using master DB returns rows from given table type with where query
+func FindFromMaster[T any](dbname string, tableName string, where WhereQuery) ([]*T, error) {
+	columnsNames := GetColumnsNames[T]()
+	whereSQL, params := where.GetWhere()
+	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
+		tableName, whereSQL)
+
+	return QueryFromMaster[T](dbname, query, params...)
+}
+
 // QueryInt single int result by query, handy for count(*) querys
 func QueryInt(dbname string, query string, params ...any) (result int, err error) {
 	mydb := getDB(dbname, DBModeRead)
+	mydb.QueryRow(query, params...).Scan(&result)
+	return
+}
+
+// QueryIntFromMaster single int result by query, handy for count(*) querys
+func QueryIntFromMaster(dbname string, query string, params ...any) (result int, err error) {
+	mydb := getDB(dbname, DBModeReadFromWrite)
 	mydb.QueryRow(query, params...).Scan(&result)
 	return
 }
