@@ -135,6 +135,28 @@ func Query[T any](dbname string, query string, params ...any) (result []*T, err 
 	return
 }
 
+// Query rows from master DB from given table type with where query & params
+func QueryFromMaster[T any](dbname string, query string, params ...any) (result []*T, err error) {
+	mydb := getDB(dbname, DBModeReadFromWrite)
+	rows, err := mydb.Query(query, params...)
+	if err != nil {
+		return
+	}
+
+	var u *T
+	for rows.Next() {
+		u = new(T)
+		data := StrutForScan(u)
+		err = rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result = append(result, u)
+	}
+
+	return
+}
+
 // GetColumnsNames returns column names joined by `,` of given type
 func GetColumnsNames[T any]() (joinedColumnNames string) {
 	var o *T
