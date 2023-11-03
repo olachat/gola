@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 var _dbp DBProvider
@@ -28,6 +29,7 @@ func Setup(dbp DBProvider) {
 }
 
 var typeColumnNames = make(map[reflect.Type]string)
+var typeColumnNamesLock sync.RWMutex
 
 func getDB(dbname string, mode DBMode) *sql.DB {
 	if _dbp == nil {
@@ -228,7 +230,9 @@ func QueryFromMaster[T any](dbname string, query string, params ...any) (result 
 func GetColumnsNames[T any]() (joinedColumnNames string) {
 	var o *T
 	t := reflect.TypeOf(o)
+	typeColumnNamesLock.RLock()
 	joinedColumnNames, ok := typeColumnNames[t]
+	typeColumnNamesLock.RUnlock()
 	if ok {
 		return
 	}
@@ -244,7 +248,10 @@ func GetColumnsNames[T any]() (joinedColumnNames string) {
 	}
 
 	joinedColumnNames = strings.Join(columnNames, ",")
+
+	typeColumnNamesLock.Lock()
 	typeColumnNames[t] = joinedColumnNames
+	typeColumnNamesLock.Unlock()
 
 	return
 }
