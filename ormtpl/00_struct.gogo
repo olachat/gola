@@ -429,8 +429,6 @@ func (c *{{.ClassName}}) Insert() error {
 	}
 	{{- end}}
 
-
-
 	affectedRows, err := result.RowsAffected()
 	if err != nil {
 		return err
