@@ -25,7 +25,7 @@ const (
 
 var tableNames = []string{"users", "blogs", "songs", "song_user_favourites", "profile", "account",
 	"gifts", "gifts_with_default",
-	"gifts_nn", "gifts_nn_with_default",
+	"gifts_nn", "gifts_nn_with_default", "wallet",
 }
 
 func init() {

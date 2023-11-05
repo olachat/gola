@@ -12,37 +12,37 @@ import (
 )
 
 // FetchByPK returns a row from `blogs` table with given primary key value
-func FetchByPKCtx(ctx context.Context, val int) *Blog {
+func FetchByPKCtx(ctx context.Context, val int) (*Blog, error) {
 	return coredb.FetchByPKCtx[Blog](ctx, DBName, TableName, []string{"id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from blogs table with given primary key value
-func FetchFieldsByPKCtx[T any](ctx context.Context, val int) *T {
+func FetchFieldsByPKCtx[T any](ctx context.Context, val int) (*T, error) {
 	return coredb.FetchByPKCtx[T](ctx, DBName, TableName, []string{"id"}, val)
 }
 
 // FetchByPKs returns rows with from `blogs` table with given primary key values
-func FetchByPKsCtx(ctx context.Context, vals ...int) []*Blog {
+func FetchByPKsCtx(ctx context.Context, vals ...int) ([]*Blog, error) {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsCtx[Blog](ctx, DBName, TableName, "id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `blogs` table with given primary key values
-func FetchFieldsByPKsCtx[T any](ctx context.Context, vals ...int) []*T {
+func FetchFieldsByPKsCtx[T any](ctx context.Context, vals ...int) ([]*T, error) {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsCtx[T](ctx, DBName, TableName, "id", pks)
 }
 
 // FindOne returns a row from `blogs` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneCtx(ctx context.Context, whereSQL string, params ...any) *Blog {
+func FindOneCtx(ctx context.Context, whereSQL string, params ...any) (*Blog, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneCtx[Blog](ctx, DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from `blogs` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneFieldsCtx[T any](ctx context.Context, whereSQL string, params ...any) *T {
+func FindOneFieldsCtx[T any](ctx context.Context, whereSQL string, params ...any) (*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneCtx[T](ctx, DBName, TableName, w)
 }
@@ -68,37 +68,37 @@ func CountCtx(ctx context.Context, whereSQL string, params ...any) (int, error) 
 }
 
 // FetchByPK returns a row from `blogs` table with given primary key value
-func FetchByPKFromMasterCtx(ctx context.Context, val int) *Blog {
+func FetchByPKFromMasterCtx(ctx context.Context, val int) (*Blog, error) {
 	return coredb.FetchByPKFromMasterCtx[Blog](ctx, DBName, TableName, []string{"id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from blogs table with given primary key value
-func FetchFieldsByPKFromMasterCtx[T any](ctx context.Context, val int) *T {
+func FetchFieldsByPKFromMasterCtx[T any](ctx context.Context, val int) (*T, error) {
 	return coredb.FetchByPKFromMasterCtx[T](ctx, DBName, TableName, []string{"id"}, val)
 }
 
 // FetchByPKs returns rows with from `blogs` table with given primary key values
-func FetchByPKsFromMasterCtx(ctx context.Context, vals ...int) []*Blog {
+func FetchByPKsFromMasterCtx(ctx context.Context, vals ...int) ([]*Blog, error) {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMasterCtx[Blog](ctx, DBName, TableName, "id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `blogs` table with given primary key values
-func FetchFieldsByPKsFromMasterCtx[T any](ctx context.Context, vals ...int) []*T {
+func FetchFieldsByPKsFromMasterCtx[T any](ctx context.Context, vals ...int) ([]*T, error) {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMasterCtx[T](ctx, DBName, TableName, "id", pks)
 }
 
 // FindOne returns a row from `blogs` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneFromMasterCtx(ctx context.Context, whereSQL string, params ...any) *Blog {
+func FindOneFromMasterCtx(ctx context.Context, whereSQL string, params ...any) (*Blog, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMasterCtx[Blog](ctx, DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from `blogs` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneFieldsFromMasterCtx[T any](ctx context.Context, whereSQL string, params ...any) *T {
+func FindOneFieldsFromMasterCtx[T any](ctx context.Context, whereSQL string, params ...any) (*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMasterCtx[T](ctx, DBName, TableName, w)
 }

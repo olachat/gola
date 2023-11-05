@@ -7,7 +7,7 @@ import (
 )
 
 // FetchByPKCtx returns a row of T type with given primary key value
-func FetchByPKCtx[T any](ctx context.Context, dbname string, tableName string, pkName []string, val ...any) *T {
+func FetchByPKCtx[T any](ctx context.Context, dbname string, tableName string, pkName []string, val ...any) (*T, error) {
 	sql := "WHERE `" + pkName[0] + "` = ?"
 	for _, name := range pkName[1:] {
 		sql += " AND `" + name + "` = ?"
@@ -17,23 +17,19 @@ func FetchByPKCtx[T any](ctx context.Context, dbname string, tableName string, p
 }
 
 // FetchByPKsCtx returns rows of T type with given primary key values
-func FetchByPKsCtx[T any](ctx context.Context, dbname string, tableName string, pkName string, vals []any) []*T {
+func FetchByPKsCtx[T any](ctx context.Context, dbname string, tableName string, pkName string, vals []any) ([]*T, error) {
 	if len(vals) == 0 {
-		return make([]*T, 0)
+		return make([]*T, 0), nil
 	}
 
 	query := fmt.Sprintf("WHERE `%s` IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
 	w := NewWhere(query, vals...)
 
-	result, err := FindCtx[T](ctx, dbname, tableName, w)
-	if err != nil {
-		panic("Find failled: " + err.Error())
-	}
-	return result
+	return FindCtx[T](ctx, dbname, tableName, w)
 }
 
 // FetchByPKFromMasterCtx returns a row of T type with given primary key value
-func FetchByPKFromMasterCtx[T any](ctx context.Context, dbname string, tableName string, pkName []string, val ...any) *T {
+func FetchByPKFromMasterCtx[T any](ctx context.Context, dbname string, tableName string, pkName []string, val ...any) (*T, error) {
 	sql := "WHERE `" + pkName[0] + "` = ?"
 	for _, name := range pkName[1:] {
 		sql += " AND `" + name + "` = ?"
@@ -43,19 +39,15 @@ func FetchByPKFromMasterCtx[T any](ctx context.Context, dbname string, tableName
 }
 
 // FetchByPKsFromMasterCtx returns rows of T type with given primary key values
-func FetchByPKsFromMasterCtx[T any](ctx context.Context, dbname string, tableName string, pkName string, vals []any) []*T {
+func FetchByPKsFromMasterCtx[T any](ctx context.Context, dbname string, tableName string, pkName string, vals []any) ([]*T, error) {
 	if len(vals) == 0 {
-		return make([]*T, 0)
+		return make([]*T, 0), nil
 	}
 
 	query := fmt.Sprintf("WHERE `%s` IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
 	w := NewWhere(query, vals...)
 
-	result, err := FindFromMasterCtx[T](ctx, dbname, tableName, w)
-	if err != nil {
-		panic("Find failled: " + err.Error())
-	}
-	return result
+	return FindFromMasterCtx[T](ctx, dbname, tableName, w)
 }
 
 // ExecCtx given query with given db info & params
@@ -64,8 +56,9 @@ func ExecCtx(ctx context.Context, dbname string, query string, params ...any) (s
 	return mydb.ExecContext(ctx, query, params...)
 }
 
-// FindOneCtx returns a row from given table type with where query
-func FindOneCtx[T any](ctx context.Context, dbname string, tableName string, where WhereQuery) *T {
+// FindOneCtx returns a row from given table type with where query.
+// If no rows found, *T will be nil. No error will be returned.
+func FindOneCtx[T any](ctx context.Context, dbname string, tableName string, where WhereQuery) (*T, error) {
 	u := new(T)
 	columnsNames := GetColumnsNames[T]()
 	data := StrutForScan(u)
@@ -78,14 +71,14 @@ func FindOneCtx[T any](ctx context.Context, dbname string, tableName string, whe
 	if err2 != nil {
 		// It's on purpose the hide the error
 		// But should re-consider later
-		if err2 != sql.ErrNoRows {
-			panic("QueryRow failed: " + err2.Error())
+		if err2 == sql.ErrNoRows {
+			return nil, nil
 		}
 
-		return nil
+		return nil, err2
 	}
 
-	return u
+	return u, nil
 }
 
 // FindCtx returns rows from given table type with where query
@@ -99,7 +92,8 @@ func FindCtx[T any](ctx context.Context, dbname string, tableName string, where 
 }
 
 // FindOneFromMasterCtx using master DB returns a row from given table type with where query
-func FindOneFromMasterCtx[T any](ctx context.Context, dbname string, tableName string, where WhereQuery) *T {
+// If no rows found, *T will be nil. No error will be returned.
+func FindOneFromMasterCtx[T any](ctx context.Context, dbname string, tableName string, where WhereQuery) (*T, error) {
 	u := new(T)
 	columnsNames := GetColumnsNames[T]()
 	data := StrutForScan(u)
@@ -112,14 +106,14 @@ func FindOneFromMasterCtx[T any](ctx context.Context, dbname string, tableName s
 	if err2 != nil {
 		// It's on purpose the hide the error
 		// But should re-consider later
-		if err2 != sql.ErrNoRows {
-			panic("QueryRow failed: " + err2.Error())
+		if err2 == sql.ErrNoRows {
+			return nil, nil
 		}
 
-		return nil
+		return nil, err2
 	}
 
-	return u
+	return u, nil
 }
 
 // FindFromMasterCtx using master DB returns rows from given table type with where query

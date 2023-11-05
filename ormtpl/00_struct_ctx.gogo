@@ -12,22 +12,22 @@ import (
 )
 
 // FetchByPK returns a row from `{{.Name}}` table with given primary key value
-func FetchByPKCtx(ctx context.Context, val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
+func FetchByPKCtx(ctx context.Context, val {{.GetPrimaryKeyType}}) (*{{.ClassName}}, error) {
 	return coredb.FetchByPKCtx[{{.ClassName}}](ctx, DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 // FetchFieldsByPK returns a row with selected fields from {{.Name}} table with given primary key value
-func FetchFieldsByPKCtx[T any](ctx context.Context, val {{.GetPrimaryKeyType}}) *T {
+func FetchFieldsByPKCtx[T any](ctx context.Context, val {{.GetPrimaryKeyType}}) (*T, error) {
 	return coredb.FetchByPKCtx[T](ctx, DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 {{- if not .HasCompositePrimaryKey }}
 // FetchByPKs returns rows with from `{{.Name}}` table with given primary key values
-func FetchByPKsCtx(ctx context.Context, vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
+func FetchByPKsCtx(ctx context.Context, vals ...{{.GetPrimaryKeyType}}) ([]*{{.ClassName}}, error) {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsCtx[{{.ClassName}}](ctx, DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `{{.Name}}` table with given primary key values
-func FetchFieldsByPKsCtx[T any](ctx context.Context, vals ...{{.GetPrimaryKeyType}}) []*T {
+func FetchFieldsByPKsCtx[T any](ctx context.Context, vals ...{{.GetPrimaryKeyType}}) ([]*T, error) {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsCtx[T](ctx, DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
 }
@@ -35,14 +35,14 @@ func FetchFieldsByPKsCtx[T any](ctx context.Context, vals ...{{.GetPrimaryKeyTyp
 
 // FindOne returns a row from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneCtx(ctx context.Context, whereSQL string, params ...any) *{{.ClassName}} {
+func FindOneCtx(ctx context.Context, whereSQL string, params ...any) (*{{.ClassName}}, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneCtx[{{.ClassName}}](ctx, DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneFieldsCtx[T any](ctx context.Context, whereSQL string, params ...any) *T {
+func FindOneFieldsCtx[T any](ctx context.Context, whereSQL string, params ...any) (*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneCtx[T](ctx, DBName, TableName, w)
 }
@@ -68,22 +68,22 @@ func CountCtx(ctx context.Context, whereSQL string, params ...any) (int, error) 
 }
 
 // FetchByPK returns a row from `{{.Name}}` table with given primary key value
-func FetchByPKFromMasterCtx(ctx context.Context, val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
+func FetchByPKFromMasterCtx(ctx context.Context, val {{.GetPrimaryKeyType}}) (*{{.ClassName}}, error) {
 	return coredb.FetchByPKFromMasterCtx[{{.ClassName}}](ctx, DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 // FetchFieldsByPK returns a row with selected fields from {{.Name}} table with given primary key value
-func FetchFieldsByPKFromMasterCtx[T any](ctx context.Context, val {{.GetPrimaryKeyType}}) *T {
+func FetchFieldsByPKFromMasterCtx[T any](ctx context.Context, val {{.GetPrimaryKeyType}}) (*T, error) {
 	return coredb.FetchByPKFromMasterCtx[T](ctx, DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 {{- if not .HasCompositePrimaryKey }}
 // FetchByPKs returns rows with from `{{.Name}}` table with given primary key values
-func FetchByPKsFromMasterCtx(ctx context.Context, vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
+func FetchByPKsFromMasterCtx(ctx context.Context, vals ...{{.GetPrimaryKeyType}}) ([]*{{.ClassName}}, error) {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMasterCtx[{{.ClassName}}](ctx, DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `{{.Name}}` table with given primary key values
-func FetchFieldsByPKsFromMasterCtx[T any](ctx context.Context, vals ...{{.GetPrimaryKeyType}}) []*T {
+func FetchFieldsByPKsFromMasterCtx[T any](ctx context.Context, vals ...{{.GetPrimaryKeyType}}) ([]*T, error) {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMasterCtx[T](ctx, DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
 }
@@ -91,14 +91,14 @@ func FetchFieldsByPKsFromMasterCtx[T any](ctx context.Context, vals ...{{.GetPri
 
 // FindOne returns a row from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneFromMasterCtx(ctx context.Context, whereSQL string, params ...any) *{{.ClassName}} {
+func FindOneFromMasterCtx(ctx context.Context, whereSQL string, params ...any) (*{{.ClassName}}, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMasterCtx[{{.ClassName}}](ctx, DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneFieldsFromMasterCtx[T any](ctx context.Context, whereSQL string, params ...any) *T {
+func FindOneFieldsFromMasterCtx[T any](ctx context.Context, whereSQL string, params ...any) (*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMasterCtx[T](ctx, DBName, TableName, w)
 }

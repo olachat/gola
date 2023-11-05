@@ -12,25 +12,25 @@ import (
 )
 
 // FetchByPK returns a row from `song_user_favourites` table with given primary key value
-func FetchByPKCtx(ctx context.Context, val PK) *SongUserFavourite {
+func FetchByPKCtx(ctx context.Context, val PK) (*SongUserFavourite, error) {
 	return coredb.FetchByPKCtx[SongUserFavourite](ctx, DBName, TableName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FetchFieldsByPK returns a row with selected fields from song_user_favourites table with given primary key value
-func FetchFieldsByPKCtx[T any](ctx context.Context, val PK) *T {
+func FetchFieldsByPKCtx[T any](ctx context.Context, val PK) (*T, error) {
 	return coredb.FetchByPKCtx[T](ctx, DBName, TableName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FindOne returns a row from `song_user_favourites` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneCtx(ctx context.Context, whereSQL string, params ...any) *SongUserFavourite {
+func FindOneCtx(ctx context.Context, whereSQL string, params ...any) (*SongUserFavourite, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneCtx[SongUserFavourite](ctx, DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from `song_user_favourites` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneFieldsCtx[T any](ctx context.Context, whereSQL string, params ...any) *T {
+func FindOneFieldsCtx[T any](ctx context.Context, whereSQL string, params ...any) (*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneCtx[T](ctx, DBName, TableName, w)
 }
@@ -56,25 +56,25 @@ func CountCtx(ctx context.Context, whereSQL string, params ...any) (int, error) 
 }
 
 // FetchByPK returns a row from `song_user_favourites` table with given primary key value
-func FetchByPKFromMasterCtx(ctx context.Context, val PK) *SongUserFavourite {
+func FetchByPKFromMasterCtx(ctx context.Context, val PK) (*SongUserFavourite, error) {
 	return coredb.FetchByPKFromMasterCtx[SongUserFavourite](ctx, DBName, TableName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FetchFieldsByPK returns a row with selected fields from song_user_favourites table with given primary key value
-func FetchFieldsByPKFromMasterCtx[T any](ctx context.Context, val PK) *T {
+func FetchFieldsByPKFromMasterCtx[T any](ctx context.Context, val PK) (*T, error) {
 	return coredb.FetchByPKFromMasterCtx[T](ctx, DBName, TableName, []string{"user_id", "song_id"}, val.UserId, val.SongId)
 }
 
 // FindOne returns a row from `song_user_favourites` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneFromMasterCtx(ctx context.Context, whereSQL string, params ...any) *SongUserFavourite {
+func FindOneFromMasterCtx(ctx context.Context, whereSQL string, params ...any) (*SongUserFavourite, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMasterCtx[SongUserFavourite](ctx, DBName, TableName, w)
 }
 
 // FindOneFields returns a row with selected fields from `song_user_favourites` table with arbitary where query
 // whereSQL must start with "where ..."
-func FindOneFieldsFromMasterCtx[T any](ctx context.Context, whereSQL string, params ...any) *T {
+func FindOneFieldsFromMasterCtx[T any](ctx context.Context, whereSQL string, params ...any) (*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMasterCtx[T](ctx, DBName, TableName, w)
 }

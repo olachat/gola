@@ -30,6 +30,7 @@ var testTables = []string{
 	"room",
 	"gifts", "gifts_nn",
 	"gifts_with_default", "gifts_nn_with_default",
+	"wallet",
 }
 var testDataPath = "testdata" + string(filepath.Separator)
 
