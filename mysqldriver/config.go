@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/olachat/gola/structs"
+	"github.com/olachat/gola/v2/structs"
 	"github.com/pkg/errors"
 )
 

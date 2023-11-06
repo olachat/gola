@@ -28,6 +28,8 @@ func NewWhere(whereSQL string, params ...any) WhereQuery {
 type ReadQuery[T any] interface {
 	All() []*T
 	Limit(offset, limit int) []*T
+	AllFromMaster() []*T
+	LimitFromMaster(offset, limit int) []*T
 }
 
 // ReadOneQuery defines interface which support reading one object

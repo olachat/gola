@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/olachat/gola/coredb"
+	"github.com/olachat/gola/v2/coredb"
 )
 
 const DBName string = "testdata"
@@ -16,11 +16,11 @@ const TableName string = "profile"
 
 // Profile represents `profile` table
 type Profile struct {
-	//  int
+	//  int(11)
 	UserId `json:"user_id"`
 	//  tinyint(4)
 	Level `json:"level"`
-	// Nick Name varchar
+	// Nick Name varchar(255)
 	NickName `json:"nick_name"`
 }
 
@@ -84,10 +84,65 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `profile` "+whereSQL, params...)
 }
 
+// FetchByPK returns a row from `profile` table with given primary key value
+func FetchByPKFromMaster(val int) *Profile {
+	return coredb.FetchByPKFromMaster[Profile](DBName, TableName, []string{"user_id"}, val)
+}
+
+// FetchFieldsByPK returns a row with selected fields from profile table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val int) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"user_id"}, val)
+}
+
+// FetchByPKs returns rows with from `profile` table with given primary key values
+func FetchByPKsFromMaster(vals ...int) []*Profile {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[Profile](DBName, TableName, "user_id", pks)
+}
+
+// FetchFieldsByPKs returns rows with selected fields from `profile` table with given primary key values
+func FetchFieldsByPKsFromMaster[T any](vals ...int) []*T {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "user_id", pks)
+}
+
+// FindOne returns a row from `profile` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *Profile {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[Profile](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `profile` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `profile` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*Profile, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[Profile](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `profile` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `profile` "+whereSQL, params...)
+}
+
 // Column types
 
 // UserId field
-//
 type UserId struct {
 	val int
 }
@@ -104,6 +159,10 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UserId) getUserIdForDB() int {
+	return c.val
+}
+
 func (c *UserId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -117,7 +176,6 @@ func (c *UserId) UnmarshalJSON(data []byte) error {
 }
 
 // Level field
-//
 type Level struct {
 	_updated bool
 	val      int8
@@ -150,6 +208,10 @@ func (c *Level) GetColumnName() string {
 
 func (c *Level) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Level) getLevelForDB() int8 {
+	return c.val
 }
 
 func (c *Level) MarshalJSON() ([]byte, error) {
@@ -200,6 +262,10 @@ func (c *NickName) GetValPointer() any {
 	return &c.val
 }
 
+func (c *NickName) getNickNameForDB() string {
+	return c.val
+}
+
 func (c *NickName) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -224,13 +290,13 @@ func NewWithPK(val int) *Profile {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
 
 // Insert Profile struct to `profile` table
 func (c *Profile) Insert() error {
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetLevel(), c.GetNickName())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getLevelForDB(), c.getNickNameForDB())
 	if err != nil {
 		return err
 	}
@@ -258,11 +324,11 @@ func (obj *Profile) Update() (bool, error) {
 	var params []any
 	if obj.Level.IsUpdated() {
 		updatedFields = append(updatedFields, "`level` = ?")
-		params = append(params, obj.GetLevel())
+		params = append(params, obj.getLevelForDB())
 	}
 	if obj.NickName.IsUpdated() {
 		updatedFields = append(updatedFields, "`nick_name` = ?")
-		params = append(params, obj.GetNickName())
+		params = append(params, obj.getNickNameForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -307,13 +373,13 @@ func Update(obj withPK) (bool, error) {
 		case *Level:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`level` = ?")
-				params = append(params, c.GetLevel())
+				params = append(params, c.getLevelForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *NickName:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`nick_name` = ?")
-				params = append(params, c.GetNickName())
+				params = append(params, c.getNickNameForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}
