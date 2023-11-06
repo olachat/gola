@@ -3,8 +3,8 @@ package tests
 import (
 	"testing"
 
-	"github.com/olachat/gola/golalib/testdata/account"
-	"github.com/olachat/gola/golalib/testdata/profile"
+	"github.com/olachat/gola/v2/golalib/testdata/account"
+	"github.com/olachat/gola/v2/golalib/testdata/profile"
 )
 
 func TestProfile(t *testing.T) {

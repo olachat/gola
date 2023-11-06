@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/olachat/gola/coredb"
+	"github.com/olachat/gola/v2/coredb"
 )
 
 type orderBy int
@@ -99,6 +99,17 @@ func (q *idxQuery[T]) All() []*T {
 func (q *idxQuery[T]) Limit(offset, limit int) []*T {
 	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, limit)
 	result, _ := coredb.Find[T](DBName, TableName, q)
+	return result
+}
+
+func (q *idxQuery[T]) AllFromMaster() []*T {
+	result, _ := coredb.FindFromMaster[T](DBName, TableName, q)
+	return result
+}
+
+func (q *idxQuery[T]) LimitFromMaster(offset, limit int) []*T {
+	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, limit)
+	result, _ := coredb.FindFromMaster[T](DBName, TableName, q)
 	return result
 }
 

@@ -3,7 +3,7 @@ package mysqldriver
 import (
 	"sort"
 
-	"github.com/olachat/gola/structs"
+	"github.com/olachat/gola/v2/structs"
 )
 
 // SetIndexAndKey sets indexes & key information to given tables

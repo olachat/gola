@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/olachat/gola/golalib/testdata/blogs"
+	"github.com/olachat/gola/v2/golalib/testdata/blogs"
 )
 
 func TestBlogMethods(t *testing.T) {
@@ -59,7 +59,7 @@ func TestBlogMethods(t *testing.T) {
 }
 
 func TestBlogFind(t *testing.T) {
-	obj := blogs.FindOne("where title = ?", "bar")
+	obj := blogs.FindOneFromMaster("where title = ?", "bar")
 	if obj.GetId() != 3 {
 		t.Error("Find blog with title bar failed")
 	}
@@ -72,21 +72,21 @@ func TestBlogFind(t *testing.T) {
 		t.Error("Find blogs with title bar failed")
 	}
 
-	objs, err = blogs.Find("where title = ?", "barbar")
+	objs, err = blogs.FindFromMaster("where title = ?", "barbar")
 	if err != nil || len(objs) != 0 {
 		t.Error("Find blogs with non-exist title bar failed: ")
 	}
 }
 
 func TestBlogFindT(t *testing.T) {
-	obj := blogs.FindOneFields[struct {
+	obj := blogs.FindOneFieldsFromMaster[struct {
 		blogs.Id
 	}]("where title = ?", "bar")
 	if obj.GetId() != 3 {
 		t.Error("Find blog with title bar failed")
 	}
 
-	objs, err := blogs.FindFields[struct {
+	objs, err := blogs.FindFieldsFromMaster[struct {
 		blogs.Id
 	}]("where title = ?", "bar")
 	if err != nil || len(objs) != 1 {
@@ -96,7 +96,7 @@ func TestBlogFindT(t *testing.T) {
 		t.Error("Find blogs with title bar failed")
 	}
 
-	data, err := blogs.FindFields[struct {
+	data, err := blogs.FindFieldsFromMaster[struct {
 		blogs.Title
 	}]("where title = ?", "barbar")
 	if err != nil || len(data) != 0 {
@@ -108,7 +108,7 @@ func TestBlogSelect(t *testing.T) {
 	objs := blogs.SelectFields[struct {
 		blogs.Id
 		blogs.Title
-	}]().OrderBy(blogs.IdAsc).All()
+	}]().OrderBy(blogs.IdAsc).AllFromMaster()
 
 	if len(objs) != 2 {
 		t.Error("Read all blog failed")
@@ -139,7 +139,7 @@ func TestBlogSelect(t *testing.T) {
 		t.Error("Read blog 2 failed")
 	}
 
-	data := blogs.FetchByPKs(2, 3)
+	data := blogs.FetchByPKsFromMaster(2, 3)
 	if len(data) != 2 {
 		t.Error("Read all blog failed")
 	}

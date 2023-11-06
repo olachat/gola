@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/olachat/gola/coredb"
+	"github.com/olachat/gola/v2/coredb"
 )
 
 const DBName string = "testdata"
@@ -16,15 +16,15 @@ const TableName string = "room"
 
 // Room represents `room` table
 type Room struct {
-	//  int unsigned
+	//  int(11) unsigned
 	Id `json:"id"`
-	//  int unsigned
+	//  int(11) unsigned
 	Group `json:"group"`
-	//  varchar
+	//  varchar(5)
 	Lang `json:"lang"`
 	//  double
 	Priority `json:"priority"`
-	//  tinyint(1)
+	//  tinyint(1) unsigned
 	Deleted `json:"deleted"`
 }
 
@@ -88,10 +88,65 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `room` "+whereSQL, params...)
 }
 
+// FetchByPK returns a row from `room` table with given primary key value
+func FetchByPKFromMaster(val uint) *Room {
+	return coredb.FetchByPKFromMaster[Room](DBName, TableName, []string{"id"}, val)
+}
+
+// FetchFieldsByPK returns a row with selected fields from room table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val uint) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"id"}, val)
+}
+
+// FetchByPKs returns rows with from `room` table with given primary key values
+func FetchByPKsFromMaster(vals ...uint) []*Room {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[Room](DBName, TableName, "id", pks)
+}
+
+// FetchFieldsByPKs returns rows with selected fields from `room` table with given primary key values
+func FetchFieldsByPKsFromMaster[T any](vals ...uint) []*T {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "id", pks)
+}
+
+// FindOne returns a row from `room` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *Room {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[Room](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `room` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `room` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*Room, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[Room](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `room` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `room` "+whereSQL, params...)
+}
+
 // Column types
 
 // Id field
-//
 type Id struct {
 	isAssigned bool
 	val        uint
@@ -109,6 +164,10 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Id) getIdForDB() uint {
+	return c.val
+}
+
 func (c *Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -122,7 +181,6 @@ func (c *Id) UnmarshalJSON(data []byte) error {
 }
 
 // Group field
-//
 type Group struct {
 	_updated bool
 	val      uint
@@ -157,6 +215,10 @@ func (c *Group) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Group) getGroupForDB() uint {
+	return c.val
+}
+
 func (c *Group) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -170,7 +232,6 @@ func (c *Group) UnmarshalJSON(data []byte) error {
 }
 
 // Lang field
-//
 type Lang struct {
 	_updated bool
 	val      string
@@ -205,6 +266,10 @@ func (c *Lang) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Lang) getLangForDB() string {
+	return c.val
+}
+
 func (c *Lang) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -218,7 +283,6 @@ func (c *Lang) UnmarshalJSON(data []byte) error {
 }
 
 // Priority field
-//
 type Priority struct {
 	_updated bool
 	val      float64
@@ -253,6 +317,10 @@ func (c *Priority) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Priority) getPriorityForDB() float64 {
+	return c.val
+}
+
 func (c *Priority) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -266,7 +334,6 @@ func (c *Priority) UnmarshalJSON(data []byte) error {
 }
 
 // Deleted field
-//
 type Deleted struct {
 	_updated bool
 	val      bool
@@ -299,6 +366,10 @@ func (c *Deleted) GetColumnName() string {
 
 func (c *Deleted) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Deleted) getDeletedForDB() bool {
+	return c.val
 }
 
 func (c *Deleted) MarshalJSON() ([]byte, error) {
@@ -339,20 +410,20 @@ func NewWithPK(val uint) *Room {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `room` (`group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?)"
-const insertWithPK string = "INSERT IGNORE INTO `room` (`id`, `group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `room` (`group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?)"
+const insertWithPK string = "INSERT INTO `room` (`id`, `group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?, ?)"
 
 // Insert Room struct to `room` table
 func (c *Room) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetGroup(), c.GetLang(), c.GetPriority(), c.GetDeleted())
+		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getGroupForDB(), c.getLangForDB(), c.getPriorityForDB(), c.getDeletedForDB())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetGroup(), c.GetLang(), c.GetPriority(), c.GetDeleted())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.getGroupForDB(), c.getLangForDB(), c.getPriorityForDB(), c.getDeletedForDB())
 		if err != nil {
 			return err
 		}
@@ -389,19 +460,19 @@ func (obj *Room) Update() (bool, error) {
 	var params []any
 	if obj.Group.IsUpdated() {
 		updatedFields = append(updatedFields, "`group` = ?")
-		params = append(params, obj.GetGroup())
+		params = append(params, obj.getGroupForDB())
 	}
 	if obj.Lang.IsUpdated() {
 		updatedFields = append(updatedFields, "`lang` = ?")
-		params = append(params, obj.GetLang())
+		params = append(params, obj.getLangForDB())
 	}
 	if obj.Priority.IsUpdated() {
 		updatedFields = append(updatedFields, "`priority` = ?")
-		params = append(params, obj.GetPriority())
+		params = append(params, obj.getPriorityForDB())
 	}
 	if obj.Deleted.IsUpdated() {
 		updatedFields = append(updatedFields, "`deleted` = ?")
-		params = append(params, obj.GetDeleted())
+		params = append(params, obj.getDeletedForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -446,25 +517,25 @@ func Update(obj withPK) (bool, error) {
 		case *Group:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`group` = ?")
-				params = append(params, c.GetGroup())
+				params = append(params, c.getGroupForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Lang:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`lang` = ?")
-				params = append(params, c.GetLang())
+				params = append(params, c.getLangForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Priority:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`priority` = ?")
-				params = append(params, c.GetPriority())
+				params = append(params, c.getPriorityForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Deleted:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`deleted` = ?")
-				params = append(params, c.GetDeleted())
+				params = append(params, c.getDeletedForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

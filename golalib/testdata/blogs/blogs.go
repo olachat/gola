@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/olachat/gola/coredb"
+	"github.com/olachat/gola/v2/coredb"
 )
 
 const DBName string = "testdata"
@@ -16,25 +16,25 @@ const TableName string = "blogs"
 
 // Blog represents `blogs` table
 type Blog struct {
-	//  int
+	//  int(11)
 	Id `json:"id"`
-	// User Id int
+	// User Id int(11)
 	UserId `json:"user_id"`
-	// Slug varchar
+	// Slug varchar(255)
 	Slug `json:"slug"`
-	// Title varchar
+	// Title varchar(255)
 	Title `json:"title"`
-	// Category Id int
+	// Category Id int(11)
 	CategoryId `json:"category_id"`
-	// Is pinned to top tinyint
+	// Is pinned to top tinyint(1)
 	IsPinned `json:"is_pinned"`
-	// Is VIP reader only tinyint
+	// Is VIP reader only tinyint(1)
 	IsVip `json:"is_vip"`
-	// Country of the blog user varchar
+	// Country of the blog user varchar(255)
 	Country `json:"country"`
-	// Created Timestamp int unsigned
+	// Created Timestamp int(11) unsigned
 	CreatedAt `json:"created_at"`
-	// Updated Timestamp int unsigned
+	// Updated Timestamp int(11) unsigned
 	UpdatedAt `json:"updated_at"`
 }
 
@@ -98,10 +98,65 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `blogs` "+whereSQL, params...)
 }
 
+// FetchByPK returns a row from `blogs` table with given primary key value
+func FetchByPKFromMaster(val int) *Blog {
+	return coredb.FetchByPKFromMaster[Blog](DBName, TableName, []string{"id"}, val)
+}
+
+// FetchFieldsByPK returns a row with selected fields from blogs table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val int) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"id"}, val)
+}
+
+// FetchByPKs returns rows with from `blogs` table with given primary key values
+func FetchByPKsFromMaster(vals ...int) []*Blog {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[Blog](DBName, TableName, "id", pks)
+}
+
+// FetchFieldsByPKs returns rows with selected fields from `blogs` table with given primary key values
+func FetchFieldsByPKsFromMaster[T any](vals ...int) []*T {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "id", pks)
+}
+
+// FindOne returns a row from `blogs` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *Blog {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[Blog](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `blogs` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `blogs` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*Blog, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[Blog](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `blogs` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `blogs` "+whereSQL, params...)
+}
+
 // Column types
 
 // Id field
-//
 type Id struct {
 	isAssigned bool
 	val        int
@@ -117,6 +172,10 @@ func (c *Id) GetColumnName() string {
 
 func (c *Id) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Id) getIdForDB() int {
+	return c.val
 }
 
 func (c *Id) MarshalJSON() ([]byte, error) {
@@ -167,6 +226,10 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UserId) getUserIdForDB() int {
+	return c.val
+}
+
 func (c *UserId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -213,6 +276,10 @@ func (c *Slug) GetColumnName() string {
 
 func (c *Slug) GetValPointer() any {
 	return &c.val
+}
+
+func (c *Slug) getSlugForDB() string {
+	return c.val
 }
 
 func (c *Slug) MarshalJSON() ([]byte, error) {
@@ -263,6 +330,10 @@ func (c *Title) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Title) getTitleForDB() string {
+	return c.val
+}
+
 func (c *Title) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -309,6 +380,10 @@ func (c *CategoryId) GetColumnName() string {
 
 func (c *CategoryId) GetValPointer() any {
 	return &c.val
+}
+
+func (c *CategoryId) getCategoryIdForDB() int {
+	return c.val
 }
 
 func (c *CategoryId) MarshalJSON() ([]byte, error) {
@@ -359,6 +434,10 @@ func (c *IsPinned) GetValPointer() any {
 	return &c.val
 }
 
+func (c *IsPinned) getIsPinnedForDB() bool {
+	return c.val
+}
+
 func (c *IsPinned) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -405,6 +484,10 @@ func (c *IsVip) GetColumnName() string {
 
 func (c *IsVip) GetValPointer() any {
 	return &c.val
+}
+
+func (c *IsVip) getIsVipForDB() bool {
+	return c.val
 }
 
 func (c *IsVip) MarshalJSON() ([]byte, error) {
@@ -455,6 +538,10 @@ func (c *Country) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Country) getCountryForDB() string {
+	return c.val
+}
+
 func (c *Country) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -501,6 +588,10 @@ func (c *CreatedAt) GetColumnName() string {
 
 func (c *CreatedAt) GetValPointer() any {
 	return &c.val
+}
+
+func (c *CreatedAt) getCreatedAtForDB() uint {
+	return c.val
 }
 
 func (c *CreatedAt) MarshalJSON() ([]byte, error) {
@@ -551,6 +642,10 @@ func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
 }
 
+func (c *UpdatedAt) getUpdatedAtForDB() uint {
+	return c.val
+}
+
 func (c *UpdatedAt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -599,20 +694,20 @@ func NewWithPK(val int) *Blog {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-const insertWithPK string = "INSERT IGNORE INTO `blogs` (`id`, `user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT INTO `blogs` (`id`, `user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 // Insert Blog struct to `blogs` table
 func (c *Blog) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetSlug(), c.GetTitle(), c.GetCategoryId(), c.GetIsPinned(), c.GetIsVip(), c.GetCountry(), c.GetCreatedAt(), c.GetUpdatedAt())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB())
 		if err != nil {
 			return err
 		}
@@ -654,39 +749,39 @@ func (obj *Blog) Update() (bool, error) {
 	var params []any
 	if obj.UserId.IsUpdated() {
 		updatedFields = append(updatedFields, "`user_id` = ?")
-		params = append(params, obj.GetUserId())
+		params = append(params, obj.getUserIdForDB())
 	}
 	if obj.Slug.IsUpdated() {
 		updatedFields = append(updatedFields, "`slug` = ?")
-		params = append(params, obj.GetSlug())
+		params = append(params, obj.getSlugForDB())
 	}
 	if obj.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "`title` = ?")
-		params = append(params, obj.GetTitle())
+		params = append(params, obj.getTitleForDB())
 	}
 	if obj.CategoryId.IsUpdated() {
 		updatedFields = append(updatedFields, "`category_id` = ?")
-		params = append(params, obj.GetCategoryId())
+		params = append(params, obj.getCategoryIdForDB())
 	}
 	if obj.IsPinned.IsUpdated() {
 		updatedFields = append(updatedFields, "`is_pinned` = ?")
-		params = append(params, obj.GetIsPinned())
+		params = append(params, obj.getIsPinnedForDB())
 	}
 	if obj.IsVip.IsUpdated() {
 		updatedFields = append(updatedFields, "`is_vip` = ?")
-		params = append(params, obj.GetIsVip())
+		params = append(params, obj.getIsVipForDB())
 	}
 	if obj.Country.IsUpdated() {
 		updatedFields = append(updatedFields, "`country` = ?")
-		params = append(params, obj.GetCountry())
+		params = append(params, obj.getCountryForDB())
 	}
 	if obj.CreatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`created_at` = ?")
-		params = append(params, obj.GetCreatedAt())
+		params = append(params, obj.getCreatedAtForDB())
 	}
 	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`updated_at` = ?")
-		params = append(params, obj.GetUpdatedAt())
+		params = append(params, obj.getUpdatedAtForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -731,55 +826,55 @@ func Update(obj withPK) (bool, error) {
 		case *UserId:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`user_id` = ?")
-				params = append(params, c.GetUserId())
+				params = append(params, c.getUserIdForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Slug:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`slug` = ?")
-				params = append(params, c.GetSlug())
+				params = append(params, c.getSlugForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Title:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`title` = ?")
-				params = append(params, c.GetTitle())
+				params = append(params, c.getTitleForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CategoryId:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`category_id` = ?")
-				params = append(params, c.GetCategoryId())
+				params = append(params, c.getCategoryIdForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsPinned:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`is_pinned` = ?")
-				params = append(params, c.GetIsPinned())
+				params = append(params, c.getIsPinnedForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *IsVip:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`is_vip` = ?")
-				params = append(params, c.GetIsVip())
+				params = append(params, c.getIsVipForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Country:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`country` = ?")
-				params = append(params, c.GetCountry())
+				params = append(params, c.getCountryForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`created_at` = ?")
-				params = append(params, c.GetCreatedAt())
+				params = append(params, c.getCreatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`updated_at` = ?")
-				params = append(params, c.GetUpdatedAt())
+				params = append(params, c.getUpdatedAtForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}
