@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/olachat/gola/coredb"
+	"github.com/olachat/gola/v2/coredb"
 
 	{{.Imports}}
 )
@@ -19,7 +19,7 @@ const TableName string = "{{.Name}}"
 // {{.ClassName}} represents `{{.Name}}` table
 type {{.ClassName}} struct {
 	{{- range .Columns }}
-	// {{.Comment}} {{.DBType}}
+	// {{.Comment}} {{.FullDBType}}
 	{{.GoName}} `json:"{{.Name}}"`
 	{{- end }}
 }
@@ -94,6 +94,62 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, params...)
 }
 
+// FetchByPK returns a row from `{{.Name}}` table with given primary key value
+func FetchByPKFromMaster(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
+	return coredb.FetchByPKFromMaster[{{.ClassName}}](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
+}
+// FetchFieldsByPK returns a row with selected fields from {{.Name}} table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val {{.GetPrimaryKeyType}}) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
+}
+{{- if not .HasCompositePrimaryKey }}
+// FetchByPKs returns rows with from `{{.Name}}` table with given primary key values
+func FetchByPKsFromMaster(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[{{.ClassName}}](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
+}
+
+// FetchFieldsByPKs returns rows with selected fields from `{{.Name}}` table with given primary key values
+func FetchFieldsByPKsFromMaster[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
+	pks := coredb.GetAnySlice(vals)
+	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
+}
+{{- end}}
+
+// FindOne returns a row from `{{.Name}}` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *{{.ClassName}} {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[{{.ClassName}}](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `{{.Name}}` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `{{.Name}}` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[{{.ClassName}}](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `{{.Name}}` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, params...)
+}
+
 // Column types
 
 {{- range .Columns }}
@@ -108,6 +164,9 @@ type {{$table.ClassName}}{{.GoName}} string
 const (
 	{{.GetSetConst}}
 )
+var {{$table.ClassName}}{{.GoName}}List = []string{
+	{{.GetSetConstList}}
+}
 	{{- end }}
 {{- end }}
 
@@ -116,28 +175,67 @@ const (
 // {{.GoName}} field
 // {{.Comment}}
 {{- if .IsSet}}
+    {{- if .IsNullable}}
+type {{.GoName}} struct {
+	_updated bool
+	val goption.Option[string]
+}
+func (c *{{.GoName}}) Get{{.GoName}}() {{.GoSetNullableType}} {
+	if !c.val.Ok() {
+		return goption.None[[]{{.GoSetEnumType}}]()
+	}
+	strSlice := strings.Split(c.val.Unwrap(), ",")
+	if len(strSlice) == 1 && !coredb.ValueInSet({{$table.ClassName}}{{.GoName}}List, strSlice[0]) {
+		return goption.Some([]{{.GoSetEnumType}}{})
+	}
+	valSlice := make([]{{.GoSetEnumType}}, 0, len(strSlice))
+	for _, s := range strSlice {
+		valSlice = append(valSlice, {{.GoSetEnumType}}(strings.ToLower(s)))
+	}
+	return goption.Some(valSlice)
+}
+
+func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoSetNullableType}}) bool {
+	if !val.Ok(){
+		c.val = goption.None[string]()
+	}
+	strSlice := make([]string, 0, len(val.Unwrap()))
+	for _, v := range val.Unwrap() {
+		strSlice = append(strSlice, string(v))
+	}
+	c.val = goption.Some(strings.Join(strSlice, ","))
+	c._updated = true
+	return true
+}
+
+    {{- else}}
 type {{.GoName}} struct {
 	_updated bool
 	val string
 }
-
-func (c *{{.GoName}}) Get{{.GoName}}() []{{.GoType}} {
+func (c *{{.GoName}}) Get{{.GoName}}() []{{.GoSetEnumType}} {
 	strSlice := strings.Split(c.val, ",")
-	valSlice := make([]{{.GoType}}, 0, len(strSlice))
+	if len(strSlice) == 1 && !coredb.ValueInSet({{$table.ClassName}}{{.GoName}}List, strSlice[0]) {
+		return []{{.GoSetEnumType}}{}
+	}
+	valSlice := make([]{{.GoSetEnumType}}, 0, len(strSlice))
 	for _, s := range strSlice {
-		valSlice = append(valSlice, {{.GoType}}(strings.ToLower(s)))
+		valSlice = append(valSlice, {{.GoSetEnumType}}(strings.ToLower(s)))
 	}
 	return valSlice
 }
 
-func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoType}}) bool {
+func (c *{{.GoName}}) Set{{.GoName}}(val []{{.GoSetEnumType}}) bool {
 	strSlice := make([]string, 0, len(val))
 	for _, v := range val {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
+	c._updated = true
 	return true
 }
+    {{- end}}
+
 {{else}}
 type {{.GoName}} struct {
 {{- if .IsPrimaryKey}}
@@ -147,27 +245,57 @@ type {{.GoName}} struct {
 {{- else }}
 	_updated bool
 {{- end}}
-	val {{.GoType}}
+	val {{.ValType}}
 }
 
 func (c *{{.GoName}}) Get{{.GoName}}() {{.GoType}} {
+	{{- if .IsNullableBool}}
+	if !c.val.Ok() {
+		return goption.None[bool]()
+	}
+	return goption.Some[bool](c.val.Unwrap() > 0)
+	{{- else }}
 	return c.val
+	{{- end}}
 }
 {{ if not .IsPrimaryKey}}
 func (c *{{.GoName}}) Set{{.GoName}}(val {{.GoType}}) bool {
-{{- if ne .GoType "[]byte"}}
+	{{- if and (ne .GoType "[]byte") (ne .GoType "goption.Option[[]byte]") (not .IsNullableBool)}}
 	if c.val == val {
 		return false
 	}
-{{- end }}
+	{{- else if .IsNullableBool}}
+	if !val.Ok() && !c.val.Ok() {
+		return false
+	}
+	if val.Ok() && c.val.Ok() {
+		if c.val.Unwrap() == 0 && !val.Unwrap() {
+			return false
+		}
+		if c.val.Unwrap() == 1 && val.Unwrap() {
+			return false
+		}
+	}
+	{{- end }}
 	c._updated = true
+	{{- if .IsNullableBool}}
+		if !val.Ok() {
+			c.val = goption.None[int]()
+		}
+		if val.Unwrap() {
+			c.val = goption.Some(1)
+		} else {
+			c.val = goption.Some(0)
+		}
+	{{- else}}
 	c.val = val
+	{{- end}}
 	return true
 }
-{{- end}}
+	{{- end}}
 {{end}}
 
-{{- if not .IsPrimaryKey}}
+	{{- if not .IsPrimaryKey}}
 func (c *{{.GoName}}) IsUpdated() bool {
 	return c._updated
 }
@@ -175,7 +303,7 @@ func (c *{{.GoName}}) IsUpdated() bool {
 func (c *{{.GoName}}) resetUpdated()  {
 	c._updated = false
 }
-{{- end}}
+	{{- end}}
 
 func (c *{{.GoName}}) GetColumnName() string {
 	return "{{.Name}}"
@@ -183,6 +311,10 @@ func (c *{{.GoName}}) GetColumnName() string {
 
 func (c *{{.GoName}}) GetValPointer() any {
 	return &c.val
+}
+
+func (c *{{.GoName}}) get{{.GoName}}ForDB() {{.ValType}} {
+	return c.val
 }
 
 func (c *{{.GoName}}) MarshalJSON() ([]byte, error) {
@@ -241,7 +373,7 @@ func NewWithPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `{{.Name}}` (`
+const insertWithoutPK string = "INSERT INTO `{{.Name}}` (`
 		{{- range $i, $c := .GetNonAutoIncrementColumns }}
 		{{- if $i}}`, `{{end}}
 		{{- $c.Name}}
@@ -251,7 +383,7 @@ const insertWithoutPK string = "INSERT IGNORE INTO `{{.Name}}` (`
 		{{- end }})"
 
 {{- if .IsPKAutoGenerated }}
-const insertWithPK string = "INSERT IGNORE INTO `{{.Name}}` (`
+const insertWithPK string = "INSERT INTO `{{.Name}}` (`
 		{{- range $i, $c := .Columns }}
 		{{- if $i}}`, `{{end}}
 		{{- $c.Name}}
@@ -269,14 +401,14 @@ func (c *{{.ClassName}}) Insert() error {
 	{{- if .IsPKAutoGenerated }}
 	if c.{{.GetPrimaryKey}}.isAssigned {
 		result, err = coredb.Exec(DBName, insertWithPK, {{- range $i, $c := .Columns }}
-		{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
+		{{- if $i}}, {{end}}c.get{{$c.GoName}}ForDB()
 		{{- end }})
 		if err != nil {
 			return err
 		}
 	} else {
 		result, err = coredb.Exec(DBName, insertWithoutPK, {{- range $i, $c := .GetNonAutoIncrementColumns }}
-		{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
+		{{- if $i}}, {{end}}c.get{{$c.GoName}}ForDB()
 		{{- end }})
 		if err != nil {
 			return err
@@ -290,14 +422,12 @@ func (c *{{.ClassName}}) Insert() error {
 	}
 	{{else}}
 	result, err = coredb.Exec(DBName, insertWithoutPK, {{- range $i, $c := .GetNonAutoIncrementColumns }}
-		{{- if $i}}, {{end}}c.Get{{$c.GoName}}()
+		{{- if $i}}, {{end}}c.get{{$c.GoName}}ForDB()
 		{{- end }})
 	if err != nil {
 		return err
 	}
 	{{- end}}
-
-
 
 	affectedRows, err := result.RowsAffected()
 	if err != nil {
@@ -325,7 +455,7 @@ func (obj *{{.ClassName}}) Update() (bool, error) {
 	{{- range $i, $c := .GetNonPKColumns }}
 	if obj.{{ $c.GoName }}.IsUpdated() {
 		updatedFields = append(updatedFields, "`{{ $c.Name }}` = ?")
-		params = append(params, obj.Get{{ $c.GoName }}())
+		params = append(params, obj.get{{$c.GoName}}ForDB())
 	}
 	{{- end }}
 
@@ -372,7 +502,7 @@ func Update(obj withPK) (bool, error) {
 		case *{{.GoName}}:
 		if c.IsUpdated() {
 			updatedFields = append(updatedFields, "`{{ $c.Name }}` = ?")
-			params = append(params, c.Get{{ $c.GoName }}())
+			params = append(params, c.get{{$c.GoName}}ForDB())
 			resetFuncs = append(resetFuncs, c.resetUpdated)
 		}
 		{{- end }}

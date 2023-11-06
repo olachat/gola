@@ -13,12 +13,71 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/olachat/gola/mysqldriver"
-	"github.com/olachat/gola/ormtpl"
-	"github.com/olachat/gola/structs"
+	"github.com/olachat/gola/v2/mysqldriver"
+	"github.com/olachat/gola/v2/mysqlparser"
+	"github.com/olachat/gola/v2/ormtpl"
+	"github.com/olachat/gola/v2/structs"
 )
 
-/*Run gola to perform code gen
+func GenWithParser(config mysqlparser.MySQLParserConfig, output string) int {
+	m := &mysqlparser.MySQLParser{}
+	db, err := m.Assemble(config)
+	if err != nil {
+		panic(err)
+	}
+
+	if output == "" {
+		output = "temp"
+	}
+
+	if !strings.HasPrefix(output, "/") {
+		// output folder is relative path
+		wd, err := os.Getwd()
+		if err != nil {
+			wd = "."
+		}
+		output = wd + string(filepath.Separator) + output
+	}
+
+	if !strings.HasSuffix(output, string(filepath.Separator)) {
+		output = output + string(filepath.Separator)
+	}
+
+	for _, t := range db.Tables {
+		if len(t.GetPKColumns()) == 0 {
+			println(t.Name + " doesn't have primay key")
+			continue
+		}
+
+		files := genORM(t)
+		needMkdir := true
+		for path, data := range files {
+			if needMkdir {
+				pos := strings.LastIndex(path, string(filepath.Separator))
+				expectedFileFolder := output + path[0:pos]
+				err = os.Mkdir(expectedFileFolder, os.ModePerm)
+				if err != nil && os.IsNotExist(err) {
+					println("Failed to create folder, please ensure " + output[:len(output)-1] + " exists")
+					return 1
+				}
+				needMkdir = false
+			}
+
+			ioutil.WriteFile(output+path, data, 0644)
+		}
+	}
+
+	files := genPackage(db)
+	for path, data := range files {
+		ioutil.WriteFile(output+path, data, 0644)
+	}
+
+	fmt.Printf("code generated in %s\n", output[:len(output)-1])
+	return 0
+}
+
+/*
+Run gola to perform code gen
 
 `output`: output folder path
 */
@@ -114,8 +173,10 @@ func genORM(t *structs.Table) map[string][]byte {
 	tableFolder := t.Name + string(filepath.Separator)
 
 	genFiles := map[string]string{
-		"00_struct.gogo":     tableFolder + t.Name + ".go",
-		"01_struct_idx.gogo": tableFolder + t.Name + "_idx.go",
+		"00_struct.gogo":         tableFolder + t.Name + ".go",
+		"00_struct_ctx.gogo":     tableFolder + t.Name + "_ctx.go",
+		"01_struct_idx.gogo":     tableFolder + t.Name + "_idx.go",
+		"01_struct_idx_ctx.gogo": tableFolder + t.Name + "_idx_ctx.go",
 	}
 
 	for genTpl, genPath := range genFiles {

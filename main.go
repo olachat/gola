@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/mitchellh/cli"
-	"github.com/olachat/gola/golalib"
+	"github.com/olachat/gola/v2/golalib"
 )
 
 func main() {

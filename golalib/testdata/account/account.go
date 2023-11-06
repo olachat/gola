@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/olachat/gola/coredb"
+	"github.com/olachat/gola/v2/coredb"
 )
 
 const DBName string = "testdata"
@@ -16,13 +16,13 @@ const TableName string = "account"
 
 // Account represents `account` table
 type Account struct {
-	//  int
+	//  int(11)
 	UserId `json:"user_id"`
 	// user account type enum('free','vip')
 	Type `json:"type"`
-	// user country code mediumint unsigned
+	// user country code mediumint(6) unsigned
 	CountryCode `json:"country_code"`
-	// Account money int
+	// Account money int(8)
 	Money `json:"money"`
 }
 type PK struct {
@@ -79,6 +79,50 @@ func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `account` "+whereSQL, params...)
 }
 
+// FetchByPK returns a row from `account` table with given primary key value
+func FetchByPKFromMaster(val PK) *Account {
+	return coredb.FetchByPKFromMaster[Account](DBName, TableName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
+}
+
+// FetchFieldsByPK returns a row with selected fields from account table with given primary key value
+func FetchFieldsByPKFromMaster[T any](val PK) *T {
+	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"user_id", "country_code"}, val.UserId, val.CountryCode)
+}
+
+// FindOne returns a row from `account` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFromMaster(whereSQL string, params ...any) *Account {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[Account](DBName, TableName, w)
+}
+
+// FindOneFields returns a row with selected fields from `account` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindOneFromMaster[T](DBName, TableName, w)
+}
+
+// Find returns rows from `account` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFromMaster(whereSQL string, params ...any) ([]*Account, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[Account](DBName, TableName, w)
+}
+
+// FindFields returns rows with selected fields from `account` table with arbitary where query
+// whereSQL must start with "where ..."
+func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
+	w := coredb.NewWhere(whereSQL, params...)
+	return coredb.FindFromMaster[T](DBName, TableName, w)
+}
+
+// Count returns select count(*) with arbitary where query
+// whereSQL must start with "where ..."
+func CountFromMaster(whereSQL string, params ...any) (int, error) {
+	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `account` "+whereSQL, params...)
+}
+
 // Column types
 type AccountType string
 
@@ -88,7 +132,6 @@ const (
 )
 
 // UserId field
-//
 type UserId struct {
 	val int
 }
@@ -103,6 +146,10 @@ func (c *UserId) GetColumnName() string {
 
 func (c *UserId) GetValPointer() any {
 	return &c.val
+}
+
+func (c *UserId) getUserIdForDB() int {
+	return c.val
 }
 
 func (c *UserId) MarshalJSON() ([]byte, error) {
@@ -153,6 +200,10 @@ func (c *Type) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Type) getTypeForDB() AccountType {
+	return c.val
+}
+
 func (c *Type) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -181,6 +232,10 @@ func (c *CountryCode) GetColumnName() string {
 
 func (c *CountryCode) GetValPointer() any {
 	return &c.val
+}
+
+func (c *CountryCode) getCountryCodeForDB() uint {
+	return c.val
 }
 
 func (c *CountryCode) MarshalJSON() ([]byte, error) {
@@ -231,6 +286,10 @@ func (c *Money) GetValPointer() any {
 	return &c.val
 }
 
+func (c *Money) getMoneyForDB() int {
+	return c.val
+}
+
 func (c *Money) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -257,13 +316,13 @@ func NewWithPK(val PK) *Account {
 	return c
 }
 
-const insertWithoutPK string = "INSERT IGNORE INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `account` (`user_id`, `type`, `country_code`, `money`) values (?, ?, ?, ?)"
 
 // Insert Account struct to `account` table
 func (c *Account) Insert() error {
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetType(), c.GetCountryCode(), c.GetMoney())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getTypeForDB(), c.getCountryCodeForDB(), c.getMoneyForDB())
 	if err != nil {
 		return err
 	}
@@ -291,11 +350,11 @@ func (obj *Account) Update() (bool, error) {
 	var params []any
 	if obj.Type.IsUpdated() {
 		updatedFields = append(updatedFields, "`type` = ?")
-		params = append(params, obj.GetType())
+		params = append(params, obj.getTypeForDB())
 	}
 	if obj.Money.IsUpdated() {
 		updatedFields = append(updatedFields, "`money` = ?")
-		params = append(params, obj.GetMoney())
+		params = append(params, obj.getMoneyForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -340,13 +399,13 @@ func Update(obj withPK) (bool, error) {
 		case *Type:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`type` = ?")
-				params = append(params, c.GetType())
+				params = append(params, c.getTypeForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Money:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`money` = ?")
-				params = append(params, c.GetMoney())
+				params = append(params, c.getMoneyForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}
