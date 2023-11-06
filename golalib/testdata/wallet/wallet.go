@@ -38,17 +38,23 @@ type withPK interface {
 }
 
 // FetchByPK returns a row from `wallet` table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchByPK(val PK) *Wallet {
 	return coredb.FetchByPK[Wallet](DBName, TableName, []string{"user_id", "wallet_type"}, val.UserId, val.WalletType)
 }
 
 // FetchFieldsByPK returns a row with selected fields from wallet table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchFieldsByPK[T any](val PK) *T {
 	return coredb.FetchByPK[T](DBName, TableName, []string{"user_id", "wallet_type"}, val.UserId, val.WalletType)
 }
 
 // FindOne returns a row from `wallet` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOne(whereSQL string, params ...any) *Wallet {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[Wallet](DBName, TableName, w)
@@ -56,6 +62,8 @@ func FindOne(whereSQL string, params ...any) *Wallet {
 
 // FindOneFields returns a row with selected fields from `wallet` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[T](DBName, TableName, w)
@@ -63,6 +71,8 @@ func FindOneFields[T any](whereSQL string, params ...any) *T {
 
 // Find returns rows from `wallet` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func Find(whereSQL string, params ...any) ([]*Wallet, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[Wallet](DBName, TableName, w)
@@ -70,6 +80,8 @@ func Find(whereSQL string, params ...any) ([]*Wallet, error) {
 
 // FindFields returns rows with selected fields from `wallet` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[T](DBName, TableName, w)
@@ -77,22 +89,30 @@ func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `wallet` "+whereSQL, params...)
 }
 
 // FetchByPK returns a row from `wallet` table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchByPKFromMaster(val PK) *Wallet {
 	return coredb.FetchByPKFromMaster[Wallet](DBName, TableName, []string{"user_id", "wallet_type"}, val.UserId, val.WalletType)
 }
 
 // FetchFieldsByPK returns a row with selected fields from wallet table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKFromMaster[T any](val PK) *T {
 	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"user_id", "wallet_type"}, val.UserId, val.WalletType)
 }
 
 // FindOne returns a row from `wallet` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFromMaster(whereSQL string, params ...any) *Wallet {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMaster[Wallet](DBName, TableName, w)
@@ -100,6 +120,8 @@ func FindOneFromMaster(whereSQL string, params ...any) *Wallet {
 
 // FindOneFields returns a row with selected fields from `wallet` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMaster[T](DBName, TableName, w)
@@ -107,6 +129,8 @@ func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
 
 // Find returns rows from `wallet` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFromMaster(whereSQL string, params ...any) ([]*Wallet, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindFromMaster[Wallet](DBName, TableName, w)
@@ -114,6 +138,8 @@ func FindFromMaster(whereSQL string, params ...any) ([]*Wallet, error) {
 
 // FindFields returns rows with selected fields from `wallet` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindFromMaster[T](DBName, TableName, w)
@@ -121,6 +147,8 @@ func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func CountFromMaster(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `wallet` "+whereSQL, params...)
 }
@@ -313,6 +341,7 @@ func NewWithPK(val PK) *Wallet {
 const insertWithoutPK string = "INSERT INTO `wallet` (`user_id`, `wallet_type`, `wallet_name`, `money`) values (?, ?, ?, ?)"
 
 // Insert Wallet struct to `wallet` table
+// Deprecated: use the function with context
 func (c *Wallet) Insert() error {
 	var result sql.Result
 	var err error
@@ -339,6 +368,7 @@ func (c *Wallet) resetUpdated() {
 }
 
 // Update Wallet struct in `wallet` table
+// Deprecated: use the function with context
 func (obj *Wallet) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -377,6 +407,7 @@ func (obj *Wallet) Update() (bool, error) {
 }
 
 // Update Wallet struct with given fields in `wallet` table
+// Deprecated: use the function with context
 func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -435,6 +466,7 @@ func Update(obj withPK) (bool, error) {
 const deleteSql string = "DELETE FROM `wallet` WHERE `user_id` = ? and `wallet_type` = ?"
 
 // DeleteByPK delete a row from wallet table with given primary key value
+// Deprecated: use the function with context
 func DeleteByPK(val PK) error {
 	_, err := coredb.Exec(DBName, deleteSql, val.UserId, val.WalletType)
 	return err
