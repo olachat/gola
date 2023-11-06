@@ -47,22 +47,30 @@ type withPK interface {
 }
 
 // FetchByPK returns a row from `users` table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchByPK(val int) *User {
 	return coredb.FetchByPK[User](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from users table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchFieldsByPK[T any](val int) *T {
 	return coredb.FetchByPK[T](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchByPKs returns rows with from `users` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchByPKs(vals ...int) []*User {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[User](DBName, TableName, "id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `users` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKs[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](DBName, TableName, "id", pks)
@@ -70,6 +78,8 @@ func FetchFieldsByPKs[T any](vals ...int) []*T {
 
 // FindOne returns a row from `users` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOne(whereSQL string, params ...any) *User {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[User](DBName, TableName, w)
@@ -77,6 +87,8 @@ func FindOne(whereSQL string, params ...any) *User {
 
 // FindOneFields returns a row with selected fields from `users` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[T](DBName, TableName, w)
@@ -84,6 +96,8 @@ func FindOneFields[T any](whereSQL string, params ...any) *T {
 
 // Find returns rows from `users` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func Find(whereSQL string, params ...any) ([]*User, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[User](DBName, TableName, w)
@@ -91,6 +105,8 @@ func Find(whereSQL string, params ...any) ([]*User, error) {
 
 // FindFields returns rows with selected fields from `users` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[T](DBName, TableName, w)
@@ -98,27 +114,37 @@ func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `users` "+whereSQL, params...)
 }
 
 // FetchByPK returns a row from `users` table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchByPKFromMaster(val int) *User {
 	return coredb.FetchByPKFromMaster[User](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from users table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKFromMaster[T any](val int) *T {
 	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchByPKs returns rows with from `users` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchByPKsFromMaster(vals ...int) []*User {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMaster[User](DBName, TableName, "id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `users` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKsFromMaster[T any](vals ...int) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "id", pks)
@@ -126,6 +152,8 @@ func FetchFieldsByPKsFromMaster[T any](vals ...int) []*T {
 
 // FindOne returns a row from `users` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFromMaster(whereSQL string, params ...any) *User {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMaster[User](DBName, TableName, w)
@@ -133,6 +161,8 @@ func FindOneFromMaster(whereSQL string, params ...any) *User {
 
 // FindOneFields returns a row with selected fields from `users` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMaster[T](DBName, TableName, w)
@@ -140,6 +170,8 @@ func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
 
 // Find returns rows from `users` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFromMaster(whereSQL string, params ...any) ([]*User, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindFromMaster[User](DBName, TableName, w)
@@ -147,6 +179,8 @@ func FindFromMaster(whereSQL string, params ...any) ([]*User, error) {
 
 // FindFields returns rows with selected fields from `users` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindFromMaster[T](DBName, TableName, w)
@@ -154,6 +188,8 @@ func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func CountFromMaster(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `users` "+whereSQL, params...)
 }
@@ -912,6 +948,7 @@ const insertWithoutPK string = "INSERT INTO `users` (`name`, `email`, `created_a
 const insertWithPK string = "INSERT INTO `users` (`id`, `name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 // Insert User struct to `users` table
+// Deprecated: use the function with context
 func (c *User) Insert() error {
 	var result sql.Result
 	var err error
@@ -960,6 +997,7 @@ func (c *User) resetUpdated() {
 }
 
 // Update User struct in `users` table
+// Deprecated: use the function with context
 func (obj *User) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -1034,6 +1072,7 @@ func (obj *User) Update() (bool, error) {
 }
 
 // Update User struct with given fields in `users` table
+// Deprecated: use the function with context
 func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -1146,6 +1185,7 @@ func Update(obj withPK) (bool, error) {
 const deleteSql string = "DELETE FROM `users` WHERE `id` = ?"
 
 // DeleteByPK delete a row from users table with given primary key value
+// Deprecated: use the function with context
 func DeleteByPK(val int) error {
 	_, err := coredb.Exec(DBName, deleteSql, val)
 	return err

@@ -39,21 +39,29 @@ type withPK interface {
 }
 
 // FetchByPK returns a row from `{{.Name}}` table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchByPK(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 	return coredb.FetchByPK[{{.ClassName}}](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 // FetchFieldsByPK returns a row with selected fields from {{.Name}} table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchFieldsByPK[T any](val {{.GetPrimaryKeyType}}) *T {
 	return coredb.FetchByPK[T](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 {{- if not .HasCompositePrimaryKey }}
 // FetchByPKs returns rows with from `{{.Name}}` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchByPKs(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[{{.ClassName}}](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `{{.Name}}` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
@@ -62,6 +70,8 @@ func FetchFieldsByPKs[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 
 // FindOne returns a row from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOne(whereSQL string, params ...any) *{{.ClassName}} {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[{{.ClassName}}](DBName, TableName, w)
@@ -69,6 +79,8 @@ func FindOne(whereSQL string, params ...any) *{{.ClassName}} {
 
 // FindOneFields returns a row with selected fields from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[T](DBName, TableName, w)
@@ -76,6 +88,8 @@ func FindOneFields[T any](whereSQL string, params ...any) *T {
 
 // Find returns rows from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func Find(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[{{.ClassName}}](DBName, TableName, w)
@@ -83,6 +97,8 @@ func Find(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
 
 // FindFields returns rows with selected fields from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[T](DBName, TableName, w)
@@ -90,26 +106,36 @@ func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, params...)
 }
 
 // FetchByPK returns a row from `{{.Name}}` table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchByPKFromMaster(val {{.GetPrimaryKeyType}}) *{{.ClassName}} {
 	return coredb.FetchByPKFromMaster[{{.ClassName}}](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 // FetchFieldsByPK returns a row with selected fields from {{.Name}} table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKFromMaster[T any](val {{.GetPrimaryKeyType}}) *T {
 	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{ {{.GetPrimaryKeyNames}} }, {{.GetPrimaryKeyVals}})
 }
 {{- if not .HasCompositePrimaryKey }}
 // FetchByPKs returns rows with from `{{.Name}}` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchByPKsFromMaster(vals ...{{.GetPrimaryKeyType}}) []*{{.ClassName}} {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMaster[{{.ClassName}}](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `{{.Name}}` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKsFromMaster[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "{{.GetPrimaryKeyName}}", pks)
@@ -118,6 +144,8 @@ func FetchFieldsByPKsFromMaster[T any](vals ...{{.GetPrimaryKeyType}}) []*T {
 
 // FindOne returns a row from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFromMaster(whereSQL string, params ...any) *{{.ClassName}} {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMaster[{{.ClassName}}](DBName, TableName, w)
@@ -125,6 +153,8 @@ func FindOneFromMaster(whereSQL string, params ...any) *{{.ClassName}} {
 
 // FindOneFields returns a row with selected fields from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMaster[T](DBName, TableName, w)
@@ -132,6 +162,8 @@ func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
 
 // Find returns rows from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFromMaster(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindFromMaster[{{.ClassName}}](DBName, TableName, w)
@@ -139,6 +171,8 @@ func FindFromMaster(whereSQL string, params ...any) ([]*{{.ClassName}}, error) {
 
 // FindFields returns rows with selected fields from `{{.Name}}` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindFromMaster[T](DBName, TableName, w)
@@ -146,6 +180,8 @@ func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func CountFromMaster(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `{{.Name}}` " + whereSQL, params...)
 }
@@ -394,6 +430,7 @@ const insertWithPK string = "INSERT INTO `{{.Name}}` (`
 {{- end}}
 
 // Insert {{.ClassName}} struct to `{{.Name}}` table
+// Deprecated: use the function with context
 func (c *{{.ClassName}}) Insert() error {
 	var result sql.Result
 	var err error
@@ -448,6 +485,7 @@ func (c *{{.ClassName}}) resetUpdated() {
 }
 
 // Update {{.ClassName}} struct in `{{.Name}}` table
+// Deprecated: use the function with context
 func (obj *{{.ClassName}}) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -485,6 +523,7 @@ func (obj *{{.ClassName}}) Update() (bool, error) {
 }
 
 // Update {{.ClassName}} struct with given fields in `{{.Name}}` table
+// Deprecated: use the function with context
 func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -539,6 +578,7 @@ func Update(obj withPK) (bool, error) {
 
 const deleteSql string = "DELETE FROM `{{.Name}}` WHERE {{.GetPrimaryKeySQL}}"
 // DeleteByPK delete a row from {{.Name}} table with given primary key value
+// Deprecated: use the function with context
 func DeleteByPK(val {{.GetPrimaryKeyType}}) (error) {
 	_, err := coredb.Exec(DBName, deleteSql, {{.GetPrimaryKeyVals}})
 	return err

@@ -53,22 +53,30 @@ type withPK interface {
 }
 
 // FetchByPK returns a row from `gifts_nn_with_default` table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchByPK(val uint) *GiftsNnWithDefault {
 	return coredb.FetchByPK[GiftsNnWithDefault](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from gifts_nn_with_default table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchFieldsByPK[T any](val uint) *T {
 	return coredb.FetchByPK[T](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchByPKs returns rows with from `gifts_nn_with_default` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchByPKs(vals ...uint) []*GiftsNnWithDefault {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[GiftsNnWithDefault](DBName, TableName, "id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `gifts_nn_with_default` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKs[T any](vals ...uint) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKs[T](DBName, TableName, "id", pks)
@@ -76,6 +84,8 @@ func FetchFieldsByPKs[T any](vals ...uint) []*T {
 
 // FindOne returns a row from `gifts_nn_with_default` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOne(whereSQL string, params ...any) *GiftsNnWithDefault {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[GiftsNnWithDefault](DBName, TableName, w)
@@ -83,6 +93,8 @@ func FindOne(whereSQL string, params ...any) *GiftsNnWithDefault {
 
 // FindOneFields returns a row with selected fields from `gifts_nn_with_default` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFields[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOne[T](DBName, TableName, w)
@@ -90,6 +102,8 @@ func FindOneFields[T any](whereSQL string, params ...any) *T {
 
 // Find returns rows from `gifts_nn_with_default` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func Find(whereSQL string, params ...any) ([]*GiftsNnWithDefault, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[GiftsNnWithDefault](DBName, TableName, w)
@@ -97,6 +111,8 @@ func Find(whereSQL string, params ...any) ([]*GiftsNnWithDefault, error) {
 
 // FindFields returns rows with selected fields from `gifts_nn_with_default` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.Find[T](DBName, TableName, w)
@@ -104,27 +120,37 @@ func FindFields[T any](whereSQL string, params ...any) ([]*T, error) {
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func Count(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryInt(DBName, "SELECT COUNT(*) FROM `gifts_nn_with_default` "+whereSQL, params...)
 }
 
 // FetchByPK returns a row from `gifts_nn_with_default` table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchByPKFromMaster(val uint) *GiftsNnWithDefault {
 	return coredb.FetchByPKFromMaster[GiftsNnWithDefault](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchFieldsByPK returns a row with selected fields from gifts_nn_with_default table with given primary key value
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKFromMaster[T any](val uint) *T {
 	return coredb.FetchByPKFromMaster[T](DBName, TableName, []string{"id"}, val)
 }
 
 // FetchByPKs returns rows with from `gifts_nn_with_default` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchByPKsFromMaster(vals ...uint) []*GiftsNnWithDefault {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMaster[GiftsNnWithDefault](DBName, TableName, "id", pks)
 }
 
 // FetchFieldsByPKs returns rows with selected fields from `gifts_nn_with_default` table with given primary key values
+//
+// Deprecated: use the function with context
 func FetchFieldsByPKsFromMaster[T any](vals ...uint) []*T {
 	pks := coredb.GetAnySlice(vals)
 	return coredb.FetchByPKsFromMaster[T](DBName, TableName, "id", pks)
@@ -132,6 +158,8 @@ func FetchFieldsByPKsFromMaster[T any](vals ...uint) []*T {
 
 // FindOne returns a row from `gifts_nn_with_default` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFromMaster(whereSQL string, params ...any) *GiftsNnWithDefault {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMaster[GiftsNnWithDefault](DBName, TableName, w)
@@ -139,6 +167,8 @@ func FindOneFromMaster(whereSQL string, params ...any) *GiftsNnWithDefault {
 
 // FindOneFields returns a row with selected fields from `gifts_nn_with_default` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindOneFromMaster[T](DBName, TableName, w)
@@ -146,6 +176,8 @@ func FindOneFieldsFromMaster[T any](whereSQL string, params ...any) *T {
 
 // Find returns rows from `gifts_nn_with_default` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFromMaster(whereSQL string, params ...any) ([]*GiftsNnWithDefault, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindFromMaster[GiftsNnWithDefault](DBName, TableName, w)
@@ -153,6 +185,8 @@ func FindFromMaster(whereSQL string, params ...any) ([]*GiftsNnWithDefault, erro
 
 // FindFields returns rows with selected fields from `gifts_nn_with_default` table with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
 	w := coredb.NewWhere(whereSQL, params...)
 	return coredb.FindFromMaster[T](DBName, TableName, w)
@@ -160,6 +194,8 @@ func FindFieldsFromMaster[T any](whereSQL string, params ...any) ([]*T, error) {
 
 // Count returns select count(*) with arbitary where query
 // whereSQL must start with "where ..."
+//
+// Deprecated: use the function with context
 func CountFromMaster(whereSQL string, params ...any) (int, error) {
 	return coredb.QueryIntFromMaster(DBName, "SELECT COUNT(*) FROM `gifts_nn_with_default` "+whereSQL, params...)
 }
@@ -943,6 +979,7 @@ const insertWithoutPK string = "INSERT INTO `gifts_nn_with_default` (`name`, `is
 const insertWithPK string = "INSERT INTO `gifts_nn_with_default` (`id`, `name`, `is_free`, `gift_count`, `gift_type`, `create_time`, `discount`, `price`, `remark`, `manifest`, `description`, `update_time`, `update_time2`, `branches`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 // Insert GiftsNnWithDefault struct to `gifts_nn_with_default` table
+// Deprecated: use the function with context
 func (c *GiftsNnWithDefault) Insert() error {
 	var result sql.Result
 	var err error
@@ -993,6 +1030,7 @@ func (c *GiftsNnWithDefault) resetUpdated() {
 }
 
 // Update GiftsNnWithDefault struct in `gifts_nn_with_default` table
+// Deprecated: use the function with context
 func (obj *GiftsNnWithDefault) Update() (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -1075,6 +1113,7 @@ func (obj *GiftsNnWithDefault) Update() (bool, error) {
 }
 
 // Update GiftsNnWithDefault struct with given fields in `gifts_nn_with_default` table
+// Deprecated: use the function with context
 func Update(obj withPK) (bool, error) {
 	var updatedFields []string
 	var params []any
@@ -1199,6 +1238,7 @@ func Update(obj withPK) (bool, error) {
 const deleteSql string = "DELETE FROM `gifts_nn_with_default` WHERE `id` = ?"
 
 // DeleteByPK delete a row from gifts_nn_with_default table with given primary key value
+// Deprecated: use the function with context
 func DeleteByPK(val uint) error {
 	_, err := coredb.Exec(DBName, deleteSql, val)
 	return err
