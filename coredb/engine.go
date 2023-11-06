@@ -3,6 +3,7 @@ package coredb
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 )
@@ -59,10 +60,7 @@ func FetchByPKs[T any](dbname string, tableName string, pkName string, vals []an
 	query := fmt.Sprintf("WHERE `%s` IN (%s)", pkName, GetParamPlaceHolder(len(vals)))
 	w := NewWhere(query, vals...)
 
-	result, err := Find[T](dbname, tableName, w)
-	if err != nil {
-		panic("Find failled: " + err.Error())
-	}
+	result, _ := Find[T](dbname, tableName, w)
 	return result
 }
 
@@ -87,7 +85,7 @@ func FindOne[T any](dbname string, tableName string, where WhereQuery) *T {
 		// It's on purpose the hide the error
 		// But should re-consider later
 		if err2 != sql.ErrNoRows {
-			panic("QueryRow failed: " + err2.Error())
+			log.Fatal(err2)
 		}
 
 		return nil

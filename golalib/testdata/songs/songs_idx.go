@@ -96,34 +96,7 @@ type orderReadQuery[T any] interface {
 type iQuery[T any] interface {
 	WhereHashEQ(val string) orderReadQuery[T]
 	WhereHashIN(vals ...string) orderReadQuery[T]
-	WhereRankEQ(val int) iQuery3[T]
-	WhereRankIN(vals ...int) iQuery3[T]
-	WhereRemarkEQ(val string) orderReadQuery[T]
-	WhereRemarkIN(vals ...string) orderReadQuery[T]
 	orderReadQuery[T]
-}
-type iQuery3[T any] interface {
-	AndRemarkEQ(val string) orderReadQuery[T]
-	AndRemarkIN(vals ...string) orderReadQuery[T]
-	orderReadQuery[T]
-}
-
-type idxQuery3[T any] struct {
-	*idxQuery[T]
-}
-
-func (q *idxQuery3[T]) AndRemarkEQ(val string) orderReadQuery[T] {
-	q.whereSql += " and `remark` = ?"
-	q.whereParams = append(q.whereParams, val)
-	return q.idxQuery
-}
-
-func (q *idxQuery3[T]) AndRemarkIN(vals ...string) orderReadQuery[T] {
-	q.whereSql += " and `remark` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
-	for _, val := range vals {
-		q.whereParams = append(q.whereParams, val)
-	}
-	return q.idxQuery
 }
 
 // Find methods
@@ -146,34 +119,6 @@ func (q *idxQuery[T]) WhereHashEQ(val string) orderReadQuery[T] {
 
 func (q *idxQuery[T]) WhereHashIN(vals ...string) orderReadQuery[T] {
 	q.whereSql = " where `hash` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
-	for _, val := range vals {
-		q.whereParams = append(q.whereParams, val)
-	}
-	return q
-}
-
-func (q *idxQuery[T]) WhereRankEQ(val int) iQuery3[T] {
-	q.whereSql += " where `rank` = ?"
-	q.whereParams = append(q.whereParams, val)
-	return &idxQuery3[T]{q}
-}
-
-func (q *idxQuery[T]) WhereRankIN(vals ...int) iQuery3[T] {
-	q.whereSql = " where `rank` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
-	for _, val := range vals {
-		q.whereParams = append(q.whereParams, val)
-	}
-	return &idxQuery3[T]{q}
-}
-
-func (q *idxQuery[T]) WhereRemarkEQ(val string) orderReadQuery[T] {
-	q.whereSql += " where `remark` = ?"
-	q.whereParams = append(q.whereParams, val)
-	return q
-}
-
-func (q *idxQuery[T]) WhereRemarkIN(vals ...string) orderReadQuery[T] {
-	q.whereSql = " where `remark` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
