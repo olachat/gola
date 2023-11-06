@@ -91,6 +91,7 @@ func Count(whereSQL string, params ...any) (int, error) {
 // Column types
 
 // Id field
+//
 type Id struct {
 	isAssigned bool
 	val        uint
@@ -108,10 +109,6 @@ func (c *Id) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Id) getIdForDB() uint {
-	return c.val
-}
-
 func (c *Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -125,6 +122,7 @@ func (c *Id) UnmarshalJSON(data []byte) error {
 }
 
 // Group field
+//
 type Group struct {
 	_updated bool
 	val      uint
@@ -159,10 +157,6 @@ func (c *Group) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Group) getGroupForDB() uint {
-	return c.val
-}
-
 func (c *Group) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -176,6 +170,7 @@ func (c *Group) UnmarshalJSON(data []byte) error {
 }
 
 // Lang field
+//
 type Lang struct {
 	_updated bool
 	val      string
@@ -210,10 +205,6 @@ func (c *Lang) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Lang) getLangForDB() string {
-	return c.val
-}
-
 func (c *Lang) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -227,6 +218,7 @@ func (c *Lang) UnmarshalJSON(data []byte) error {
 }
 
 // Priority field
+//
 type Priority struct {
 	_updated bool
 	val      float64
@@ -261,10 +253,6 @@ func (c *Priority) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Priority) getPriorityForDB() float64 {
-	return c.val
-}
-
 func (c *Priority) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -278,6 +266,7 @@ func (c *Priority) UnmarshalJSON(data []byte) error {
 }
 
 // Deleted field
+//
 type Deleted struct {
 	_updated bool
 	val      bool
@@ -310,10 +299,6 @@ func (c *Deleted) GetColumnName() string {
 
 func (c *Deleted) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Deleted) getDeletedForDB() bool {
-	return c.val
 }
 
 func (c *Deleted) MarshalJSON() ([]byte, error) {
@@ -354,20 +339,20 @@ func NewWithPK(val uint) *Room {
 	return c
 }
 
-const insertWithoutPK string = "INSERT INTO `room` (`group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?)"
-const insertWithPK string = "INSERT INTO `room` (`id`, `group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT IGNORE INTO `room` (`group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?)"
+const insertWithPK string = "INSERT IGNORE INTO `room` (`id`, `group`, `lang`, `priority`, `deleted`) values (?, ?, ?, ?, ?)"
 
 // Insert Room struct to `room` table
 func (c *Room) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getGroupForDB(), c.getLangForDB(), c.getPriorityForDB(), c.getDeletedForDB())
+		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetGroup(), c.GetLang(), c.GetPriority(), c.GetDeleted())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.getGroupForDB(), c.getLangForDB(), c.getPriorityForDB(), c.getDeletedForDB())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetGroup(), c.GetLang(), c.GetPriority(), c.GetDeleted())
 		if err != nil {
 			return err
 		}
@@ -404,19 +389,19 @@ func (obj *Room) Update() (bool, error) {
 	var params []any
 	if obj.Group.IsUpdated() {
 		updatedFields = append(updatedFields, "`group` = ?")
-		params = append(params, obj.getGroupForDB())
+		params = append(params, obj.GetGroup())
 	}
 	if obj.Lang.IsUpdated() {
 		updatedFields = append(updatedFields, "`lang` = ?")
-		params = append(params, obj.getLangForDB())
+		params = append(params, obj.GetLang())
 	}
 	if obj.Priority.IsUpdated() {
 		updatedFields = append(updatedFields, "`priority` = ?")
-		params = append(params, obj.getPriorityForDB())
+		params = append(params, obj.GetPriority())
 	}
 	if obj.Deleted.IsUpdated() {
 		updatedFields = append(updatedFields, "`deleted` = ?")
-		params = append(params, obj.getDeletedForDB())
+		params = append(params, obj.GetDeleted())
 	}
 
 	if len(updatedFields) == 0 {
@@ -461,25 +446,25 @@ func Update(obj withPK) (bool, error) {
 		case *Group:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`group` = ?")
-				params = append(params, c.getGroupForDB())
+				params = append(params, c.GetGroup())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Lang:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`lang` = ?")
-				params = append(params, c.getLangForDB())
+				params = append(params, c.GetLang())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Priority:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`priority` = ?")
-				params = append(params, c.getPriorityForDB())
+				params = append(params, c.GetPriority())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Deleted:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`deleted` = ?")
-				params = append(params, c.getDeletedForDB())
+				params = append(params, c.GetDeleted())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

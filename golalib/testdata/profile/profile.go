@@ -87,6 +87,7 @@ func Count(whereSQL string, params ...any) (int, error) {
 // Column types
 
 // UserId field
+//
 type UserId struct {
 	val int
 }
@@ -103,10 +104,6 @@ func (c *UserId) GetValPointer() any {
 	return &c.val
 }
 
-func (c *UserId) getUserIdForDB() int {
-	return c.val
-}
-
 func (c *UserId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -120,6 +117,7 @@ func (c *UserId) UnmarshalJSON(data []byte) error {
 }
 
 // Level field
+//
 type Level struct {
 	_updated bool
 	val      int8
@@ -152,10 +150,6 @@ func (c *Level) GetColumnName() string {
 
 func (c *Level) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Level) getLevelForDB() int8 {
-	return c.val
 }
 
 func (c *Level) MarshalJSON() ([]byte, error) {
@@ -206,10 +200,6 @@ func (c *NickName) GetValPointer() any {
 	return &c.val
 }
 
-func (c *NickName) getNickNameForDB() string {
-	return c.val
-}
-
 func (c *NickName) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -234,13 +224,13 @@ func NewWithPK(val int) *Profile {
 	return c
 }
 
-const insertWithoutPK string = "INSERT INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
+const insertWithoutPK string = "INSERT IGNORE INTO `profile` (`user_id`, `level`, `nick_name`) values (?, ?, ?)"
 
 // Insert Profile struct to `profile` table
 func (c *Profile) Insert() error {
 	var result sql.Result
 	var err error
-	result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getLevelForDB(), c.getNickNameForDB())
+	result, err = coredb.Exec(DBName, insertWithoutPK, c.GetUserId(), c.GetLevel(), c.GetNickName())
 	if err != nil {
 		return err
 	}
@@ -268,11 +258,11 @@ func (obj *Profile) Update() (bool, error) {
 	var params []any
 	if obj.Level.IsUpdated() {
 		updatedFields = append(updatedFields, "`level` = ?")
-		params = append(params, obj.getLevelForDB())
+		params = append(params, obj.GetLevel())
 	}
 	if obj.NickName.IsUpdated() {
 		updatedFields = append(updatedFields, "`nick_name` = ?")
-		params = append(params, obj.getNickNameForDB())
+		params = append(params, obj.GetNickName())
 	}
 
 	if len(updatedFields) == 0 {
@@ -317,13 +307,13 @@ func Update(obj withPK) (bool, error) {
 		case *Level:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`level` = ?")
-				params = append(params, c.getLevelForDB())
+				params = append(params, c.GetLevel())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *NickName:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`nick_name` = ?")
-				params = append(params, c.getNickNameForDB())
+				params = append(params, c.GetNickName())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

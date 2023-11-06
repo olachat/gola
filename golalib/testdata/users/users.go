@@ -130,15 +130,6 @@ const (
 	UserSportsBadminton  UserSports = "badminton"
 )
 
-var UserSportsList = []string{
-	"swim",
-	"tennis",
-	"basketball",
-	"football",
-	"squash",
-	"badminton",
-}
-
 type UserSports2 string
 
 const (
@@ -149,15 +140,6 @@ const (
 	UserSports2Squash     UserSports2 = "squash"
 	UserSports2Badminton  UserSports2 = "badminton"
 )
-
-var UserSports2List = []string{
-	"swim",
-	"tennis",
-	"basketball",
-	"football",
-	"squash",
-	"badminton",
-}
 
 type UserSportsNoDefault string
 
@@ -170,16 +152,8 @@ const (
 	UserSportsNoDefaultBadminton  UserSportsNoDefault = "badminton"
 )
 
-var UserSportsNoDefaultList = []string{
-	"swim",
-	"tennis",
-	"basketball",
-	"football",
-	"squash",
-	"badminton",
-}
-
 // Id field
+//
 type Id struct {
 	isAssigned bool
 	val        int
@@ -195,10 +169,6 @@ func (c *Id) GetColumnName() string {
 
 func (c *Id) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Id) getIdForDB() int {
-	return c.val
 }
 
 func (c *Id) MarshalJSON() ([]byte, error) {
@@ -249,10 +219,6 @@ func (c *Name) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Name) getNameForDB() string {
-	return c.val
-}
-
 func (c *Name) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -299,10 +265,6 @@ func (c *Email) GetColumnName() string {
 
 func (c *Email) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Email) getEmailForDB() string {
-	return c.val
 }
 
 func (c *Email) MarshalJSON() ([]byte, error) {
@@ -353,10 +315,6 @@ func (c *CreatedAt) GetValPointer() any {
 	return &c.val
 }
 
-func (c *CreatedAt) getCreatedAtForDB() uint {
-	return c.val
-}
-
 func (c *CreatedAt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -405,10 +363,6 @@ func (c *UpdatedAt) GetValPointer() any {
 	return &c.val
 }
 
-func (c *UpdatedAt) getUpdatedAtForDB() uint {
-	return c.val
-}
-
 func (c *UpdatedAt) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -425,14 +379,14 @@ func (c *UpdatedAt) UnmarshalJSON(data []byte) error {
 // float
 type FloatType struct {
 	_updated bool
-	val      float64
+	val      float32
 }
 
-func (c *FloatType) GetFloatType() float64 {
+func (c *FloatType) GetFloatType() float32 {
 	return c.val
 }
 
-func (c *FloatType) SetFloatType(val float64) bool {
+func (c *FloatType) SetFloatType(val float32) bool {
 	if c.val == val {
 		return false
 	}
@@ -455,10 +409,6 @@ func (c *FloatType) GetColumnName() string {
 
 func (c *FloatType) GetValPointer() any {
 	return &c.val
-}
-
-func (c *FloatType) getFloatTypeForDB() float64 {
-	return c.val
 }
 
 func (c *FloatType) MarshalJSON() ([]byte, error) {
@@ -509,10 +459,6 @@ func (c *DoubleType) GetValPointer() any {
 	return &c.val
 }
 
-func (c *DoubleType) getDoubleTypeForDB() float64 {
-	return c.val
-}
-
 func (c *DoubleType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -559,10 +505,6 @@ func (c *Hobby) GetColumnName() string {
 
 func (c *Hobby) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Hobby) getHobbyForDB() UserHobby {
-	return c.val
 }
 
 func (c *Hobby) MarshalJSON() ([]byte, error) {
@@ -613,10 +555,6 @@ func (c *HobbyNoDefault) GetValPointer() any {
 	return &c.val
 }
 
-func (c *HobbyNoDefault) getHobbyNoDefaultForDB() UserHobbyNoDefault {
-	return c.val
-}
-
 func (c *HobbyNoDefault) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -638,9 +576,6 @@ type Sports struct {
 
 func (c *Sports) GetSports() []UserSports {
 	strSlice := strings.Split(c.val, ",")
-	if len(strSlice) == 1 && !coredb.ValueInSet(UserSportsList, strSlice[0]) {
-		return []UserSports{}
-	}
 	valSlice := make([]UserSports, 0, len(strSlice))
 	for _, s := range strSlice {
 		valSlice = append(valSlice, UserSports(strings.ToLower(s)))
@@ -654,7 +589,6 @@ func (c *Sports) SetSports(val []UserSports) bool {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
-	c._updated = true
 	return true
 }
 
@@ -672,10 +606,6 @@ func (c *Sports) GetColumnName() string {
 
 func (c *Sports) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Sports) getSportsForDB() string {
-	return c.val
 }
 
 func (c *Sports) MarshalJSON() ([]byte, error) {
@@ -699,9 +629,6 @@ type Sports2 struct {
 
 func (c *Sports2) GetSports2() []UserSports2 {
 	strSlice := strings.Split(c.val, ",")
-	if len(strSlice) == 1 && !coredb.ValueInSet(UserSports2List, strSlice[0]) {
-		return []UserSports2{}
-	}
 	valSlice := make([]UserSports2, 0, len(strSlice))
 	for _, s := range strSlice {
 		valSlice = append(valSlice, UserSports2(strings.ToLower(s)))
@@ -715,7 +642,6 @@ func (c *Sports2) SetSports2(val []UserSports2) bool {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
-	c._updated = true
 	return true
 }
 
@@ -733,10 +659,6 @@ func (c *Sports2) GetColumnName() string {
 
 func (c *Sports2) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Sports2) getSports2ForDB() string {
-	return c.val
 }
 
 func (c *Sports2) MarshalJSON() ([]byte, error) {
@@ -760,9 +682,6 @@ type SportsNoDefault struct {
 
 func (c *SportsNoDefault) GetSportsNoDefault() []UserSportsNoDefault {
 	strSlice := strings.Split(c.val, ",")
-	if len(strSlice) == 1 && !coredb.ValueInSet(UserSportsNoDefaultList, strSlice[0]) {
-		return []UserSportsNoDefault{}
-	}
 	valSlice := make([]UserSportsNoDefault, 0, len(strSlice))
 	for _, s := range strSlice {
 		valSlice = append(valSlice, UserSportsNoDefault(strings.ToLower(s)))
@@ -776,7 +695,6 @@ func (c *SportsNoDefault) SetSportsNoDefault(val []UserSportsNoDefault) bool {
 		strSlice = append(strSlice, string(v))
 	}
 	c.val = strings.Join(strSlice, ",")
-	c._updated = true
 	return true
 }
 
@@ -794,10 +712,6 @@ func (c *SportsNoDefault) GetColumnName() string {
 
 func (c *SportsNoDefault) GetValPointer() any {
 	return &c.val
-}
-
-func (c *SportsNoDefault) getSportsNoDefaultForDB() string {
-	return c.val
 }
 
 func (c *SportsNoDefault) MarshalJSON() ([]byte, error) {
@@ -820,11 +734,11 @@ func New() *User {
 		Email{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
-		FloatType{val: float64(0)},
+		FloatType{val: float32(0)},
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
-		Sports{val: "swim,football"},
+		Sports{val: "swim, football"},
 		Sports2{val: "swim,football"},
 		SportsNoDefault{},
 	}
@@ -839,11 +753,11 @@ func NewWithPK(val int) *User {
 		Email{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
-		FloatType{val: float64(0)},
+		FloatType{val: float32(0)},
 		DoubleType{val: float64(0)},
 		Hobby{val: "swimming"},
 		HobbyNoDefault{},
-		Sports{val: "swim,football"},
+		Sports{val: "swim, football"},
 		Sports2{val: "swim,football"},
 		SportsNoDefault{},
 	}
@@ -852,20 +766,20 @@ func NewWithPK(val int) *User {
 	return c
 }
 
-const insertWithoutPK string = "INSERT INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-const insertWithPK string = "INSERT INTO `users` (`id`, `name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT IGNORE INTO `users` (`name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT IGNORE INTO `users` (`id`, `name`, `email`, `created_at`, `updated_at`, `float_type`, `double_type`, `hobby`, `hobby_no_default`, `sports`, `sports2`, `sports_no_default`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 // Insert User struct to `users` table
 func (c *User) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getNameForDB(), c.getEmailForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB(), c.getFloatTypeForDB(), c.getDoubleTypeForDB(), c.getHobbyForDB(), c.getHobbyNoDefaultForDB(), c.getSportsForDB(), c.getSports2ForDB(), c.getSportsNoDefaultForDB())
+		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.getNameForDB(), c.getEmailForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB(), c.getFloatTypeForDB(), c.getDoubleTypeForDB(), c.getHobbyForDB(), c.getHobbyNoDefaultForDB(), c.getSportsForDB(), c.getSports2ForDB(), c.getSportsNoDefaultForDB())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetName(), c.GetEmail(), c.GetCreatedAt(), c.GetUpdatedAt(), c.GetFloatType(), c.GetDoubleType(), c.GetHobby(), c.GetHobbyNoDefault(), c.GetSports(), c.GetSports2(), c.GetSportsNoDefault())
 		if err != nil {
 			return err
 		}
@@ -909,47 +823,47 @@ func (obj *User) Update() (bool, error) {
 	var params []any
 	if obj.Name.IsUpdated() {
 		updatedFields = append(updatedFields, "`name` = ?")
-		params = append(params, obj.getNameForDB())
+		params = append(params, obj.GetName())
 	}
 	if obj.Email.IsUpdated() {
 		updatedFields = append(updatedFields, "`email` = ?")
-		params = append(params, obj.getEmailForDB())
+		params = append(params, obj.GetEmail())
 	}
 	if obj.CreatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`created_at` = ?")
-		params = append(params, obj.getCreatedAtForDB())
+		params = append(params, obj.GetCreatedAt())
 	}
 	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`updated_at` = ?")
-		params = append(params, obj.getUpdatedAtForDB())
+		params = append(params, obj.GetUpdatedAt())
 	}
 	if obj.FloatType.IsUpdated() {
 		updatedFields = append(updatedFields, "`float_type` = ?")
-		params = append(params, obj.getFloatTypeForDB())
+		params = append(params, obj.GetFloatType())
 	}
 	if obj.DoubleType.IsUpdated() {
 		updatedFields = append(updatedFields, "`double_type` = ?")
-		params = append(params, obj.getDoubleTypeForDB())
+		params = append(params, obj.GetDoubleType())
 	}
 	if obj.Hobby.IsUpdated() {
 		updatedFields = append(updatedFields, "`hobby` = ?")
-		params = append(params, obj.getHobbyForDB())
+		params = append(params, obj.GetHobby())
 	}
 	if obj.HobbyNoDefault.IsUpdated() {
 		updatedFields = append(updatedFields, "`hobby_no_default` = ?")
-		params = append(params, obj.getHobbyNoDefaultForDB())
+		params = append(params, obj.GetHobbyNoDefault())
 	}
 	if obj.Sports.IsUpdated() {
 		updatedFields = append(updatedFields, "`sports` = ?")
-		params = append(params, obj.getSportsForDB())
+		params = append(params, obj.GetSports())
 	}
 	if obj.Sports2.IsUpdated() {
 		updatedFields = append(updatedFields, "`sports2` = ?")
-		params = append(params, obj.getSports2ForDB())
+		params = append(params, obj.GetSports2())
 	}
 	if obj.SportsNoDefault.IsUpdated() {
 		updatedFields = append(updatedFields, "`sports_no_default` = ?")
-		params = append(params, obj.getSportsNoDefaultForDB())
+		params = append(params, obj.GetSportsNoDefault())
 	}
 
 	if len(updatedFields) == 0 {
@@ -994,67 +908,67 @@ func Update(obj withPK) (bool, error) {
 		case *Name:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`name` = ?")
-				params = append(params, c.getNameForDB())
+				params = append(params, c.GetName())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Email:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`email` = ?")
-				params = append(params, c.getEmailForDB())
+				params = append(params, c.GetEmail())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *CreatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`created_at` = ?")
-				params = append(params, c.getCreatedAtForDB())
+				params = append(params, c.GetCreatedAt())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *UpdatedAt:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`updated_at` = ?")
-				params = append(params, c.getUpdatedAtForDB())
+				params = append(params, c.GetUpdatedAt())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *FloatType:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`float_type` = ?")
-				params = append(params, c.getFloatTypeForDB())
+				params = append(params, c.GetFloatType())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *DoubleType:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`double_type` = ?")
-				params = append(params, c.getDoubleTypeForDB())
+				params = append(params, c.GetDoubleType())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Hobby:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`hobby` = ?")
-				params = append(params, c.getHobbyForDB())
+				params = append(params, c.GetHobby())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *HobbyNoDefault:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`hobby_no_default` = ?")
-				params = append(params, c.getHobbyNoDefaultForDB())
+				params = append(params, c.GetHobbyNoDefault())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Sports:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`sports` = ?")
-				params = append(params, c.getSportsForDB())
+				params = append(params, c.GetSports())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Sports2:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`sports2` = ?")
-				params = append(params, c.getSports2ForDB())
+				params = append(params, c.GetSports2())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *SportsNoDefault:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`sports_no_default` = ?")
-				params = append(params, c.getSportsNoDefaultForDB())
+				params = append(params, c.GetSportsNoDefault())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

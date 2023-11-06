@@ -10,7 +10,7 @@ import (
 
 	"github.com/olachat/gola/coredb"
 
-	"github.com/jordan-bonecutter/goption"
+	"github.com/volatiletech/null/v8"
 )
 
 const DBName string = "testdata"
@@ -106,6 +106,7 @@ const (
 )
 
 // Id field
+//
 type Id struct {
 	isAssigned bool
 	val        uint
@@ -121,10 +122,6 @@ func (c *Id) GetColumnName() string {
 
 func (c *Id) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Id) getIdForDB() uint {
-	return c.val
 }
 
 func (c *Id) MarshalJSON() ([]byte, error) {
@@ -175,10 +172,6 @@ func (c *Title) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Title) getTitleForDB() string {
-	return c.val
-}
-
 func (c *Title) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -227,10 +220,6 @@ func (c *Rank) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Rank) getRankForDB() int {
-	return c.val
-}
-
 func (c *Rank) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -244,16 +233,17 @@ func (c *Rank) UnmarshalJSON(data []byte) error {
 }
 
 // Type field
+//
 type Type struct {
 	_updated bool
-	val      goption.Option[SongType]
+	val      SongType
 }
 
-func (c *Type) GetType() goption.Option[SongType] {
+func (c *Type) GetType() SongType {
 	return c.val
 }
 
-func (c *Type) SetType(val goption.Option[SongType]) bool {
+func (c *Type) SetType(val SongType) bool {
 	if c.val == val {
 		return false
 	}
@@ -276,10 +266,6 @@ func (c *Type) GetColumnName() string {
 
 func (c *Type) GetValPointer() any {
 	return &c.val
-}
-
-func (c *Type) getTypeForDB() goption.Option[SongType] {
-	return c.val
 }
 
 func (c *Type) MarshalJSON() ([]byte, error) {
@@ -330,10 +316,6 @@ func (c *Hash) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Hash) getHashForDB() string {
-	return c.val
-}
-
 func (c *Hash) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -347,16 +329,17 @@ func (c *Hash) UnmarshalJSON(data []byte) error {
 }
 
 // Remark field
+//
 type Remark struct {
 	_updated bool
-	val      goption.Option[string]
+	val      null.String
 }
 
-func (c *Remark) GetRemark() goption.Option[string] {
+func (c *Remark) GetRemark() null.String {
 	return c.val
 }
 
-func (c *Remark) SetRemark(val goption.Option[string]) bool {
+func (c *Remark) SetRemark(val null.String) bool {
 	if c.val == val {
 		return false
 	}
@@ -381,10 +364,6 @@ func (c *Remark) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Remark) getRemarkForDB() goption.Option[string] {
-	return c.val
-}
-
 func (c *Remark) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -398,6 +377,7 @@ func (c *Remark) UnmarshalJSON(data []byte) error {
 }
 
 // Manifest field
+//
 type Manifest struct {
 	_updated bool
 	val      []byte
@@ -429,10 +409,6 @@ func (c *Manifest) GetValPointer() any {
 	return &c.val
 }
 
-func (c *Manifest) getManifestForDB() []byte {
-	return c.val
-}
-
 func (c *Manifest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&c.val)
 }
@@ -454,7 +430,7 @@ func New() *Song {
 		Type{},
 		Hash{},
 		Remark{},
-		Manifest{val: []byte("man")},
+		Manifest{},
 	}
 }
 
@@ -468,27 +444,27 @@ func NewWithPK(val uint) *Song {
 		Type{},
 		Hash{},
 		Remark{},
-		Manifest{val: []byte("man")},
+		Manifest{},
 	}
 	c.Id.val = val
 	c.Id.isAssigned = true
 	return c
 }
 
-const insertWithoutPK string = "INSERT INTO `songs` (`title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?)"
-const insertWithPK string = "INSERT INTO `songs` (`id`, `title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT IGNORE INTO `songs` (`title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT IGNORE INTO `songs` (`id`, `title`, `rank`, `type`, `hash`, `remark`, `manifest`) values (?, ?, ?, ?, ?, ?, ?)"
 
 // Insert Song struct to `songs` table
 func (c *Song) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getTitleForDB(), c.getRankForDB(), c.getTypeForDB(), c.getHashForDB(), c.getRemarkForDB(), c.getManifestForDB())
+		result, err = coredb.Exec(DBName, insertWithPK, c.GetId(), c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetRemark(), c.GetManifest())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.getTitleForDB(), c.getRankForDB(), c.getTypeForDB(), c.getHashForDB(), c.getRemarkForDB(), c.getManifestForDB())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.GetTitle(), c.GetRank(), c.GetType(), c.GetHash(), c.GetRemark(), c.GetManifest())
 		if err != nil {
 			return err
 		}
@@ -527,27 +503,27 @@ func (obj *Song) Update() (bool, error) {
 	var params []any
 	if obj.Title.IsUpdated() {
 		updatedFields = append(updatedFields, "`title` = ?")
-		params = append(params, obj.getTitleForDB())
+		params = append(params, obj.GetTitle())
 	}
 	if obj.Rank.IsUpdated() {
 		updatedFields = append(updatedFields, "`rank` = ?")
-		params = append(params, obj.getRankForDB())
+		params = append(params, obj.GetRank())
 	}
 	if obj.Type.IsUpdated() {
 		updatedFields = append(updatedFields, "`type` = ?")
-		params = append(params, obj.getTypeForDB())
+		params = append(params, obj.GetType())
 	}
 	if obj.Hash.IsUpdated() {
 		updatedFields = append(updatedFields, "`hash` = ?")
-		params = append(params, obj.getHashForDB())
+		params = append(params, obj.GetHash())
 	}
 	if obj.Remark.IsUpdated() {
 		updatedFields = append(updatedFields, "`remark` = ?")
-		params = append(params, obj.getRemarkForDB())
+		params = append(params, obj.GetRemark())
 	}
 	if obj.Manifest.IsUpdated() {
 		updatedFields = append(updatedFields, "`manifest` = ?")
-		params = append(params, obj.getManifestForDB())
+		params = append(params, obj.GetManifest())
 	}
 
 	if len(updatedFields) == 0 {
@@ -592,37 +568,37 @@ func Update(obj withPK) (bool, error) {
 		case *Title:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`title` = ?")
-				params = append(params, c.getTitleForDB())
+				params = append(params, c.GetTitle())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Rank:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`rank` = ?")
-				params = append(params, c.getRankForDB())
+				params = append(params, c.GetRank())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Type:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`type` = ?")
-				params = append(params, c.getTypeForDB())
+				params = append(params, c.GetType())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Hash:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`hash` = ?")
-				params = append(params, c.getHashForDB())
+				params = append(params, c.GetHash())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Remark:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`remark` = ?")
-				params = append(params, c.getRemarkForDB())
+				params = append(params, c.GetRemark())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		case *Manifest:
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`manifest` = ?")
-				params = append(params, c.getManifestForDB())
+				params = append(params, c.GetManifest())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}
