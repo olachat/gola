@@ -43,6 +43,7 @@ func getDB(dbname string, mode DBMode) *sql.DB {
 }
 
 // FetchByPK returns a row of T type with given primary key value
+//
 // Deprecated: use the function with context
 func FetchByPK[T any](dbname string, tableName string, pkName []string, val ...any) *T {
 	sql := "WHERE `" + pkName[0] + "` = ?"
@@ -54,6 +55,7 @@ func FetchByPK[T any](dbname string, tableName string, pkName []string, val ...a
 }
 
 // FetchByPKs returns rows of T type with given primary key values
+//
 // Deprecated: use the function with context
 func FetchByPKs[T any](dbname string, tableName string, pkName string, vals []any) []*T {
 	if len(vals) == 0 {
@@ -71,6 +73,7 @@ func FetchByPKs[T any](dbname string, tableName string, pkName string, vals []an
 }
 
 // FetchByPKFromMaster returns a row of T type with given primary key value
+//
 // Deprecated: use the function with context
 func FetchByPKFromMaster[T any](dbname string, tableName string, pkName []string, val ...any) *T {
 	sql := "WHERE `" + pkName[0] + "` = ?"
@@ -82,6 +85,7 @@ func FetchByPKFromMaster[T any](dbname string, tableName string, pkName []string
 }
 
 // FetchByPKsFromMaster returns rows of T type with given primary key values
+//
 // Deprecated: use the function with context
 func FetchByPKsFromMaster[T any](dbname string, tableName string, pkName string, vals []any) []*T {
 	if len(vals) == 0 {
@@ -99,6 +103,7 @@ func FetchByPKsFromMaster[T any](dbname string, tableName string, pkName string,
 }
 
 // Exec given query with given db info & params
+//
 // Deprecated: use the function with context
 func Exec(dbname string, query string, params ...any) (sql.Result, error) {
 	mydb := getDB(dbname, DBModeWrite)
@@ -106,6 +111,7 @@ func Exec(dbname string, query string, params ...any) (sql.Result, error) {
 }
 
 // FindOne returns a row from given table type with where query
+//
 // Deprecated: use the function with context
 func FindOne[T any](dbname string, tableName string, where WhereQuery) *T {
 	u := new(T)
@@ -131,6 +137,7 @@ func FindOne[T any](dbname string, tableName string, where WhereQuery) *T {
 }
 
 // Find returns rows from given table type with where query
+//
 // Deprecated: use the function with context
 func Find[T any](dbname string, tableName string, where WhereQuery) ([]*T, error) {
 	columnsNames := GetColumnsNames[T]()
@@ -142,6 +149,7 @@ func Find[T any](dbname string, tableName string, where WhereQuery) ([]*T, error
 }
 
 // FindOneFromMaster using master DB returns a row from given table type with where query
+//
 // Deprecated: use the function with context
 func FindOneFromMaster[T any](dbname string, tableName string, where WhereQuery) *T {
 	u := new(T)
@@ -167,6 +175,7 @@ func FindOneFromMaster[T any](dbname string, tableName string, where WhereQuery)
 }
 
 // FindFromMaster using master DB returns rows from given table type with where query
+//
 // Deprecated: use the function with context
 func FindFromMaster[T any](dbname string, tableName string, where WhereQuery) ([]*T, error) {
 	columnsNames := GetColumnsNames[T]()
@@ -178,6 +187,7 @@ func FindFromMaster[T any](dbname string, tableName string, where WhereQuery) ([
 }
 
 // QueryInt single int result by query, handy for count(*) querys
+//
 // Deprecated: use the function with context
 func QueryInt(dbname string, query string, params ...any) (result int, err error) {
 	mydb := getDB(dbname, DBModeRead)
@@ -186,6 +196,7 @@ func QueryInt(dbname string, query string, params ...any) (result int, err error
 }
 
 // QueryIntFromMaster single int result by query, handy for count(*) querys
+//
 // Deprecated: use the function with context
 func QueryIntFromMaster(dbname string, query string, params ...any) (result int, err error) {
 	mydb := getDB(dbname, DBModeReadFromWrite)
@@ -194,6 +205,7 @@ func QueryIntFromMaster(dbname string, query string, params ...any) (result int,
 }
 
 // Query rows from given table type with where query & params
+//
 // Deprecated: use the function with context
 func Query[T any](dbname string, query string, params ...any) (result []*T, err error) {
 	mydb := getDB(dbname, DBModeRead)
@@ -217,6 +229,7 @@ func Query[T any](dbname string, query string, params ...any) (result []*T, err 
 }
 
 // Query rows from master DB from given table type with where query & params
+//
 // Deprecated: use the function with context
 func QueryFromMaster[T any](dbname string, query string, params ...any) (result []*T, err error) {
 	mydb := getDB(dbname, DBModeReadFromWrite)
