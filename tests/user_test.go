@@ -52,7 +52,16 @@ func init() {
 		panic(err)
 	}
 
+	realdb, err := open()
+
+	if err != nil {
+		panic(err)
+	}
+
 	coredb.Setup(func(dbname string, mode coredb.DBMode) *sql.DB {
+		if dbname == "newdb" {
+			return realdb
+		}
 		return db
 	})
 

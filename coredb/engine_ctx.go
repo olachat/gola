@@ -129,14 +129,14 @@ func FindFromMasterCtx[T any](ctx context.Context, dbname string, tableName stri
 // QueryIntCtx single int result by query, handy for count(*) querys
 func QueryIntCtx(ctx context.Context, dbname string, query string, params ...any) (result int, err error) {
 	mydb := getDB(dbname, DBModeRead)
-	mydb.QueryRowContext(ctx, query, params...).Scan(&result)
+	err = mydb.QueryRowContext(ctx, query, params...).Scan(&result)
 	return
 }
 
 // QueryIntFromMasterCtx single int result by query, handy for count(*) querys
 func QueryIntFromMasterCtx(ctx context.Context, dbname string, query string, params ...any) (result int, err error) {
 	mydb := getDB(dbname, DBModeReadFromWrite)
-	mydb.QueryRowContext(ctx, query, params...).Scan(&result)
+	err = mydb.QueryRowContext(ctx, query, params...).Scan(&result)
 	return
 }
 
