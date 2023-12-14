@@ -28,6 +28,8 @@ func (e *InvalidScanError) Error() string {
 //
 // The function returns a slice of pointers to T structs and an error.
 func RowsToStructSlice[T any](rows *sql.Rows) (result []*T, err error) {
+	defer rows.Close()
+
 	var u *T
 	for rows.Next() {
 		u = new(T)
@@ -38,6 +40,7 @@ func RowsToStructSlice[T any](rows *sql.Rows) (result []*T, err error) {
 		}
 		result = append(result, u)
 	}
+	err = rows.Err()
 	return
 }
 
@@ -59,14 +62,7 @@ func RowToStruct[T any](row *sql.Row) (result *T, err error) {
 
 // StrutForScan returns value pointers of given obj
 func StrutForScan(u any) (pointers []any) {
-	val := reflect.ValueOf(u)
-	if val.Kind() != reflect.Pointer || val.IsNil() {
-		err := &InvalidScanError{reflect.TypeOf(u)}
-		panic(err)
-	}
-
-	val = val.Elem()
-
+	val := reflect.ValueOf(u).Elem()
 	pointers = make([]any, 0, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
