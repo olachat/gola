@@ -74,6 +74,7 @@ func RowsToStructSliceReflect(rows *sql.Rows, out any) (err error) {
 	if rows == nil {
 		return
 	}
+	defer rows.Close()
 	sliceValue := reflect.ValueOf(out)
 	if sliceValue.Kind() != reflect.Ptr || sliceValue.IsNil() {
 		panic(&InvalidScanError{Type: sliceValue.Type()})
