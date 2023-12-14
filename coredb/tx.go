@@ -24,10 +24,30 @@ var DefaultTxOpts = sql.TxOptions{
 
 // TxContext interface for DAO operations with context.
 type TxContext interface {
+	// Exec executes a query without returning any rows.
+	// The args are for any placeholder parameters in the query.
 	Exec(query string, args ...any) (sql.Result, error)
+
+	// Query executes a SELECT query and scans the resulting rows into the provided 'results' destination.
+	// It accepts a SQL query and an optional list of parameters for placeholder substitution.
+	// NOTE: results must be a pointer to a slice of struct pointers.
 	Query(results any, query string, params ...any) (err error)
+
+	// QueryInt executes a SELECT query expected to return a single integer value.
+	// Commonly used for COUNT(*) operations or where the result is inherently an integer.
+	// Multiple params for query placeholders are supported.
 	QueryInt(query string, params ...any) (result int, err error)
+
+	// FindOne fetches a single record from the database and populates 'result'.
+	// It requires the name of the table, an optional WHERE clause ('whereSQL'), and
+	// parameters to substitute into the WHERE clause's placeholders.
+	// NOTE: result must be a non-nil pointer to a struct.
 	FindOne(result any, tableName string, whereSQL string, params ...any) error
+
+	// Find executes a SELECT query based on the given 'tableName' and 'whereSQL',
+	// placing all matching records into the 'results' slice.
+	// Parameters for the WHERE clause's placeholders can be passed with 'params'.
+	// NOTE: results must be a pointer to a slice of struct pointers.
 	Find(results any, tableName string, whereSQL string, params ...any) error
 }
 
