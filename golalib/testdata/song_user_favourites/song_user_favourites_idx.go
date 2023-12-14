@@ -67,22 +67,26 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 	return q
 }
 
+// deprecated: use the function with context
 func (q *idxQuery[T]) All() []*T {
 	result, _ := coredb.Find[T](DBName, TableName, q)
 	return result
 }
 
+// deprecated: use the function with context
 func (q *idxQuery[T]) Limit(offset, limit int) []*T {
 	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, limit)
 	result, _ := coredb.Find[T](DBName, TableName, q)
 	return result
 }
 
+// deprecated: use the function with context
 func (q *idxQuery[T]) AllFromMaster() []*T {
 	result, _ := coredb.FindFromMaster[T](DBName, TableName, q)
 	return result
 }
 
+// deprecated: use the function with context
 func (q *idxQuery[T]) LimitFromMaster(offset, limit int) []*T {
 	q.limitSql = fmt.Sprintf(" limit %d, %d", offset, limit)
 	result, _ := coredb.FindFromMaster[T](DBName, TableName, q)
