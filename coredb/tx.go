@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 )
 
 // BeginTx returns a custom db.Tx based on opts. This method exists for flexibility.
@@ -144,8 +143,9 @@ func (t *TxProvider) acquireWithOpts(ctx context.Context, opts *sql.TxOptions) (
 }
 
 // TxWithOpts ...
-func (t *TxProvider) TxWithOpts(ctx context.Context, fn func(TxContext) error, opts *sql.TxOptions) error {
-	tx, err := t.acquireWithOpts(ctx, opts)
+func (t *TxProvider) TxWithOpts(ctx context.Context, fn func(TxContext) error, opts *sql.TxOptions) (err error) {
+	var trx *tx
+	trx, err = t.acquireWithOpts(ctx, opts)
 	if err != nil {
 		return err
 	}
@@ -153,21 +153,26 @@ func (t *TxProvider) TxWithOpts(ctx context.Context, fn func(TxContext) error, o
 	defer func() {
 		//nolint:gocritic
 		if r := recover(); r != nil {
-			log.Printf("Recovering from panic in TxWithOpts error is: %v \n", r)
-			_ = tx.Rollback()
-			err, _ = r.(error)
+			_ = trx.Rollback()
+			var ok bool
+			err, ok = r.(error)
+			if !ok {
+				err = fmt.Errorf("%v", r)
+			}
 		} else if err != nil {
-			err = tx.Rollback()
+			errRollback := trx.Rollback()
+			if errors.Is(errRollback, sql.ErrTxDone) && ctx.Err() != nil {
+				errRollback = nil
+			}
+			if errRollback != nil {
+				err = fmt.Errorf("%v encountered. but rollback failed: %w", err, errRollback)
+			}
 		} else {
-			err = tx.Commit()
-		}
-
-		if ctx.Err() != nil && errors.Is(err, context.DeadlineExceeded) {
-			log.Printf("query response time exceeded the configured timeout")
+			err = trx.Commit()
 		}
 	}()
 
-	err = fn(tx)
+	err = fn(trx)
 
 	return err
 }

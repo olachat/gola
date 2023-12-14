@@ -51,11 +51,8 @@ func RowToStruct[T any](row *sql.Row) (result *T, err error) {
 	result = new(T)
 	data := StrutForScan(result)
 	err = row.Scan(data...)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, err
+	if err == sql.ErrNoRows {
+		err = nil
 	}
 	return
 }
@@ -74,20 +71,24 @@ func StrutForScan(u any) (pointers []any) {
 }
 
 func RowsToStructSliceReflect(rows *sql.Rows, out any) (err error) {
+	if rows == nil {
+		return
+	}
 	sliceValue := reflect.ValueOf(out)
 	if sliceValue.Kind() != reflect.Ptr || sliceValue.IsNil() {
-		return &InvalidScanError{Type: sliceValue.Type()}
+		panic(&InvalidScanError{Type: sliceValue.Type()})
 	}
 	sliceValue = sliceValue.Elem()
 	if sliceValue.Kind() != reflect.Slice {
-		return &InvalidScanError{Type: reflect.TypeOf(out)}
+		panic(&InvalidScanError{Type: reflect.TypeOf(out)})
 	}
 	elementType := sliceValue.Type().Elem()
 	if elementType.Kind() != reflect.Ptr {
-		return &InvalidScanError{Type: reflect.TypeOf(out)}
+		panic(&InvalidScanError{Type: reflect.TypeOf(out)})
 	}
 	elementType = elementType.Elem()
 
+	var elements []reflect.Value
 	for rows.Next() {
 		v := reflect.New(elementType)
 		data := StrutForScan(v.Interface())
@@ -95,24 +96,28 @@ func RowsToStructSliceReflect(rows *sql.Rows, out any) (err error) {
 		if err != nil {
 			return
 		}
-		sliceValue.Set(reflect.Append(sliceValue, v))
+		elements = append(elements, v.Elem())
 	}
+
+	sliceValue.Set(reflect.MakeSlice(sliceValue.Type(), len(elements), len(elements)))
+	for i, v := range elements {
+		sliceValue.Index(i).Set(v.Addr())
+	}
+
+	err = rows.Err()
 	return
 }
 
 func RowToStructReflect(row *sql.Row, v any) (err error) {
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Pointer || rv.IsNil() {
-		return &InvalidScanError{reflect.TypeOf(v)}
+		panic(&InvalidScanError{reflect.TypeOf(v)})
 	}
 
 	data := StrutForScan(v)
 	err = row.Scan(data...)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil
-		}
-		return err
+	if err == sql.ErrNoRows {
+		return nil
 	}
 	return
 }

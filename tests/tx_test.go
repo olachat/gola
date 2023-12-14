@@ -4,73 +4,74 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"reflect"
 	"strings"
-	"testing"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/olachat/gola/v2/coredb"
 	"github.com/olachat/gola/v2/golalib/testdata/worker"
 )
 
-func TestBeginTx(t *testing.T) {
-	as := assert.New(t)
+func ExampleNewTxProvider() {
 
 	prov := coredb.NewTxProvider("newdb")
 	err := prov.Tx(context.Background(), func(tx coredb.TxContext) error {
 		_, err := tx.Exec("truncate table worker")
-		as.Nil(err)
+		panicOnErr(err)
 
 		var workers []*worker.Worker
 		err = tx.Find(&workers, "worker", "where id > ?", 0)
-		as.Nil(err)
-		as.Equal(0, len(workers))
+		panicOnErr(err)
+		mustEqual(0, len(workers))
+		fmt.Println("no of workers:", len(workers)) // uncomment to run test
+		// Output: no of workers: 0
 
 		_, err = tx.Exec("insert into worker (name,age) values (?, ?)", "peter", 18)
-		as.Nil(err)
+		panicOnErr(err)
 
 		_, err = tx.Exec("insert into worker (name,age) values (?, ?)", "john", 28)
-		as.Nil(err)
+		panicOnErr(err)
 		return err
 	})
-	as.Nil(err)
+	panicOnErr(err)
 
 	err = prov.Tx(context.Background(), func(tx coredb.TxContext) error {
 		var workers []*worker.Worker
 		err := tx.Find(&workers, "worker", "where id > ?", 0)
-		as.Nil(err)
-		as.Equal(2, len(workers))
-		as.Equal("peter", workers[0].GetName())
-		as.Equal(18, workers[0].GetAge())
-		as.Equal("john", workers[1].GetName())
-		as.Equal(28, workers[1].GetAge())
+		panicOnErr(err)
+		mustEqual(2, len(workers))
+		mustEqual("peter", workers[0].GetName())
+		mustEqual(18, workers[0].GetAge())
+		mustEqual("john", workers[1].GetName())
+		mustEqual(28, workers[1].GetAge())
 
 		var w worker.Worker
 		err = tx.FindOne(&w, "worker", "where id = ?", 1)
-		as.Nil(err)
-		as.Equal("peter", w.GetName())
-		as.Equal(18, w.GetAge())
+		panicOnErr(err)
+		mustEqual("peter", w.GetName())
+		mustEqual(18, w.GetAge())
 
 		r, err := tx.QueryInt("select count(1) from worker")
-		as.Nil(err)
-		as.Equal(2, r)
+		panicOnErr(err)
+		mustEqual(2, r)
 
 		var workers2 []*worker.Worker
 		err = tx.Query(&workers2, "select * from worker where id > ?", 0)
-		as.Nil(err)
-		as.Equal(2, len(workers2))
-		as.Equal("peter", workers2[0].GetName())
-		as.Equal(18, workers2[0].GetAge())
-		as.Equal("john", workers2[1].GetName())
-		as.Equal(28, workers2[1].GetAge())
+		panicOnErr(err)
+		mustEqual(2, len(workers2))
+		mustEqual("peter", workers2[0].GetName())
+		mustEqual(18, workers2[0].GetAge())
+		mustEqual("john", workers2[1].GetName())
+		mustEqual(28, workers2[1].GetAge())
 		return nil
 	})
 
 	prov.Tx(context.Background(), func(tx coredb.TxContext) error {
 		_, err := tx.Exec("insert into worker (name,age) values (?, ?)", "winson", 19)
-		as.Nil(err)
+		panicOnErr(err)
 
 		return errors.New("abort")
 	})
@@ -78,16 +79,47 @@ func TestBeginTx(t *testing.T) {
 	prov.Tx(context.Background(), func(tx coredb.TxContext) error {
 		var w []*worker.Worker
 		err := tx.Find(&w, "worker", "where id > ?", 0)
-		as.Nil(err)
-		as.Equal(2, len(w))
-		as.Equal("peter", w[0].GetName())
-		as.Equal(18, w[0].GetAge())
-		as.Equal("john", w[1].GetName())
-		as.Equal(28, w[1].GetAge())
+		panicOnErr(err)
+		mustEqual(2, len(w))
+		mustEqual("peter", w[0].GetName())
+		mustEqual(18, w[0].GetAge())
+		mustEqual("john", w[1].GetName())
+		mustEqual(28, w[1].GetAge())
 		return nil
 	})
-	as.Nil(err)
+	panicOnErr(err)
 
+	prov2 := coredb.NewTxProvider("newdb")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+	defer cancel()
+	err = prov2.Tx(ctx, func(tx coredb.TxContext) error {
+		_, err := tx.Exec("insert into worker (name,age) values (?, ?)", "winson", 19)
+		if err != nil {
+			return err
+		}
+		var w []*worker.Worker
+		time.Sleep(10 * time.Millisecond)
+		err = tx.Find(&w, "worker", "where age = ?", 28)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if !errors.Is(err, context.DeadlineExceeded) {
+		panic(err)
+	}
+
+}
+
+func panicOnErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+func mustEqual(a, b interface{}) {
+	if !reflect.DeepEqual(a, b) {
+		panic(fmt.Sprintf("%v != %v", a, b))
+	}
 }
 
 func open() (db *sql.DB, err error) {
