@@ -67,6 +67,7 @@ func (t *tx) Query(results any, query string, params ...any) error {
 	if err != nil {
 		return err
 	}
+	defer rows.Close()
 	return RowsToStructSliceReflect(rows, results)
 }
 
