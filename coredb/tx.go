@@ -11,7 +11,7 @@ import (
 // Make sure you call Commit or Rollback on the returned Tx.
 // Refer to https://go.dev/doc/database/execute-transactions on how to use the returned Tx.
 func BeginTx(ctx context.Context, dbname string, opts *sql.TxOptions) (tx *sql.Tx, err error) {
-	mydb := getDB(dbname, DBModeRead)
+	mydb := getDB(dbname, DBModeWrite)
 	return mydb.BeginTx(ctx, opts)
 }
 
