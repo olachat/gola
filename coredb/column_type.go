@@ -1,7 +1,9 @@
 package coredb
 
 // ColumnType defines the generated type of a table column
-type ColumnType interface {
-	GetColumnName() string
+type ColumnValPointer interface {
 	GetValPointer() any
+}
+type ColumnNamer interface {
+	GetColumnName() string
 }

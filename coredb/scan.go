@@ -61,7 +61,7 @@ func StrutForScan(u any) (pointers []any) {
 	pointers = make([]any, 0, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
-		if f, ok := valueField.Addr().Interface().(ColumnType); ok {
+		if f, ok := valueField.Addr().Interface().(ColumnValPointer); ok {
 			pointers = append(pointers, f.GetValPointer())
 		}
 	}
