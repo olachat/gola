@@ -38,4 +38,8 @@ func TestNewParams(t *testing.T) {
 	as.Equal(88, out[9])
 	as.Equal(99, out[10])
 	as.Equal(100, out[11])
+
+	p2 := NewParams(1, 2, []int{3, 4, 5}, "Mary", []string{"Wilson", "Mandy"})
+	p2.Get()
+	as.Equal([]any{1, 2, 3, 4, 5, "Mary", "Wilson", "Mandy"}, p2.Get())
 }
