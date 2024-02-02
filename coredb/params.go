@@ -11,20 +11,28 @@ func NewParams(params ...any) *Params {
 }
 
 func (p *Params) Add(params ...any) {
+	totalLen := len(p.params)
+	for i := 0; i < len(params); i++ {
+		if v := reflect.ValueOf(params[i]); v.Kind() == reflect.Slice {
+			totalLen += v.Len()
+		} else {
+			totalLen++
+		}
+	}
+
+	newSlice := make([]any, 0, totalLen)
+	newSlice = append(newSlice, p.params...)
 	for i := 0; i < len(params); i++ {
 		if v := reflect.ValueOf(params[i]); v.Kind() == reflect.Slice {
 			// append all elements in params[0] to p.params
-			requiredCapacity := len(p.params) + v.Len() + len(params)
-			newSlice := make([]any, 0, requiredCapacity)
-			newSlice = append(newSlice, p.params...)
 			for j := 0; j < v.Len(); j++ {
 				newSlice = append(newSlice, v.Index(j).Interface())
 			}
-			p.params = newSlice
 		} else {
-			p.params = append(p.params, params[i])
+			newSlice = append(newSlice, params[i])
 		}
 	}
+	p.params = newSlice
 }
 
 func (p *Params) Get() []any {
