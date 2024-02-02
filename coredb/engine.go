@@ -28,8 +28,10 @@ func Setup(dbp DBProvider) {
 	_dbp = dbp
 }
 
-var typeColumnNames = make(map[reflect.Type]string)
-var typeColumnNamesLock sync.RWMutex
+var (
+	typeColumnNames     = make(map[reflect.Type]string)
+	typeColumnNamesLock sync.RWMutex
+)
 
 func getDB(dbname string, mode DBMode) *sql.DB {
 	if _dbp == nil {
@@ -269,7 +271,7 @@ func GetColumnsNames[T any]() (joinedColumnNames string) {
 	val := reflect.ValueOf(o).Elem()
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
-		if f, ok := valueField.Addr().Interface().(ColumnType); ok {
+		if f, ok := valueField.Addr().Interface().(ColumnNamer); ok {
 			columnNames = append(columnNames, "`"+f.GetColumnName()+"`")
 		}
 	}
@@ -315,7 +317,7 @@ func GetColumnsNamesReflect(o any) (joinedColumnNames string) {
 	val := reflect.New(elemType).Elem()
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
-		if f, ok := valueField.Addr().Interface().(ColumnType); ok {
+		if f, ok := valueField.Addr().Interface().(ColumnNamer); ok {
 			columnNames = append(columnNames, "`"+f.GetColumnName()+"`")
 		}
 	}
