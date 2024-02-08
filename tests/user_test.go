@@ -23,9 +23,10 @@ const (
 	testDBName string = "testdb"
 )
 
-var tableNames = []string{"users", "blogs", "songs", "song_user_favourites", "profile", "account",
+var tableNames = []string{
+	"users", "blogs", "songs", "song_user_favourites", "profile", "account",
 	"gifts", "gifts_with_default",
-	"gifts_nn", "gifts_nn_with_default", "wallet",
+	"gifts_nn", "gifts_nn_with_default", "wallet", "xs_pay_change_new",
 }
 
 func init() {
@@ -53,7 +54,6 @@ func init() {
 	}
 
 	realdb, err := open()
-
 	if err != nil {
 		panic(err)
 	}
@@ -65,13 +65,13 @@ func init() {
 		return db
 	})
 
-	//create tables
+	// create tables
 	for _, tableName := range tableNames {
 		query, _ := testdata.Fixtures.ReadFile(tableName + ".sql")
 		db.Exec(string(query))
 	}
 
-	//add data
+	// add data
 	_, err = db.Exec(`
 insert into users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports_no_default, sports) values
 ("John Doe", "john@doe.com", NOW(), NOW(), 1.55555, 1.8729, 'running','swimming', ('SWIM,TENNIS'), ("TENNIS")),
