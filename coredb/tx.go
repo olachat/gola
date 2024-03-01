@@ -11,14 +11,22 @@ import (
 // Make sure you call Commit or Rollback on the returned Tx.
 // Refer to https://go.dev/doc/database/execute-transactions on how to use the returned Tx.
 func BeginTx(ctx context.Context, dbname string, opts *sql.TxOptions) (tx *sql.Tx, err error) {
-	mydb := getDB(dbname, DBModeWrite)
-	return mydb.BeginTx(ctx, opts)
+	myDB := getDB(dbname, DBModeWrite)
+	return myDB.BeginTx(ctx, opts)
 }
 
 // DefaultTxOpts is package variable with default transaction level
 var DefaultTxOpts = sql.TxOptions{
 	Isolation: sql.LevelDefault,
 	ReadOnly:  false,
+}
+
+func newLockError(lock string, durationInSec int) error {
+	return fmt.Errorf("fail to acquire lock: %s, durationInSec: %d", lock, durationInSec)
+}
+
+func newReleaseLockError(lock string, durationInSec int) error {
+	return fmt.Errorf("fail to release lock: %s, durationInSec: %d", lock, durationInSec)
 }
 
 // TxContext interface for DAO operations with context.
@@ -67,7 +75,9 @@ func (t *tx) Query(results any, query string, params ...any) error {
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err = rows.Close()
+	}(rows)
 	return RowsToStructSliceReflect(rows, results)
 }
 
@@ -86,7 +96,7 @@ func (t *tx) FindOne(result any, tableName string, whereSQL string, params ...an
 	if err2 != nil {
 		// It's on purpose the hide the error
 		// But should re-consider later
-		if err2 == sql.ErrNoRows {
+		if errors.Is(err2, sql.ErrNoRows) {
 			return nil
 		}
 		return err2
@@ -112,27 +122,39 @@ func (t *tx) Rollback() error {
 	return t.Tx.Rollback()
 }
 
-// Connector for sql database.
-type Connector interface {
+// TxStarter for sql database.
+type TxStarter interface {
 	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+}
+
+type ConnectionGetter interface {
+	Conn(ctx context.Context) (*sql.Conn, error)
+}
+
+type TxStarterWithConnection interface {
+	TxStarter
+	ConnectionGetter
 }
 
 // TxProvider ...
 type TxProvider struct {
-	conn Connector
+	conn TxStarterWithConnection
 }
 
 // NewTxProvider ...
 func NewTxProvider(dbname string) *TxProvider {
-	mydb := getDB(dbname, DBModeWrite)
+	myDB := getDB(dbname, DBModeWrite)
 	return &TxProvider{
-		conn: mydb,
+		conn: myDB,
 	}
 }
 
 // acquireWithOpts transaction from db
-func (t *TxProvider) acquireWithOpts(ctx context.Context, opts *sql.TxOptions) (*tx, error) {
-	trx, err := t.conn.BeginTx(ctx, opts)
+func (t *TxProvider) acquireWithOpts(ctx context.Context, conn TxStarter, opts *sql.TxOptions) (*tx, error) {
+	if conn == nil {
+		conn = t.conn
+	}
+	trx, err := conn.BeginTx(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -144,9 +166,9 @@ func (t *TxProvider) acquireWithOpts(ctx context.Context, opts *sql.TxOptions) (
 }
 
 // TxWithOpts ...
-func (t *TxProvider) TxWithOpts(ctx context.Context, fn func(TxContext) error, opts *sql.TxOptions) (err error) {
+func (t *TxProvider) TxWithOpts(ctx context.Context, fn func(TxContext) error, conn TxStarter, opts *sql.TxOptions) (err error) {
 	var trx *tx
-	trx, err = t.acquireWithOpts(ctx, opts)
+	trx, err = t.acquireWithOpts(ctx, conn, opts)
 	if err != nil {
 		return err
 	}
@@ -180,5 +202,45 @@ func (t *TxProvider) TxWithOpts(ctx context.Context, fn func(TxContext) error, o
 
 // Tx runs fn in transaction.
 func (t *TxProvider) Tx(ctx context.Context, fn func(TxContext) error) error {
-	return t.TxWithOpts(ctx, fn, &DefaultTxOpts)
+	return t.TxWithOpts(ctx, fn, nil, &DefaultTxOpts)
+}
+
+func (t *TxProvider) TxWithLock(ctx context.Context, lock string, durationInSec int, fn func(txContext TxContext) error) error {
+	dbConn, err := t.conn.Conn(ctx)
+	if err != nil {
+		return fmt.Errorf("fail to get db connection: %w", err)
+	}
+
+	{
+		var res int
+		err = dbConn.QueryRowContext(ctx, "select get_lock(?,?)", lock, durationInSec).Scan(&res)
+		if err != nil {
+			return fmt.Errorf("get_lock failed: %w", err)
+		}
+		if res != 1 {
+			return newLockError(lock, durationInSec)
+		}
+	}
+
+	defer func() {
+		var res int
+		errRelease := dbConn.QueryRowContext(ctx, "select release_lock(?)", lock).Scan(&res)
+		if errRelease != nil {
+			if err == nil {
+				err = fmt.Errorf("release_lock failed: %w", errRelease)
+			} else {
+				err = errors.Join(err, fmt.Errorf("release_lock failed: %w", errRelease))
+			}
+			return
+		}
+		if res != 1 {
+			if err == nil {
+				err = newReleaseLockError(lock, durationInSec)
+			} else {
+				err = errors.Join(err, newReleaseLockError(lock, durationInSec))
+			}
+		}
+	}()
+
+	return t.TxWithOpts(ctx, fn, dbConn, &DefaultTxOpts)
 }
