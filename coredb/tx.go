@@ -206,7 +206,14 @@ func (t *TxProvider) Tx(ctx context.Context, fn func(TxContext) error) error {
 }
 
 func (t *TxProvider) TxWithLock(ctx context.Context, lock string, durationInSec int, fn func(txContext TxContext) error) error {
-	dbConn, err := t.conn.Conn(ctx)
+	connCtx, cancel := context.WithCancel(context.Background())
+	dbConn, err := t.conn.Conn(connCtx)
+	defer func() {
+		cancel()
+		if dbConn != nil {
+			dbConn.Close()
+		}
+	}()
 	if err != nil {
 		return fmt.Errorf("fail to get db connection: %w", err)
 	}
