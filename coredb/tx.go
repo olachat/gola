@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 )
 
 // BeginTx returns a custom db.Tx based on opts. This method exists for flexibility.
@@ -205,17 +206,22 @@ func (t *TxProvider) Tx(ctx context.Context, fn func(TxContext) error) error {
 	return t.TxWithOpts(ctx, fn, nil, &DefaultTxOpts)
 }
 
-func (t *TxProvider) TxWithLock(ctx context.Context, lock string, durationInSec int, fn func(txContext TxContext) error) error {
+// TxWithLock executes a transaction with a lock and a specified duration in seconds.
+func (t *TxProvider) TxWithLock(ctx context.Context, lock string, durationInSec int, fn func(txContext TxContext) error) (err error) {
 	connCtx, cancel := context.WithCancel(context.Background())
-	dbConn, err := t.conn.Conn(connCtx)
+	dbConn, errConn := t.conn.Conn(connCtx)
 	defer func() {
 		cancel()
 		if dbConn != nil {
-			dbConn.Close()
+			errCloseConn := dbConn.Close()
+			if errCloseConn != nil {
+				log.Printf("fail to close db connection: %#v", errCloseConn)
+				err = errCloseConn
+			}
 		}
 	}()
-	if err != nil {
-		return fmt.Errorf("fail to get db connection: %w", err)
+	if errConn != nil {
+		return fmt.Errorf("fail to get db connection: %w", errConn)
 	}
 
 	{
