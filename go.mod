@@ -1,6 +1,6 @@
 module github.com/olachat/gola/v2
 
-go 1.18
+go 1.20
 
 replace github.com/dolthub/go-mysql-server v0.12.0 => github.com/Wuvist/go-mysql-server v0.10.1-0.20220815042140-eac9e0ba16d8
 

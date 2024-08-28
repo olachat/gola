@@ -12,6 +12,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
+	"sync/atomic"
 
 	"github.com/olachat/gola/v2/mysqldriver"
 	"github.com/olachat/gola/v2/mysqlparser"
@@ -19,6 +21,7 @@ import (
 	"github.com/olachat/gola/v2/structs"
 )
 
+// GenWithParser generate orm stubs from config provided
 func GenWithParser(config mysqlparser.MySQLParserConfig, output string) int {
 	m := &mysqlparser.MySQLParser{}
 	db, err := m.Assemble(config)
@@ -30,46 +33,58 @@ func GenWithParser(config mysqlparser.MySQLParserConfig, output string) int {
 		output = "temp"
 	}
 
-	if !strings.HasPrefix(output, "/") {
-		// output folder is relative path
-		wd, err := os.Getwd()
-		if err != nil {
-			wd = "."
-		}
-		output = wd + string(filepath.Separator) + output
+	output, err = filepath.Abs(output)
+	if err != nil {
+		panic(err)
 	}
+	output += string(filepath.Separator)
 
-	if !strings.HasSuffix(output, string(filepath.Separator)) {
-		output = output + string(filepath.Separator)
-	}
-
+	var hasFailure atomic.Bool
+	wg := &sync.WaitGroup{}
 	for _, t := range db.Tables {
 		if len(t.GetPKColumns()) == 0 {
 			println(t.Name + " doesn't have primay key")
 			continue
 		}
-
-		files := genORM(t)
-		needMkdir := true
-		for path, data := range files {
-			if needMkdir {
-				pos := strings.LastIndex(path, string(filepath.Separator))
-				expectedFileFolder := output + path[0:pos]
-				err = os.Mkdir(expectedFileFolder, os.ModePerm)
-				if err != nil && os.IsNotExist(err) {
-					println("Failed to create folder, please ensure " + output[:len(output)-1] + " exists")
-					return 1
+		wg.Add(1)
+		go func(table *structs.Table, wgInner *sync.WaitGroup) {
+			defer wgInner.Done()
+			files := genORM(table)
+			needMkdir := true
+			for path, data := range files {
+				if needMkdir {
+					pos := strings.LastIndex(path, string(filepath.Separator))
+					expectedFileFolder := output + path[0:pos]
+					errMkdir := os.Mkdir(expectedFileFolder, os.ModePerm)
+					if errMkdir != nil && os.IsNotExist(errMkdir) {
+						println("Failed to create folder, please ensure " + output[:len(output)-1] + " exists")
+						hasFailure.Store(true)
+						break
+					}
+					needMkdir = false
 				}
-				needMkdir = false
-			}
 
-			ioutil.WriteFile(output+path, data, 0644)
-		}
+				errWritefile := os.WriteFile(output+path, data, 0o644)
+				if errWritefile != nil {
+					println("Failed to write file" + output + path)
+					hasFailure.Store(true)
+					break
+				}
+			}
+		}(t, wg)
+	}
+	wg.Wait()
+	if hasFailure.Load() {
+		return 1
 	}
 
 	files := genPackage(db)
 	for path, data := range files {
-		ioutil.WriteFile(output+path, data, 0644)
+		err = os.WriteFile(output+path, data, 0o644)
+		if err != nil {
+			println("Failed to write file" + output + path)
+			return 1
+		}
 	}
 
 	fmt.Printf("code generated in %s\n", output[:len(output)-1])
@@ -125,13 +140,13 @@ func Run(config mysqldriver.DBConfig, output string) int {
 				needMkdir = false
 			}
 
-			ioutil.WriteFile(output+path, data, 0644)
+			ioutil.WriteFile(output+path, data, 0o644)
 		}
 	}
 
 	files := genPackage(db)
 	for path, data := range files {
-		ioutil.WriteFile(output+path, data, 0644)
+		ioutil.WriteFile(output+path, data, 0o644)
 	}
 
 	fmt.Printf("code generated in %s\n", output[:len(output)-1])
@@ -190,9 +205,7 @@ func genORM(t *structs.Table) map[string][]byte {
 	return files
 }
 
-var (
-	rgxSyntaxError = regexp.MustCompile(`(\d+):\d+: `)
-)
+var rgxSyntaxError = regexp.MustCompile(`(\d+):\d+: `)
 
 func formatBuffer(buf []byte) ([]byte, error) {
 	output, err := format.Source(buf)
