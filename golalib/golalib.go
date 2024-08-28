@@ -21,6 +21,7 @@ import (
 	"github.com/olachat/gola/v2/structs"
 )
 
+// GenWithParser generate orm stubs from config provided
 func GenWithParser(config mysqlparser.MySQLParserConfig, output string) int {
 	m := &mysqlparser.MySQLParser{}
 	db, err := m.Assemble(config)
@@ -32,18 +33,11 @@ func GenWithParser(config mysqlparser.MySQLParserConfig, output string) int {
 		output = "temp"
 	}
 
-	if !strings.HasPrefix(output, "/") {
-		// output folder is relative path
-		wd, err := os.Getwd()
-		if err != nil {
-			wd = "."
-		}
-		output = wd + string(filepath.Separator) + output
+	output, err = filepath.Abs(output)
+	if err != nil {
+		panic(err)
 	}
-
-	if !strings.HasSuffix(output, string(filepath.Separator)) {
-		output = output + string(filepath.Separator)
-	}
+	output += string(filepath.Separator)
 
 	var hasFailure atomic.Bool
 	wg := &sync.WaitGroup{}
