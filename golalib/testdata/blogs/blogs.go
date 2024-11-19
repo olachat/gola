@@ -36,6 +36,8 @@ type Blog struct {
 	CreatedAt `json:"created_at"`
 	// Updated Timestamp int(11) unsigned
 	UpdatedAt `json:"updated_at"`
+	// count int(11) unsigned
+	Count_ `json:"count"`
 }
 
 type withPK interface {
@@ -694,6 +696,58 @@ func (c *UpdatedAt) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Count_ field
+// count
+type Count_ struct {
+	_updated bool
+	val      uint
+}
+
+func (c *Count_) GetCount() uint {
+	return c.val
+}
+
+func (c *Count_) SetCount(val uint) bool {
+	if c.val == val {
+		return false
+	}
+	c._updated = true
+	c.val = val
+	return true
+}
+
+func (c *Count_) IsUpdated() bool {
+	return c._updated
+}
+
+func (c *Count_) resetUpdated() {
+	c._updated = false
+}
+
+func (c *Count_) GetColumnName() string {
+	return "count"
+}
+
+func (c *Count_) GetValPointer() any {
+	return &c.val
+}
+
+func (c *Count_) getCountForDB() uint {
+	return c.val
+}
+
+func (c *Count_) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&c.val)
+}
+
+func (c *Count_) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &c.val); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // New return new *Blog with default values
 func New() *Blog {
 	return &Blog{
@@ -707,6 +761,7 @@ func New() *Blog {
 		Country{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
+		Count_{val: uint(0)},
 	}
 }
 
@@ -724,14 +779,15 @@ func NewWithPK(val int) *Blog {
 		Country{},
 		CreatedAt{val: uint(0)},
 		UpdatedAt{val: uint(0)},
+		Count_{val: uint(0)},
 	}
 	c.Id.val = val
 	c.Id.isAssigned = true
 	return c
 }
 
-const insertWithoutPK string = "INSERT INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-const insertWithPK string = "INSERT INTO `blogs` (`id`, `user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithoutPK string = "INSERT INTO `blogs` (`user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`, `count`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const insertWithPK string = "INSERT INTO `blogs` (`id`, `user_id`, `slug`, `title`, `category_id`, `is_pinned`, `is_vip`, `country`, `created_at`, `updated_at`, `count`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 // Insert Blog struct to `blogs` table
 // Deprecated: use the function with context
@@ -739,12 +795,12 @@ func (c *Blog) Insert() error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB())
+		result, err = coredb.Exec(DBName, insertWithPK, c.getIdForDB(), c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB(), c.getCountForDB())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB())
+		result, err = coredb.Exec(DBName, insertWithoutPK, c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB(), c.getCountForDB())
 		if err != nil {
 			return err
 		}
@@ -778,6 +834,7 @@ func (c *Blog) resetUpdated() {
 	c.Country.resetUpdated()
 	c.CreatedAt.resetUpdated()
 	c.UpdatedAt.resetUpdated()
+	c.Count_.resetUpdated()
 }
 
 // Update Blog struct in `blogs` table
@@ -820,6 +877,10 @@ func (obj *Blog) Update() (bool, error) {
 	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`updated_at` = ?")
 		params = append(params, obj.getUpdatedAtForDB())
+	}
+	if obj.Count_.IsUpdated() {
+		updatedFields = append(updatedFields, "`count` = ?")
+		params = append(params, obj.getCountForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -914,6 +975,12 @@ func Update(obj withPK) (bool, error) {
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`updated_at` = ?")
 				params = append(params, c.getUpdatedAtForDB())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Count_:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "`count` = ?")
+				params = append(params, c.getCountForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

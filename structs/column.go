@@ -63,9 +63,11 @@ var dbTypeToGoTypes = map[string]string{
 func (c Column) GoSetEnumType() string {
 	return c.Table.ClassName() + c.GoName()
 }
+
 func (c Column) GoSetNullableType() string {
 	return fmt.Sprintf("goption.Option[[]%s]", c.Table.ClassName()+c.GoName())
 }
+
 func (c Column) GoEnumNullableType() string {
 	return fmt.Sprintf("goption.Option[%s]", c.Table.ClassName()+c.GoName())
 }
@@ -179,6 +181,15 @@ func (c Column) GoType() string {
 // GoName returns the variable name for go of the column
 func (c Column) GoName() string {
 	return getGoName(c.Name)
+}
+
+// GoName returns the variable name for go of the column
+func (c Column) GoTypeName() string {
+	goName := c.GoName()
+	if goName == "Count" {
+		goName = "Count_"
+	}
+	return goName
 }
 
 // IsNullable returns if the column is nullable as string

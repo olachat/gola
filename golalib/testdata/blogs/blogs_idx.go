@@ -40,6 +40,8 @@ const (
 	CreatedAtDesc
 	UpdatedAtAsc
 	UpdatedAtDesc
+	CountAsc
+	CountDesc
 )
 
 func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
@@ -86,6 +88,10 @@ func (q *idxQuery[T]) OrderBy(args ...orderBy) coredb.ReadQuery[T] {
 			q.orders[i] = "`updated_at` asc"
 		case UpdatedAtDesc:
 			q.orders[i] = "`updated_at` desc"
+		case CountAsc:
+			q.orders[i] = "`count` asc"
+		case CountDesc:
+			q.orders[i] = "`count` desc"
 		}
 	}
 	return q
@@ -164,14 +170,16 @@ type iQuery5[T any] interface {
 }
 
 type iQuery9[T any] interface {
-	AndIsPinnedEQ(val bool) iQuery10[T]
-	AndIsPinnedIN(vals ...bool) iQuery10[T]
+	AndCountEQ(val uint) orderReadQuery[T]
+	AndCountIN(vals ...uint) orderReadQuery[T]
+	AndIsPinnedEQ(val bool) iQuery11[T]
+	AndIsPinnedIN(vals ...bool) iQuery11[T]
 	AndIsVipEQ(val bool) orderReadQuery[T]
 	AndIsVipIN(vals ...bool) orderReadQuery[T]
 	orderReadQuery[T]
 }
 
-type iQuery10[T any] interface {
+type iQuery11[T any] interface {
 	AndCategoryIdEQ(val int) orderReadQuery[T]
 	AndCategoryIdIN(vals ...int) orderReadQuery[T]
 	orderReadQuery[T]
@@ -267,18 +275,32 @@ type idxQuery9[T any] struct {
 	*idxQuery[T]
 }
 
-func (q *idxQuery9[T]) AndIsPinnedEQ(val bool) iQuery10[T] {
-	q.whereSql += " and `is_pinned` = ?"
+func (q *idxQuery9[T]) AndCountEQ(val uint) orderReadQuery[T] {
+	q.whereSql += " and `count` = ?"
 	q.whereParams = append(q.whereParams, val)
-	return &idxQuery10[T]{q.idxQuery}
+	return q.idxQuery
 }
 
-func (q *idxQuery9[T]) AndIsPinnedIN(vals ...bool) iQuery10[T] {
+func (q *idxQuery9[T]) AndCountIN(vals ...uint) orderReadQuery[T] {
+	q.whereSql += " and `count` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
+	for _, val := range vals {
+		q.whereParams = append(q.whereParams, val)
+	}
+	return q.idxQuery
+}
+
+func (q *idxQuery9[T]) AndIsPinnedEQ(val bool) iQuery11[T] {
+	q.whereSql += " and `is_pinned` = ?"
+	q.whereParams = append(q.whereParams, val)
+	return &idxQuery11[T]{q.idxQuery}
+}
+
+func (q *idxQuery9[T]) AndIsPinnedIN(vals ...bool) iQuery11[T] {
 	q.whereSql += " and `is_pinned` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)
 	}
-	return &idxQuery10[T]{q.idxQuery}
+	return &idxQuery11[T]{q.idxQuery}
 }
 
 func (q *idxQuery9[T]) AndIsVipEQ(val bool) orderReadQuery[T] {
@@ -295,17 +317,17 @@ func (q *idxQuery9[T]) AndIsVipIN(vals ...bool) orderReadQuery[T] {
 	return q.idxQuery
 }
 
-type idxQuery10[T any] struct {
+type idxQuery11[T any] struct {
 	*idxQuery[T]
 }
 
-func (q *idxQuery10[T]) AndCategoryIdEQ(val int) orderReadQuery[T] {
+func (q *idxQuery11[T]) AndCategoryIdEQ(val int) orderReadQuery[T] {
 	q.whereSql += " and `category_id` = ?"
 	q.whereParams = append(q.whereParams, val)
 	return q.idxQuery
 }
 
-func (q *idxQuery10[T]) AndCategoryIdIN(vals ...int) orderReadQuery[T] {
+func (q *idxQuery11[T]) AndCategoryIdIN(vals ...int) orderReadQuery[T] {
 	q.whereSql += " and `category_id` in (" + coredb.GetParamPlaceHolder(len(vals)) + ")"
 	for _, val := range vals {
 		q.whereParams = append(q.whereParams, val)

@@ -9,6 +9,7 @@ import (
 func TestBlogMethods(t *testing.T) {
 	blog := blogs.New()
 	blog.SetTitle("foo")
+	blog.SetCount(55)
 	e := blog.Insert()
 	if e != nil {
 		t.Error(e)
@@ -16,6 +17,9 @@ func TestBlogMethods(t *testing.T) {
 
 	if blog.GetId() != 1 {
 		t.Error("Insert blog 1 failed")
+	}
+	if blog.GetCount() != 55 {
+		t.Error("Set count failed")
 	}
 
 	e = blogs.DeleteByPK(blog.GetId())
@@ -29,10 +33,12 @@ func TestBlogMethods(t *testing.T) {
 
 	blog = blogs.New()
 	blog.SetTitle("foo")
+	blog.SetCount(99)
 	blog.Insert()
 
 	blog = blogs.New()
 	blog.SetTitle("bar")
+	blog.SetCount(88)
 	e = blog.Insert()
 	if e != nil {
 		t.Error(e)
@@ -108,6 +114,7 @@ func TestBlogSelect(t *testing.T) {
 	objs := blogs.SelectFields[struct {
 		blogs.Id
 		blogs.Title
+		blogs.Count_
 	}]().OrderBy(blogs.IdAsc).AllFromMaster()
 
 	if len(objs) != 2 {
@@ -117,14 +124,21 @@ func TestBlogSelect(t *testing.T) {
 	if objs[0].GetTitle() != "foo" {
 		t.Error("Read blog 1 failed")
 	}
+	if objs[0].GetCount() != 99 {
+		t.Error("Read blog 1 failed")
+	}
 
 	if objs[1].GetTitle() != "bar" {
+		t.Error("Read blog 2 failed")
+	}
+	if objs[1].GetCount() != 88 {
 		t.Error("Read blog 2 failed")
 	}
 
 	objs = blogs.SelectFields[struct {
 		blogs.Id
 		blogs.Title
+		blogs.Count_
 	}]().OrderBy(blogs.IdDesc).All()
 
 	if len(objs) != 2 {

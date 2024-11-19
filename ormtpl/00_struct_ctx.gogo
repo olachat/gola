@@ -177,7 +177,7 @@ func (obj *{{.ClassName}}) UpdateCtx(ctx context.Context) (bool, error) {
 	var params []any
 
 	{{- range $i, $c := .GetNonPKColumns }}
-	if obj.{{ $c.GoName }}.IsUpdated() {
+	if obj.{{ $c.GoTypeName }}.IsUpdated() {
 		updatedFields = append(updatedFields, "`{{ $c.Name }}` = ?")
 		params = append(params, obj.get{{$c.GoName}}ForDB())
 	}
@@ -223,7 +223,7 @@ func UpdateCtx(ctx context.Context, obj withPK) (bool, error) {
 
 		switch c := col.(type) {
 		{{- range $i, $c := .GetNonPKColumns }}
-		case *{{.GoName}}:
+		case *{{.GoTypeName}}:
 		if c.IsUpdated() {
 			updatedFields = append(updatedFields, "`{{ $c.Name }}` = ?")
 			params = append(params, c.get{{$c.GoName}}ForDB())
