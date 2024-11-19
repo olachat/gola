@@ -56,7 +56,7 @@ func (t *Table) ClassName() string {
 func (t *Table) GetPrimaryKey() string {
 	for _, c := range t.Columns {
 		if c.IsPrimaryKey() {
-			return c.GoName()
+			return c.GoTypeName()
 		}
 	}
 
@@ -111,7 +111,7 @@ func (t *Table) GetPrimaryKeyVals() string {
 
 	var result []string
 	for _, c := range cols {
-		result = append(result, "val."+c.GoName())
+		result = append(result, "val."+c.GoTypeName())
 	}
 
 	return strings.Join(result, ", ")
@@ -224,7 +224,6 @@ func (t *Table) GetIndexNodes() []*IdxNode {
 			}
 			nodes = append(nodes, n)
 		}
-
 	}
 	return nodes
 }

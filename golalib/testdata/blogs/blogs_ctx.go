@@ -128,12 +128,12 @@ func (c *Blog) InsertCtx(ctx context.Context) error {
 	var result sql.Result
 	var err error
 	if c.Id.isAssigned {
-		result, err = coredb.ExecCtx(ctx, DBName, insertWithPK, c.getIdForDB(), c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB())
+		result, err = coredb.ExecCtx(ctx, DBName, insertWithPK, c.getIdForDB(), c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB(), c.getCountForDB())
 		if err != nil {
 			return err
 		}
 	} else {
-		result, err = coredb.ExecCtx(ctx, DBName, insertWithoutPK, c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB())
+		result, err = coredb.ExecCtx(ctx, DBName, insertWithoutPK, c.getUserIdForDB(), c.getSlugForDB(), c.getTitleForDB(), c.getCategoryIdForDB(), c.getIsPinnedForDB(), c.getIsVipForDB(), c.getCountryForDB(), c.getCreatedAtForDB(), c.getUpdatedAtForDB(), c.getCountForDB())
 		if err != nil {
 			return err
 		}
@@ -196,6 +196,10 @@ func (obj *Blog) UpdateCtx(ctx context.Context) (bool, error) {
 	if obj.UpdatedAt.IsUpdated() {
 		updatedFields = append(updatedFields, "`updated_at` = ?")
 		params = append(params, obj.getUpdatedAtForDB())
+	}
+	if obj.Count_.IsUpdated() {
+		updatedFields = append(updatedFields, "`count` = ?")
+		params = append(params, obj.getCountForDB())
 	}
 
 	if len(updatedFields) == 0 {
@@ -289,6 +293,12 @@ func UpdateCtx(ctx context.Context, obj withPK) (bool, error) {
 			if c.IsUpdated() {
 				updatedFields = append(updatedFields, "`updated_at` = ?")
 				params = append(params, c.getUpdatedAtForDB())
+				resetFuncs = append(resetFuncs, c.resetUpdated)
+			}
+		case *Count_:
+			if c.IsUpdated() {
+				updatedFields = append(updatedFields, "`count` = ?")
+				params = append(params, c.getCountForDB())
 				resetFuncs = append(resetFuncs, c.resetUpdated)
 			}
 		}

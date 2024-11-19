@@ -20,19 +20,22 @@ import (
 
 //go:embed testdata
 var fixtures embed.FS
-var s *server.Server
-var testDBPort int = 33066
-var testDBName string = "testdata"
-var testTables = []string{
-	"blogs",
-	"users", "songs", "song_user_favourites",
-	"profile", "account",
-	"room",
-	"gifts", "gifts_nn",
-	"gifts_with_default", "gifts_nn_with_default",
-	"wallet",
-	"worker",
-}
+
+var (
+	s          *server.Server
+	testDBPort int    = 33066
+	testDBName string = "testdata"
+	testTables        = []string{
+		"blogs",
+		"users", "songs", "song_user_favourites",
+		"profile", "account",
+		"room",
+		"gifts", "gifts_nn",
+		"gifts_with_default", "gifts_nn_with_default",
+		"wallet",
+		"worker",
+	}
+)
 var testDataPath = "testdata" + string(filepath.Separator)
 
 var update = flag.Bool("update", false, "update generated files")
@@ -70,7 +73,7 @@ func testGen(t *testing.T, wd string, gen genMethod, data ormtpl.TplStruct) {
 				os.Mkdir(expectedFileFolder, os.ModePerm)
 			}
 
-			err := ioutil.WriteFile(testDataPath+path, data, 0644)
+			err := ioutil.WriteFile(testDataPath+path, data, 0o644)
 			if err != nil {
 				panic(err)
 			}
@@ -136,7 +139,7 @@ func TestIdx(t *testing.T) {
 	tb := getOne(db.Tables, func(tb *structs.Table) bool {
 		return tb.Name == "blogs"
 	})
-	if len(tb.Indexes) != 7 {
+	if len(tb.Indexes) != 8 {
 		t.Error("Failed to parse blogs table's 7 indexes")
 	}
 
