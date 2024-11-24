@@ -69,12 +69,12 @@ func assertDefaultGiftNnWithDefault(t *testing.T, gift *gifts_nn_with_default.Gi
 		t.Error("wrong remark")
 	}
 
-	ti, err := time.Parse("2006-01-02 15:04:05.999999", "2023-01-19 03:14:07.999999")
+	ti, err := time.Parse("2006-01-02 15:04:05.0", "2023-01-19 03:14:07.0")
 	if err != nil {
 		panic(err)
 	}
 	if !gift.GetUpdateTime().Equal(ti) {
-		t.Error("wrong update time")
+		t.Error("wrong update time", ti, gift.GetUpdateTime())
 	}
 	fmt.Println(gift.GetUpdateTime2())
 }
@@ -118,7 +118,7 @@ func TestGiftNotNullWithDefaultInsertRetrieveUpdate(t *testing.T) {
 	gift.SetName("gift 2")
 	gift.SetPrice(65.555)
 	gift.SetRemark("remark 2")
-	now2 := time.Now().UTC().Truncate(time.Microsecond)
+	now2 := time.Now().UTC().Truncate(time.Second)
 	gift.SetUpdateTime(now2)
 	ok, err := gift.Update()
 	if err != nil {

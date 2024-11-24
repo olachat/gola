@@ -970,7 +970,7 @@ func New() *GiftsWithDefault {
 		Remark{val: goption.Some[string]("hope you like it")},
 		Manifest{val: goption.Some[[]byte]([]byte("manifest data"))},
 		Description{},
-		UpdateTime{val: goption.Some[time.Time](coredb.MustParseTime("2023-01-19 03:14:07.999999"))},
+		UpdateTime{val: goption.Some[time.Time](coredb.MustParseTime("2023-01-19 03:14:07.0"))},
 		UpdateTime2{val: goption.Some[time.Time](time.Now())},
 		Branches{val: goption.Some[string]("sentosa,changi")},
 	}
@@ -991,7 +991,7 @@ func NewWithPK(val uint) *GiftsWithDefault {
 		Remark{val: goption.Some[string]("hope you like it")},
 		Manifest{val: goption.Some[[]byte]([]byte("manifest data"))},
 		Description{},
-		UpdateTime{val: goption.Some[time.Time](coredb.MustParseTime("2023-01-19 03:14:07.999999"))},
+		UpdateTime{val: goption.Some[time.Time](coredb.MustParseTime("2023-01-19 03:14:07.0"))},
 		UpdateTime2{val: goption.Some[time.Time](time.Now())},
 		Branches{val: goption.Some[string]("sentosa,changi")},
 	}

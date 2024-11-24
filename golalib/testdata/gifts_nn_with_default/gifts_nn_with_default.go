@@ -945,7 +945,7 @@ func New() *GiftsNnWithDefault {
 		Remark{val: "hope you like it"},
 		Manifest{val: []byte("manifest data")},
 		Description{},
-		UpdateTime{val: coredb.MustParseTime("2023-01-19 03:14:07.999999")},
+		UpdateTime{val: coredb.MustParseTime("2023-01-19 03:14:07.0")},
 		UpdateTime2{val: time.Now()},
 		Branches{val: "sentosa,changi"},
 	}
@@ -966,7 +966,7 @@ func NewWithPK(val uint) *GiftsNnWithDefault {
 		Remark{val: "hope you like it"},
 		Manifest{val: []byte("manifest data")},
 		Description{},
-		UpdateTime{val: coredb.MustParseTime("2023-01-19 03:14:07.999999")},
+		UpdateTime{val: coredb.MustParseTime("2023-01-19 03:14:07.0")},
 		UpdateTime2{val: time.Now()},
 		Branches{val: "sentosa,changi"},
 	}

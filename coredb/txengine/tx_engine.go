@@ -7,8 +7,6 @@ import (
 	"fmt"
 
 	"github.com/olachat/gola/v2/coredb"
-	"github.com/olachat/gola/v2/golalib/testdata/blogs"
-	"github.com/olachat/gola/v2/golalib/testdata/users"
 )
 
 type TypedTx[T any] sql.Tx
@@ -48,28 +46,6 @@ func StartTx(ctx context.Context, tx *sql.Tx, fn func(ctx context.Context, sqlTx
 	err = fn(ctx, tx)
 
 	return err
-}
-
-func Example() {
-	ctxOuter := context.Background()
-	tx, _ := coredb.BeginTx(ctxOuter, "test_db", &coredb.DefaultTxOpts)
-	var count int
-	_ = StartTx(ctxOuter, tx, func(ctx context.Context, sqlTx *sql.Tx) error {
-		userRec, err := WithTypedTx[users.User](sqlTx).FindOne(ctx, users.TableName, coredb.NewWhere("where uid=?", 1))
-		if err != nil {
-			return fmt.Errorf("findOne user uid:%d failed: %w", 1, err)
-		}
-		if userRec == nil {
-			return fmt.Errorf("user:%d not found", 1)
-		}
-		ct, err := WithTx(sqlTx).QueryInt(ctx, blogs.DBName, "select count(*) from blogs")
-		if err != nil {
-			return fmt.Errorf("QueryInt error: %w", err)
-		}
-		count = ct
-		return nil
-	})
-	fmt.Println(count)
 }
 
 // FindOne returns a row from given table type with where query.

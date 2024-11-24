@@ -145,7 +145,7 @@ func TestGiftNotNullInsertRetrieveUpdate(t *testing.T) {
 	gOut.SetName("gift 2")
 	gOut.SetPrice(65.555)
 	gOut.SetRemark("remark 2")
-	now2 := time.Now().UTC().Truncate(time.Microsecond)
+	now2 := time.Now().UTC().Truncate(time.Second)
 	gOut.SetUpdateTime(now2)
 	ok, err := gOut.Update()
 	if err != nil {
@@ -198,7 +198,7 @@ func TestGiftNotNullInsertRetrieveUpdate(t *testing.T) {
 	if g22.GetRemark() != "remark 2" {
 		t.Error("wrong remark")
 	}
-	if g22.GetUpdateTime() != now2 {
-		t.Error("wrong update time")
+	if !g22.GetUpdateTime().Equal(now2) {
+		t.Errorf("wrong update time. expected %s, gotten %s", now2, g22.GetUpdateTime())
 	}
 }

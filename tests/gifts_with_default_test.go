@@ -70,7 +70,7 @@ func assertDefaultGiftWithDefault(t *testing.T, gift *gifts_with_default.GiftsWi
 		t.Error("wrong remark")
 	}
 
-	ti, err := time.Parse("2006-01-02 15:04:05.999999", "2023-01-19 03:14:07.999999")
+	ti, err := time.Parse("2006-01-02 15:04:05.999999", "2023-01-19 03:14:07.0")
 	if err != nil {
 		panic(err)
 	}
@@ -175,7 +175,7 @@ func TestGiftWithDefaultInsertRetrieveUpdate(t *testing.T) {
 	gOut.SetName(goption.Some("gift 2"))
 	gOut.SetPrice(goption.Some(65.555))
 	gOut.SetRemark(goption.Some("remark 2"))
-	now2 := time.Now().UTC().Truncate(time.Microsecond)
+	now2 := time.Now().UTC().Truncate(time.Second)
 	gOut.SetUpdateTime(goption.Some(now2))
 	ok, err := gOut.Update()
 	if err != nil {

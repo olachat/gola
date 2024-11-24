@@ -10,7 +10,7 @@ CREATE TABLE `gifts_with_default` (
   `remark` varchar(128) default 'hope you like it',
   `manifest` varbinary(255) default 'manifest data',
   `description` text,
-  `update_time` timestamp default '2023-01-19 03:14:07.999999',
+  `update_time` timestamp default '2023-01-19 03:14:07.0',
   `update_time2` timestamp default CURRENT_TIMESTAMP,
   `branches` set('orchard','vivo','sentosa','changi') default 'sentosa,changi',
   PRIMARY KEY (`id`)
