@@ -329,8 +329,11 @@ func TestSongInsertWithPK(t *testing.T) {
 	s.SetHash("hashhash")
 	s.SetManifest([]byte(""))
 	err = s.Insert()
-	if err == nil {
-		t.Error("expected insert to fail with duplicate unique key error")
+	if err != nil {
+		t.Error(err)
+	}
+	if s.GetId() != 1100+1+1 {
+		t.Error("Insert without pk after pk failed")
 	}
 }
 

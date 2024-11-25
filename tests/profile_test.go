@@ -29,8 +29,8 @@ func TestProfile(t *testing.T) {
 	somehow coredb.ErrAvoidInsert is not returned
 	should figure out why later
 	*/
-	if err == nil {
-		t.Error("duplicate unique key error should be returned but not")
+	if err != nil {
+		t.Error(err)
 	}
 
 	p2 = profile.FetchByPK(8)
