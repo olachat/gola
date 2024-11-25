@@ -1,8 +1,14 @@
 package tests
 
 import (
+	"context"
+	"database/sql"
+	"errors"
+	"fmt"
 	"testing"
 
+	"github.com/olachat/gola/v2/coredb"
+	"github.com/olachat/gola/v2/coredb/txengine"
 	"github.com/olachat/gola/v2/golalib/testdata/blogs"
 )
 
@@ -39,6 +45,7 @@ func TestBlogMethods(t *testing.T) {
 	blog = blogs.New()
 	blog.SetTitle("bar")
 	blog.SetCount(88)
+	blog.SetSlug("slug")
 	e = blog.Insert()
 	if e != nil {
 		t.Error(e)
@@ -82,6 +89,128 @@ func TestBlogFind(t *testing.T) {
 	if err != nil || len(objs) != 0 {
 		t.Error("Find blogs with non-exist title bar failed: ")
 	}
+}
+
+func TestBlogTx(t *testing.T) {
+	ctx := context.Background()
+	tx, err := coredb.BeginTx(ctx, blogs.DBName, &coredb.DefaultTxOpts)
+	if err != nil {
+		t.Fatalf("fail to start tx: %v", err)
+	}
+	err = txengine.StartTx(ctx, tx, func(ctx context.Context, sqlTx *sql.Tx) error {
+		blogRec, err := txengine.WithTypedTx[blogs.Blog](sqlTx).FindOne(ctx, blogs.TableName, coredb.NewWhere("where title = ?", "bar"))
+		if err != nil {
+			return err
+		}
+		if blogRec.GetId() != 3 {
+			t.Error("Find blog with title bar failed")
+		}
+		blogRec.SetCountry("GuaGua")
+		updateOk, err := blogRec.UpdateTx(ctx, sqlTx)
+		if err != nil {
+			return err
+		}
+		if !updateOk {
+			t.Error("fail to update blog in tx")
+		}
+		c, err := txengine.WithTx(sqlTx).QueryInt(ctx, "select count(*) from blogs where country = ?", "GuaGua")
+		if err != nil {
+			return fmt.Errorf("QueryInt failed: %w", err)
+		}
+		if c != 1 {
+			t.Error("expect count to be 1")
+		}
+		newBlog := blogs.New()
+		newBlog.SetCountry("GuaGua")
+		newBlog.SetSlug("oldSlug")
+		err = newBlog.InsertTx(ctx, sqlTx)
+		if err != nil {
+			return fmt.Errorf("fail to insert with Tx")
+		}
+		newBlog.SetSlug("slugadded123")
+		_, err = newBlog.UpdateTx(ctx, sqlTx)
+		if err != nil {
+			return fmt.Errorf("update failed: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal("error encountered", err)
+	}
+	obj := blogs.FindOneFromMaster("where title = ?", "bar")
+	if obj.GetId() != 3 {
+		t.Error("Find blog with title bar failed")
+	}
+	if obj.GetCountry() != "GuaGua" {
+		t.Error("blog not updated")
+	}
+	recs, err := blogs.FindCtx(ctx, "where country=? order by id desc", "GuaGua")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(recs) != 2 {
+		t.Error("insertTx must have failed")
+	}
+	if recs[0].GetSlug() != "slugadded123" {
+		t.Error("wrong slug gotten")
+	}
+
+	// start a new transaction
+	tx, err = coredb.BeginTx(ctx, blogs.DBName, &coredb.DefaultTxOpts)
+	if err != nil {
+		t.Fatalf("fail to start tx: %v", err)
+	}
+	err = txengine.StartTx(ctx, tx, func(ctx context.Context, sqlTx *sql.Tx) error {
+		blogRec, err := txengine.WithTypedTx[blogs.Blog](sqlTx).FindOne(ctx, blogs.TableName, coredb.NewWhere("where title = ?", "bar"))
+		if err != nil {
+			return err
+		}
+		if blogRec.GetId() != 3 {
+			t.Error("Find blog with title bar failed")
+		}
+		blogRec.SetCountry("PuaPua")
+		updateOk, err := blogRec.UpdateTx(ctx, sqlTx)
+		if err != nil {
+			return err
+		}
+		if !updateOk {
+			t.Error("fail to update blog in tx")
+		}
+		return errors.New("rollback")
+	})
+	if err == nil {
+		t.Fatal("should get rollback error but err is nil")
+	}
+	// currently there is no way to test rollback using dolt in memory DB as transaction is not supported
+
+	// start a new transaction
+	tx, err = coredb.BeginTx(ctx, blogs.DBName, &coredb.DefaultTxOpts)
+	if err != nil {
+		t.Fatalf("fail to start tx: %v", err)
+	}
+	err = txengine.StartTx(ctx, tx, func(ctx context.Context, sqlTx *sql.Tx) error {
+		blogRecs, err := txengine.WithTypedTx[struct {
+			blogs.Id
+		}](sqlTx).Find(ctx, blogs.TableName, coredb.NewWhere("where slug = ?", "slugadded123"))
+		if err != nil {
+			return err
+		}
+		if len(blogRecs) != 1 {
+			t.Errorf("expected to have 1 blog")
+			return errors.New("expected to have 1 blog")
+		}
+		id := blogRecs[0].GetId()
+		_, err = txengine.WithTx(sqlTx).Exec(ctx, "delete from blogs where id=?", id)
+		return err
+	})
+	if err != nil {
+		t.Fatalf("tx delete failed")
+	}
+	r := blogs.FindOne("where slug = ?", "slugadded123")
+	if r != nil {
+		t.Error("r should already been deleted")
+	}
+
 }
 
 func TestBlogFindT(t *testing.T) {

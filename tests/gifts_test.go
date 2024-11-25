@@ -182,7 +182,7 @@ func TestInsertRetrieveUpdate(t *testing.T) {
 	g2.SetName(goption.Some("xmas gift"))
 	g2.SetPrice(goption.Some(15.5))
 	g2.SetRemark(goption.Some("selling out soon"))
-	now := time.Now().UTC().Truncate(time.Microsecond)
+	now := time.Now().UTC().Truncate(time.Second)
 	g2.SetUpdateTime(goption.Some(now))
 	err = g2.Insert()
 	if err != nil {
@@ -195,7 +195,7 @@ func TestInsertRetrieveUpdate(t *testing.T) {
 	j2, _ := json.Marshal(g2)
 	j2Out, _ := json.Marshal(g2out)
 	if string(j2) != string(j2Out) {
-		t.Fatalf("gift fetched is not as expected")
+		t.Fatalf("gift fetched is not as expected %s %s", string(j2), string(j2Out))
 	}
 
 	g2out.SetBranches(goption.Some([]gifts.GiftBranches{
@@ -212,7 +212,7 @@ func TestInsertRetrieveUpdate(t *testing.T) {
 	g2out.SetName(goption.Some("gift 2"))
 	g2out.SetPrice(goption.Some(65.555))
 	g2out.SetRemark(goption.Some("remark 2"))
-	now2 := time.Now().UTC().Truncate(time.Microsecond)
+	now2 := time.Now().UTC().Truncate(time.Second)
 	g2out.SetUpdateTime(goption.Some(now2))
 	ok, err := g2out.Update()
 	if err != nil {

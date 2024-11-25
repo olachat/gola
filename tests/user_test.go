@@ -70,13 +70,18 @@ func init() {
 		db.Exec(string(query))
 	}
 
+	_, err = db.Exec("SET autocommit = 0")
+	if err != nil {
+		panic("fail to set autocommit mode")
+	}
+
 	// add data
 	_, err = db.Exec(`
 insert into users (name, email, created_at, updated_at, float_type, double_type, hobby, hobby_no_default, sports_no_default, sports) values
-("John Doe", "john@doe.com", NOW(), NOW(), 1.55555, 1.8729, 'running','swimming', ('SWIM,TENNIS'), ("TENNIS")),
-("John Doe", "johnalt@doe.com", NOW(), NOW(), 2.5, 2.8239, 'swimming','running', ('BASKETBALL'), ("FOOTBALL")),
-("Jane Doe", "jane@doe.com", NOW(), NOW(), 3.5, 334.8593, 'singing','swimming', ('SQUASH,BADMINTON'), ("SQUASH,TENNIS")),
-("Evil Bob", "evilbob@gmail.com", NOW(), NOW(), 4.5, 42234.83, 'singing','running', 'tennis', 'BADMINTON,BASKETBALL')
+("John Doe", "john@doe.com", NOW(), NOW(), 1.55555, 1.8729, 'running','swimming', ('swim,tennis'), ("tennis")),
+("John Doe", "johnalt@doe.com", NOW(), NOW(), 2.5, 2.8239, 'swimming','running', ('basketball'), ("football")),
+("Jane Doe", "jane@doe.com", NOW(), NOW(), 3.5, 334.8593, 'singing','swimming', ('squash,badminton'), ("squash,tennis")),
+("Evil Bob", "evilbob@gmail.com", NOW(), NOW(), 4.5, 42234.83, 'singing','running', 'tennis', 'badminton,basketball')
 	`)
 	if err != nil {
 		panic("insert failed " + err.Error())
