@@ -93,11 +93,7 @@ func TestBlogFind(t *testing.T) {
 
 func TestBlogTx(t *testing.T) {
 	ctx := context.Background()
-	tx, err := coredb.BeginTx(ctx, blogs.DBName, &coredb.DefaultTxOpts)
-	if err != nil {
-		t.Fatalf("fail to start tx: %v", err)
-	}
-	err = txengine.StartTx(ctx, tx, func(ctx context.Context, sqlTx *sql.Tx) error {
+	err := txengine.RunTransaction(ctx, blogs.DBName, func(ctx context.Context, sqlTx *sql.Tx) error {
 		blogRec, err := txengine.WithTypedTx[blogs.Blog](sqlTx).FindOne(ctx, blogs.TableName, coredb.NewWhere("where title = ?", "bar"))
 		if err != nil {
 			return err
@@ -156,11 +152,7 @@ func TestBlogTx(t *testing.T) {
 	}
 
 	// start a new transaction
-	tx, err = coredb.BeginTx(ctx, blogs.DBName, &coredb.DefaultTxOpts)
-	if err != nil {
-		t.Fatalf("fail to start tx: %v", err)
-	}
-	err = txengine.StartTx(ctx, tx, func(ctx context.Context, sqlTx *sql.Tx) error {
+	err = txengine.RunTransaction(ctx, blogs.DBName, func(ctx context.Context, sqlTx *sql.Tx) error {
 		blogRec, err := txengine.WithTypedTx[blogs.Blog](sqlTx).FindOne(ctx, blogs.TableName, coredb.NewWhere("where title = ?", "bar"))
 		if err != nil {
 			return err
@@ -184,11 +176,7 @@ func TestBlogTx(t *testing.T) {
 	// currently there is no way to test rollback using dolt in memory DB as transaction is not supported
 
 	// start a new transaction
-	tx, err = coredb.BeginTx(ctx, blogs.DBName, &coredb.DefaultTxOpts)
-	if err != nil {
-		t.Fatalf("fail to start tx: %v", err)
-	}
-	err = txengine.StartTx(ctx, tx, func(ctx context.Context, sqlTx *sql.Tx) error {
+	err = txengine.RunTransaction(ctx, blogs.DBName, func(ctx context.Context, sqlTx *sql.Tx) error {
 		blogRecs, err := txengine.WithTypedTx[struct {
 			blogs.Id
 		}](sqlTx).Find(ctx, blogs.TableName, coredb.NewWhere("where slug = ?", "slugadded123"))
@@ -210,7 +198,6 @@ func TestBlogTx(t *testing.T) {
 	if r != nil {
 		t.Error("r should already been deleted")
 	}
-
 }
 
 func TestBlogFindT(t *testing.T) {
