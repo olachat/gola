@@ -182,7 +182,10 @@ func (o *TypedTx[T]) Query(ctx context.Context, query string, params ...any) (re
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		errClose := rows.Close()
+		if errClose != nil {
+			log.Printf("Gola: TypedTx.Query: failed to close rows: %v", errClose)
+		}
 	}()
 
 	var u *T
@@ -194,6 +197,10 @@ func (o *TypedTx[T]) Query(ctx context.Context, query string, params ...any) (re
 			return
 		}
 		result = append(result, u)
+	}
+
+	if rows.Err() != nil {
+		err = rows.Err()
 	}
 
 	return

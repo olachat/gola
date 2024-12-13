@@ -3,6 +3,7 @@ package coredb
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 	"sync"
@@ -217,7 +218,10 @@ func Query[T any](dbname string, query string, params ...any) (result []*T, err 
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		errClose := rows.Close()
+		if errClose != nil {
+			log.Printf("Gola: Query: failed to close rows: %v", errClose)
+		}
 	}()
 
 	var u *T
@@ -229,6 +233,10 @@ func Query[T any](dbname string, query string, params ...any) (result []*T, err 
 			return
 		}
 		result = append(result, u)
+	}
+
+	if rows.Err() != nil {
+		err = rows.Err()
 	}
 
 	return
@@ -245,7 +253,10 @@ func QueryFromMaster[T any](dbname string, query string, params ...any) (result 
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		errClose := rows.Close()
+		if errClose != nil {
+			log.Printf("Gola: QueryFromMaster: failed to close rows: %v", errClose)
+		}
 	}()
 
 	var u *T
@@ -259,6 +270,9 @@ func QueryFromMaster[T any](dbname string, query string, params ...any) (result 
 		result = append(result, u)
 	}
 
+	if rows.Err() != nil {
+		err = rows.Err()
+	}
 	return
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 )
 
 // FetchByPKCtx returns a row of T type with given primary key value
@@ -149,7 +150,10 @@ func QueryCtx[T any](ctx context.Context, dbname string, query string, params ..
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		errClose := rows.Close()
+		if errClose != nil {
+			log.Printf("Gola: QueryCtx: failed to close rows: %v", errClose)
+		}
 	}()
 
 	var u *T
@@ -161,6 +165,10 @@ func QueryCtx[T any](ctx context.Context, dbname string, query string, params ..
 			return
 		}
 		result = append(result, u)
+	}
+
+	if rows.Err() != nil {
+		err = rows.Err()
 	}
 
 	return
@@ -175,7 +183,10 @@ func QueryFromMasterCtx[T any](ctx context.Context, dbname string, query string,
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		errClose := rows.Close()
+		if errClose != nil {
+			log.Printf("Gola: QueryFromMasterCtx: failed to close rows: %v", errClose)
+		}
 	}()
 
 	var u *T
@@ -187,6 +198,10 @@ func QueryFromMasterCtx[T any](ctx context.Context, dbname string, query string,
 			return
 		}
 		result = append(result, u)
+	}
+
+	if rows.Err() != nil {
+		err = rows.Err()
 	}
 
 	return

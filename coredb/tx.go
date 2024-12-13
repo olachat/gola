@@ -84,7 +84,10 @@ func (t *tx) Query(results any, query string, params ...any) error {
 		return err
 	}
 	defer func(rows *sql.Rows) {
-		err = rows.Close()
+		errClose := rows.Close()
+		if errClose != nil {
+			log.Printf("Gola: tx.Query: failed to close rows: %v", errClose)
+		}
 	}(rows)
 	return RowsToStructSliceReflect(rows, results)
 }
