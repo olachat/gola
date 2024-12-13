@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/olachat/gola/v2/coredb"
 	"github.com/olachat/gola/v2/coredb/txengine"
 	"github.com/olachat/gola/v2/golalib/testdata/blogs"
 )
@@ -94,7 +93,7 @@ func TestBlogFind(t *testing.T) {
 func TestBlogTx(t *testing.T) {
 	ctx := context.Background()
 	err := txengine.RunTransaction(ctx, blogs.DBName, func(ctx context.Context, sqlTx *sql.Tx) error {
-		blogRec, err := txengine.WithTypedTx[blogs.Blog](sqlTx).FindOne(ctx, blogs.TableName, coredb.NewWhere("where title = ?", "bar"))
+		blogRec, err := txengine.WithTypedTx[blogs.Blog](sqlTx).FindOne(ctx, blogs.TableName, "where title = ?", "bar")
 		if err != nil {
 			return err
 		}
@@ -153,7 +152,7 @@ func TestBlogTx(t *testing.T) {
 
 	// start a new transaction
 	err = txengine.RunTransaction(ctx, blogs.DBName, func(ctx context.Context, sqlTx *sql.Tx) error {
-		blogRec, err := txengine.WithTypedTx[blogs.Blog](sqlTx).FindOne(ctx, blogs.TableName, coredb.NewWhere("where title = ?", "bar"))
+		blogRec, err := txengine.WithTypedTx[blogs.Blog](sqlTx).FindOne(ctx, blogs.TableName, "where title = ?", "bar")
 		if err != nil {
 			return err
 		}
@@ -179,7 +178,7 @@ func TestBlogTx(t *testing.T) {
 	err = txengine.RunTransaction(ctx, blogs.DBName, func(ctx context.Context, sqlTx *sql.Tx) error {
 		blogRecs, err := txengine.WithTypedTx[struct {
 			blogs.Id
-		}](sqlTx).Find(ctx, blogs.TableName, coredb.NewWhere("where slug = ?", "slugadded123"))
+		}](sqlTx).Find(ctx, blogs.TableName, "where slug = ?", "slugadded123")
 		if err != nil {
 			return err
 		}

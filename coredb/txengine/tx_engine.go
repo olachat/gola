@@ -16,14 +16,21 @@ type (
 	Tx             sql.Tx
 )
 
+// WithTypedTx converts *sql.Tx to *txengine.TypedTx[T].
+//
+// With *txengine.TypedTx[T], you have access to FindOne[T], Find[T] and Query[T]
 func WithTypedTx[T any](tx *sql.Tx) *TypedTx[T] {
 	return (*TypedTx[T])(tx)
 }
 
+// WithTx converts *sql.Tx to *txengine.Tx.
+//
+// With *txengine.Tx, you have access to Exec and QueryInt
 func WithTx(tx *sql.Tx) *Tx {
 	return (*Tx)(tx)
 }
 
+// RunTransaction runs a transaction
 func RunTransaction(ctx context.Context, dbName string, fn func(ctx context.Context, sqlTx *sql.Tx) error) (err error) {
 	tx, err := coredb.BeginTx(ctx, dbName, &coredb.DefaultTxOpts)
 	if err != nil {
@@ -69,6 +76,7 @@ func runTransaction(ctx context.Context, tx *sql.Tx, conn *sql.Conn, fn func(ctx
 
 const lockTimeoutBuffer = 5 * time.Millisecond
 
+// RunTransactionWithLock runs a transaction with a lock for durationInSec seconds
 func RunTransactionWithLock(ctx context.Context, dbName string, lock string, durationInSec int, fn func(ctx context.Context, sqlTx *sql.Tx) error) (err error) {
 	connCtx, cancel := context.WithTimeout(ctx, time.Duration(durationInSec)*time.Second+lockTimeoutBuffer)
 	defer cancel()
@@ -125,11 +133,10 @@ func newReleaseLockError(lock string, durationInSec int) error {
 
 // FindOne returns a row from given table type with where query.
 // If no rows found, *T will be nil. No error will be returned.
-func (o *TypedTx[T]) FindOne(ctx context.Context, tableName string, where coredb.WhereQuery) (*T, error) {
+func (o *TypedTx[T]) FindOne(ctx context.Context, tableName string, whereSQL string, params ...any) (*T, error) {
 	u := new(T)
 	columnsNames := coredb.GetColumnsNames[T]()
 	data := coredb.StrutForScan(u)
-	whereSQL, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
 		tableName, whereSQL)
 	err2 := (*sql.Tx)(o).QueryRowContext(ctx, query, params...).Scan(data...)
@@ -153,9 +160,8 @@ func (o *Tx) Exec(ctx context.Context, query string, params ...any) (sql.Result,
 }
 
 // Find returns rows from given table type with where query
-func (o *TypedTx[T]) Find(ctx context.Context, tableName string, where coredb.WhereQuery) ([]*T, error) {
+func (o *TypedTx[T]) Find(ctx context.Context, tableName string, whereSQL string, params ...any) ([]*T, error) {
 	columnsNames := coredb.GetColumnsNames[T]()
-	whereSQL, params := where.GetWhere()
 	query := fmt.Sprintf("SELECT %s FROM `%s` %s", columnsNames,
 		tableName, whereSQL)
 
