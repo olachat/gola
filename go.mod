@@ -8,7 +8,7 @@ replace github.com/jordan-bonecutter/goption v1.0.1 => github.com/yinloo-ola/gop
 
 require (
 	github.com/blastrain/vitess-sqlparser v0.0.0-20201030050434-a139afbb1aba
-	github.com/go-sql-driver/mysql v1.7.0
+	github.com/go-sql-driver/mysql v1.8.1
 	github.com/jordan-bonecutter/goption v1.0.1
 	github.com/mitchellh/cli v1.1.4
 	github.com/pkg/errors v0.9.1
@@ -18,6 +18,7 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.0 // indirect

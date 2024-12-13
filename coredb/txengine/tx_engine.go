@@ -170,10 +170,14 @@ func (o *Tx) QueryInt(ctx context.Context, query string, params ...any) (result 
 
 // Query rows from given table type with where query & params
 func (o *TypedTx[T]) Query(ctx context.Context, query string, params ...any) (result []*T, err error) {
-	rows, err := (*sql.Tx)(o).QueryContext(ctx, query, params...)
+	var rows *sql.Rows
+	rows, err = (*sql.Tx)(o).QueryContext(ctx, query, params...)
 	if err != nil {
 		return
 	}
+	defer func() {
+		err = rows.Close()
+	}()
 
 	var u *T
 	for rows.Next() {
