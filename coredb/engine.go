@@ -211,10 +211,14 @@ func QueryIntFromMaster(dbname string, query string, params ...any) (result int,
 // Deprecated: use the function with context
 func Query[T any](dbname string, query string, params ...any) (result []*T, err error) {
 	mydb := getDB(dbname, DBModeRead)
-	rows, err := mydb.Query(query, params...)
+	var rows *sql.Rows
+	rows, err = mydb.Query(query, params...)
 	if err != nil {
 		return
 	}
+	defer func() {
+		err = rows.Close()
+	}()
 
 	var u *T
 	for rows.Next() {
@@ -230,15 +234,19 @@ func Query[T any](dbname string, query string, params ...any) (result []*T, err 
 	return
 }
 
-// Query rows from master DB from given table type with where query & params
+// QueryFromMaster rows from master DB from given table type with where query & params
 //
 // Deprecated: use the function with context
 func QueryFromMaster[T any](dbname string, query string, params ...any) (result []*T, err error) {
 	mydb := getDB(dbname, DBModeReadFromWrite)
-	rows, err := mydb.Query(query, params...)
+	var rows *sql.Rows
+	rows, err = mydb.Query(query, params...)
 	if err != nil {
 		return
 	}
+	defer func() {
+		err = rows.Close()
+	}()
 
 	var u *T
 	for rows.Next() {

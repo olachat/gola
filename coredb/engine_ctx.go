@@ -143,10 +143,14 @@ func QueryIntFromMasterCtx(ctx context.Context, dbname string, query string, par
 // QueryCtx rows from given table type with where query & params
 func QueryCtx[T any](ctx context.Context, dbname string, query string, params ...any) (result []*T, err error) {
 	mydb := getDB(dbname, DBModeRead)
-	rows, err := mydb.QueryContext(ctx, query, params...)
+	var rows *sql.Rows
+	rows, err = mydb.QueryContext(ctx, query, params...)
 	if err != nil {
 		return
 	}
+	defer func() {
+		err = rows.Close()
+	}()
 
 	var u *T
 	for rows.Next() {
@@ -162,13 +166,17 @@ func QueryCtx[T any](ctx context.Context, dbname string, query string, params ..
 	return
 }
 
-// QueryCtx rows from master DB from given table type with where query & params
+// QueryFromMasterCtx rows from master DB from given table type with where query & params
 func QueryFromMasterCtx[T any](ctx context.Context, dbname string, query string, params ...any) (result []*T, err error) {
 	mydb := getDB(dbname, DBModeReadFromWrite)
-	rows, err := mydb.QueryContext(ctx, query, params...)
+	var rows *sql.Rows
+	rows, err = mydb.QueryContext(ctx, query, params...)
 	if err != nil {
 		return
 	}
+	defer func() {
+		err = rows.Close()
+	}()
 
 	var u *T
 	for rows.Next() {
