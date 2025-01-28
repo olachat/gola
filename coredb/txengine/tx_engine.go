@@ -40,6 +40,51 @@ func RunTransaction(ctx context.Context, dbName string, fn func(ctx context.Cont
 	return
 }
 
+// RunTxWithRetry runs a transaction with retry logic on failure.
+func RunTxWithRetry(ctx context.Context, dbName string, retryConfig coredb.RetryConfig, fn func(ctx context.Context, sqlTx *sql.Tx) error) (err error) {
+	// Set defaults for invalid config
+	if retryConfig.MaxRetries <= 0 {
+		retryConfig.MaxRetries = coredb.DefaultRetryConfig.MaxRetries
+	}
+
+	if retryConfig.InitialBackoff <= 0 {
+		retryConfig.InitialBackoff = coredb.DefaultRetryConfig.InitialBackoff
+	}
+
+	var resultErr error
+	retryCount := 0
+	currentBackoff := retryConfig.InitialBackoff
+
+	for {
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("context cancelled during retry: %w", ctx.Err())
+		default:
+			resultErr = RunTransaction(ctx, dbName, fn)
+			if resultErr == nil {
+				return nil // Success!
+			}
+
+			if coredb.IsNonRetryableError(resultErr) {
+				log.Printf("Non-retryable error: %v", resultErr)
+				return resultErr // Fail immediately for non-retryable errors
+			}
+
+			retryCount++
+			if retryCount > retryConfig.MaxRetries {
+				log.Printf("Max retries (%d) exceeded, last error: %v", retryConfig.MaxRetries, resultErr)
+				return fmt.Errorf("max retries exceeded, last error: %w", resultErr)
+
+			}
+
+			delay := currentBackoff
+			log.Printf("Retrying attempt %d with delay %v. Last error: %v", retryCount, delay, resultErr)
+			time.Sleep(delay)
+			currentBackoff *= 2
+		}
+	}
+}
+
 func runTransaction(ctx context.Context, tx *sql.Tx, conn *sql.Conn, fn func(ctx context.Context, sqlTx *sql.Tx) error) (err error) {
 	if tx == nil && conn == nil {
 		return errors.New("wrong usage. tx and conn cannot both be nil")
