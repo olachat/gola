@@ -54,15 +54,17 @@ func init() {
 		panic(err)
 	}
 
-	// realdb, err := open()
-
-	// if err != nil {
-	// 	panic(err)
-	// }
-
 	coredb.Setup(func(dbname string, mode coredb.DBMode) *sql.DB {
-		return db
+		if dbname == testDBName {
+			return db
+		}
+		return nil
 	})
+
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS test_table (name VARCHAR(255), email VARCHAR(255))")
+	if err != nil {
+		panic(err)
+	}
 
 	// create tables
 	for _, tableName := range tableNames {

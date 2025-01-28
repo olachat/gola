@@ -46,7 +46,10 @@ func IsNonRetryableError(err error) bool {
 	if strings.Contains(err.Error(), "1146") { // Table doesn't exists
 		return true
 	}
-	if strings.Contains(err.Error(), "1064") { // Invalid SQL statement
+	if strings.Contains(err.Error(), "1064") { // No database selected
+		return true
+	}
+	if strings.Contains(err.Error(), "1149") { // Invalid SQL statement
 		return true
 	}
 	// Example: Authentication issues
