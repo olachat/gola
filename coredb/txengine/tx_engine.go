@@ -51,6 +51,11 @@ func RunTxWithRetry(ctx context.Context, dbName string, retryConfig coredb.Retry
 		retryConfig.InitialBackoff = coredb.DefaultRetryConfig.InitialBackoff
 	}
 
+	nonRetryableErrorFunc := retryConfig.IsNonRetryableErrorFunc
+	if nonRetryableErrorFunc == nil {
+		nonRetryableErrorFunc = coredb.IsNonRetryableError
+	}
+
 	var resultErr error
 	retryCount := 0
 	currentBackoff := retryConfig.InitialBackoff
@@ -65,7 +70,7 @@ func RunTxWithRetry(ctx context.Context, dbName string, retryConfig coredb.Retry
 				return nil // Success!
 			}
 
-			if coredb.IsNonRetryableError(resultErr) {
+			if nonRetryableErrorFunc(resultErr) {
 				log.Printf("Non-retryable error: %v", resultErr)
 				return resultErr // Fail immediately for non-retryable errors
 			}

@@ -10,16 +10,20 @@ import (
 	"time"
 )
 
+type IsNonRetryableErrorFunc func(err error) bool
+
 // RetryConfig encapsulates retry parameters.
 type RetryConfig struct {
-	MaxRetries     int
-	InitialBackoff time.Duration
+	MaxRetries              int
+	InitialBackoff          time.Duration
+	IsNonRetryableErrorFunc IsNonRetryableErrorFunc
 }
 
 // DefaultRetryConfig provides a reasonable default configuration
 var DefaultRetryConfig = RetryConfig{
-	MaxRetries:     5,
-	InitialBackoff: 200 * time.Millisecond,
+	MaxRetries:              5,
+	InitialBackoff:          200 * time.Millisecond,
+	IsNonRetryableErrorFunc: IsNonRetryableError,
 }
 
 // IsNonRetryableError checks if an error is non-retryable.
@@ -114,6 +118,12 @@ func ExecWithRetry(ctx context.Context, dbname string, query string, retryConfig
 		retryConfig.InitialBackoff = DefaultRetryConfig.InitialBackoff
 	}
 
+	// Use the default if NonRetryableErrorFunc is nil
+	nonRetryableErrorFunc := retryConfig.IsNonRetryableErrorFunc
+	if nonRetryableErrorFunc == nil {
+		nonRetryableErrorFunc = IsNonRetryableError
+	}
+
 	var result sql.Result
 	var err error
 	retryCount := 0
@@ -129,7 +139,7 @@ func ExecWithRetry(ctx context.Context, dbname string, query string, retryConfig
 				return result, nil // Success!
 			}
 
-			if IsNonRetryableError(err) {
+			if nonRetryableErrorFunc(err) {
 				return result, err // Fail immediately for non-retryable errors
 			}
 
