@@ -3,9 +3,62 @@ package coredb
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
+	"strings"
+	"time"
 )
+
+type IsNonRetryableErrorFunc func(err error) bool
+
+// RetryConfig encapsulates retry parameters.
+type RetryConfig struct {
+	MaxRetries              int
+	InitialBackoff          time.Duration
+	IsNonRetryableErrorFunc IsNonRetryableErrorFunc
+}
+
+// DefaultRetryConfig provides a reasonable default configuration
+var DefaultRetryConfig = RetryConfig{
+	MaxRetries:              5,
+	InitialBackoff:          200 * time.Millisecond,
+	IsNonRetryableErrorFunc: IsNonRetryableError,
+}
+
+// IsNonRetryableError checks if an error is non-retryable.
+func IsNonRetryableError(err error) bool {
+	if err == nil {
+		return false
+	}
+	// Example (Replace with your database's non-retryable errors)
+
+	// SQL specific errors that are not retryable
+	if errors.Is(err, sql.ErrNoRows) {
+		return true
+	}
+
+	// Example: Invalid SQL syntax
+	if strings.Contains(err.Error(), "syntax error") {
+		return true
+	}
+
+	if strings.Contains(err.Error(), "1146") { // Table doesn't exists
+		return true
+	}
+	if strings.Contains(err.Error(), "1064") { // No database selected
+		return true
+	}
+	if strings.Contains(err.Error(), "1149") { // Invalid SQL statement
+		return true
+	}
+	// Example: Authentication issues
+	if strings.Contains(err.Error(), "Access denied") {
+		return true
+	}
+
+	return false // Default is retryable
+}
 
 // FetchByPKCtx returns a row of T type with given primary key value
 func FetchByPKCtx[T any](ctx context.Context, dbname string, tableName string, pkName []string, val ...any) (*T, error) {
@@ -55,6 +108,56 @@ func FetchByPKsFromMasterCtx[T any](ctx context.Context, dbname string, tableNam
 func ExecCtx(ctx context.Context, dbname string, query string, params ...any) (sql.Result, error) {
 	mydb := getDB(dbname, DBModeWrite)
 	return mydb.ExecContext(ctx, query, params...)
+}
+
+// ExecWithRetry executes a query with retry logic on failure.
+func ExecWithRetry(ctx context.Context, dbname string, query string, retryConfig RetryConfig, params ...any) (sql.Result, error) {
+	// Set defaults for invalid config
+	if retryConfig.MaxRetries <= 0 {
+		retryConfig.MaxRetries = DefaultRetryConfig.MaxRetries
+	}
+
+	if retryConfig.InitialBackoff <= 0 {
+		retryConfig.InitialBackoff = DefaultRetryConfig.InitialBackoff
+	}
+
+	// Use the default if NonRetryableErrorFunc is nil
+	nonRetryableErrorFunc := retryConfig.IsNonRetryableErrorFunc
+	if nonRetryableErrorFunc == nil {
+		nonRetryableErrorFunc = IsNonRetryableError
+	}
+
+	var result sql.Result
+	var err error
+	retryCount := 0
+	currentBackoff := retryConfig.InitialBackoff
+
+	for {
+		select {
+		case <-ctx.Done():
+			return result, fmt.Errorf("context cancelled during retry: %w", ctx.Err())
+		default:
+			result, err = ExecCtx(ctx, dbname, query, params...)
+			if err == nil {
+				return result, nil // Success!
+			}
+
+			if nonRetryableErrorFunc(err) {
+				return result, err // Fail immediately for non-retryable errors
+			}
+
+			retryCount++
+			if retryCount > retryConfig.MaxRetries {
+				log.Printf("Max retries (%d) exceeded for: %s, last error: %v", retryConfig.MaxRetries, query, err)
+				return result, fmt.Errorf("max retries exceeded, last error: %w", err)
+			}
+
+			delay := currentBackoff
+			log.Printf("Retrying attempt %d with delay %v. Last error: %v", retryCount, delay, err)
+			time.Sleep(delay)
+			currentBackoff *= 2
+		}
+	}
 }
 
 // FindOneCtx returns a row from given table type with where query.
